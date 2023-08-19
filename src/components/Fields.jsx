@@ -15,13 +15,14 @@ function Label({ id, children }) {
   )
 }
 
-export function TextField({ label, type = 'text', className, ...props }) {
+export function TextField({ label, type = 'text', className, error, ...props }) {
   let id = useId()
 
   return (
     <div className={className}>
       {label && <Label id={id}>{label}</Label>}
-      <input id={id} type={type} {...props} className={formClasses} />
+      <input id={id} type={type} {...props} className={clsx(formClasses, error && 'border-red-500')} />
+      {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
     </div>
   )
 }
