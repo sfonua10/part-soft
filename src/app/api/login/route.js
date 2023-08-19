@@ -1,5 +1,6 @@
 import { connectToDB } from '@/utils/database'
 import User from '@/models/user'
+import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 
 export async function POST(req) {
@@ -27,12 +28,17 @@ export async function POST(req) {
         headers: { 'Content-Type': 'application/json' },
       })
     }
-
-    // Here, you might handle starting a session or generating a JWT.
-    // Since that's not covered in your registration example, we'll just return a success response.
+    // Generating a JWT
+    const tokenPayload = { userId: user._id, email: user.email } // You can store basic user info in token payload
+    const secretKey = process.env.JWT_SECRET_KEY
+    const jwtToken = jwt.sign(tokenPayload, secretKey, { expiresIn: '1h' }) // Token will expire in 1 hour
 
     return new Response(
-      JSON.stringify({ success: true, message: 'Logged in successfully' }),
+      JSON.stringify({
+        success: true,
+        token: jwtToken,
+        message: 'Logged in successfully',
+      }),
       {
         status: 200,
         headers: { 'Content-Type': 'application/json' },

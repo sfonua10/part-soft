@@ -15,36 +15,44 @@ const LoginForm = () => {
 
   const router = useRouter()
 
+  async function loginUser(email, password) {
+    const response = await fetch('/api/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    })
+
+    if (!response.ok) {
+      const data = await response.json()
+      throw new Error(data.error || 'Login failed.')
+    }
+
+    return response.json()
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setEmailError('')
     setPasswordError('')
-    try {
-      const response = await fetch('/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      })
 
-      if (response.ok) {
-        // handle successful login logic here
-        router.push('/dashboard')
-      } else {
-        // handle errors from the server
-        const data = await response.json()
-        if (data.error === 'User not found') {
-          setEmailError(data.error)
-        } else if (data.error === 'Invalid password') {
-          setPasswordError(data.error)
-        } else {
-          alert(data.error || 'Login failed.')
-        }
-      }
+    try {
+      const { token } = await loginUser(email, password)
+
+      // Store JWT on the client-side
+      sessionStorage.setItem('jwt', token) // or localStorage, depending on your needs
+
+      router.push('/dashboard')
     } catch (error) {
+      if (error.message === 'User not found') {
+        setEmailError(error.message)
+      } else if (error.message === 'Invalid password') {
+        setPasswordError(error.message)
+      } else {
+        alert(error.message)
+      }
       console.error('Error logging in:', error)
-      alert('An error occurred while logging in.')
     }
   }
 
