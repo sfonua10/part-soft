@@ -43,7 +43,7 @@ export default function DashboardLayout({ children }) {
     { name: 'Dashboard', href: '/dashboard', icon: HomeIcon, current: true },
     {
       name: 'Manage Vendors',
-      href: '/manage-vendors',
+      href: '/dashboard/manage-vendors',
       icon: UsersIcon,
       current: false,
     },
