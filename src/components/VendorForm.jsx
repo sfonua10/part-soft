@@ -158,12 +158,12 @@ export default function VendorForm() {
               <div className="mt-4 divide-y divide-gray-200 border-b border-t border-gray-200">
                 {vendorList.map((person, personIdx) => (
                   <div
-                    key={personIdx}
+                    key={person._id}
                     className="relative flex items-start py-4"
                   >
                     <div className="min-w-0 flex-1 text-sm leading-6">
                       <label
-                        htmlFor={`person-${person.id}`}
+                        htmlFor={`person-${person._id}`}
                         className="block text-sm font-medium text-gray-700"
                       >
                         {person.name}
@@ -171,8 +171,8 @@ export default function VendorForm() {
                     </div>
                     <div className="ml-3 flex h-6 items-center">
                       <input
-                        id={`person-${person.id}`}
-                        name={`person-${person.id}`}
+                        id={`person-${person._id}`}
+                        name={`person-${person._id}`}
                         type="checkbox"
                         checked={person.active}
                         onChange={() => handleVendorToggle(person.id)}

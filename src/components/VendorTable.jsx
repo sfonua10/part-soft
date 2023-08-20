@@ -89,7 +89,7 @@ const VendorTable = ({ data }) => {
                 </thead>
                 <tbody>
                   {data?.map((person, personIdx) => (
-                    <tr key={person.price}>
+                    <tr key={person._id}>
                       <td
                         className={classNames(
                           personIdx !== data.length - 1
