@@ -29,8 +29,9 @@ const getPartAvailabilityStyles = (availability) => {
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
-const VendorTable = ({ data }) => {
+const VendorTable2 = ({ data }) => {
   const [open, setOpen] = useState(false)
+    const { partRequest, vendorResponses } = data;
 
   return (
     <>
@@ -41,8 +42,7 @@ const VendorTable = ({ data }) => {
               Part Request Status
             </h1>
             <p className="mt-2 text-sm text-gray-700">
-            A list of all the parts including the part name, vendor name, availability status, price, and vendor's role for each part. This list provides real-time status updates from vendors on the availability and pricing of their parts.
-            </p>
+            A real-time list of parts showing name, vendor, availability status, price, and vendor role for each.            </p>
           </div>
           <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
             <button
@@ -54,7 +54,48 @@ const VendorTable = ({ data }) => {
             </button>
           </div>
         </div>
-        <div className="mt-8 flow-root">
+
+
+<div>
+    
+</div>
+        <div className="sm:flex sm:items-center mt-8">
+          <div className="sm:flex-auto">
+            <h1 className="text-base font-semibold leading-6 text-gray-900">
+            Work Order: {partRequest.workOrderNumber}
+            </h1>
+            <p className="mt-2 text-sm text-gray-700">
+            Part Name: {partRequest.partName}
+            </p>
+            <p className="mt-2 text-sm text-gray-700">
+            Year: {partRequest.year} | Vin: {partRequest.vin} | Make: {partRequest.make} | Model: {partRequest.model}
+            </p>
+          </div>
+          {/* <div className="sm:flex-auto">
+            <h1 className="text-base font-semibold leading-6 text-gray-900">
+            Work Order: {partRequest.workOrderNumber}
+            </h1>
+            <p className="mt-2 text-sm text-gray-700">
+            Part Name: {partRequest.partName}
+            </p>
+            <p className="mt-2 text-sm text-gray-700">
+            Make: {partRequest.make} | Model: {partRequest.model}
+
+            </p>
+ 
+            <p className="mt-2 text-sm text-gray-700">
+            Year: {partRequest.year} | Vin: {partRequest.vin}
+            </p>
+          </div> */}
+        </div>
+
+
+
+
+
+
+
+        <div className="flow-root">
           <div className="-mx-4 -my-2 sm:-mx-6 lg:-mx-8">
             <div className="inline-block min-w-full py-2 align-middle">
               <table className="min-w-full border-separate border-spacing-0">
@@ -64,13 +105,19 @@ const VendorTable = ({ data }) => {
                       scope="col"
                       className="sticky top-0 z-10 border-b border-gray-300 bg-white bg-opacity-75 py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter sm:pl-6 lg:pl-8"
                     >
-                      Name
+                      Vendor Name
                     </th>
                     <th
                       scope="col"
                       className="sticky top-0 z-10 hidden border-b border-gray-300 bg-white bg-opacity-75 px-3 py-3.5 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter sm:table-cell"
                     >
-                      Available
+                      Availability
+                    </th>
+                    <th
+                      scope="col"
+                      className="sticky top-0 z-10 border-b border-gray-300 bg-white bg-opacity-75 px-3 py-3.5 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter"
+                    >
+                      Order Status
                     </th>
                     <th
                       scope="col"
@@ -80,29 +127,35 @@ const VendorTable = ({ data }) => {
                     </th>
                     <th
                       scope="col"
-                      className="sticky top-0 z-10 border-b border-gray-300 bg-white bg-opacity-75 px-3 py-3.5 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter"
+                      className="sticky top-0 z-10 hidden border-b border-gray-300 bg-white bg-opacity-75 px-3 py-3.5 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter lg:table-cell"
                     >
-                      Order Status
+                      Delivery
+                    </th>
+                    <th
+                      scope="col"
+                      className="sticky top-0 z-10 hidden border-b border-gray-300 bg-white bg-opacity-75 px-3 py-3.5 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter lg:table-cell"
+                    >
+                      Part Available
                     </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {data?.map((person, personIdx) => (
-                    <tr key={person._id}>
+                  {vendorResponses?.map((vendor, vendorIdx) => (
+                    <tr key={vendor._id}>
                       <td
                         className={classNames(
-                          personIdx !== data.length - 1
+                          vendorIdx !== vendorResponses.length - 1
                             ? 'border-b border-gray-200'
                             : '',
                           'whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8',
                         )}
                       >
-                        {person.name}
+                        {vendor.vendorName}
                       </td>
 
                       <td
                         className={classNames(
-                          personIdx !== data.length - 1
+                          vendorIdx !== vendorResponses.length - 1
                             ? 'border-b border-gray-200'
                             : '',
                           'hidden whitespace-nowrap px-3 py-4 text-sm text-gray-500 sm:table-cell',
@@ -110,38 +163,58 @@ const VendorTable = ({ data }) => {
                       >
                         <span
                           className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${
-                            getPartAvailabilityStyles(person.partAvailable)
+                            getPartAvailabilityStyles(vendor.partAvailable)
                               .background
                           } ${
-                            getPartAvailabilityStyles(person.partAvailable)
+                            getPartAvailabilityStyles(vendor.partAvailable)
                               .text
                           } ${
-                            getPartAvailabilityStyles(person.partAvailable)
+                            getPartAvailabilityStyles(vendor.partAvailable)
                               .ring
                           }`}
                         >
-                          {person.partAvailable}
+                          {vendor.availability}
                         </span>
                       </td>
                       <td
                         className={classNames(
-                          personIdx !== data.length - 1
-                            ? 'border-b border-gray-200'
-                            : '',
-                          'hidden whitespace-nowrap px-3 py-4 text-sm text-gray-500 lg:table-cell',
-                        )}
-                      >
-                        {person.price}
-                      </td>
-                      <td
-                        className={classNames(
-                          personIdx !== data.length - 1
+                          vendorIdx !== vendorResponses.length - 1
                             ? 'border-b border-gray-200'
                             : '',
                           'whitespace-nowrap px-3 py-4 text-sm text-gray-500',
                         )}
                       >
-                        {person.orderStatus}
+                        {vendor.orderStatus}
+                      </td>
+                      <td
+                        className={classNames(
+                          vendorIdx !== vendorResponses.length - 1
+                            ? 'border-b border-gray-200'
+                            : '',
+                          'hidden whitespace-nowrap px-3 py-4 text-sm text-gray-500 lg:table-cell',
+                        )}
+                      >
+                        {vendor.price}
+                      </td>
+                      <td
+                        className={classNames(
+                          vendorIdx !== vendorResponses.length - 1
+                            ? 'border-b border-gray-200'
+                            : '',
+                          'hidden whitespace-nowrap px-3 py-4 text-sm text-gray-500 lg:table-cell',
+                        )}
+                      >
+                        {vendor.delivery}
+                      </td>
+                      <td
+                        className={classNames(
+                          vendorIdx !== vendorResponses.length - 1
+                            ? 'border-b border-gray-200'
+                            : '',
+                          'hidden whitespace-nowrap px-3 py-4 text-sm text-gray-500 lg:table-cell',
+                        )}
+                      >
+                        {vendor.partAvailable}
                       </td>
                     </tr>
                   ))}
@@ -150,10 +223,16 @@ const VendorTable = ({ data }) => {
             </div>
           </div>
         </div>
+
+
+
+
+
+
       </div>
       <SlideOverRequestForm open={open} setOpen={setOpen} />
     </>
   )
 }
 
-export default VendorTable
+export default VendorTable2
