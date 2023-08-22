@@ -41,7 +41,7 @@ const VendorTable = ({ data }) => {
               Part Request Status
             </h1>
             <p className="mt-2 text-sm text-gray-700">
-            A list of all the parts including the part name, vendor name, availability status, price, and vendor's role for each part. This list provides real-time status updates from vendors on the availability and pricing of their parts.
+            A list of all the parts including the part name, vendor name, availability status, price, and vendor&apos;s role for each part. This list provides real-time status updates from vendors on the availability and pricing of their parts.
             </p>
           </div>
           <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
