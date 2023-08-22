@@ -1,24 +1,27 @@
 import twilio from 'twilio'
 
 export async function POST(request) {
-  // throw new Error("This is a test error.");
   try {
-    const accountSid = process.env.TWILIO_ACCOUNT_SID
-    const authToken = process.env.TWILIO_AUTH_TOKEN
-    const fromNumber = process.env.FROM_NUMBER
-    const numbersString = process.env.NUMBERS_TO_SEND_TO
+    const accountSid = process.env.TWILIO_ACCOUNT_SID;
+    const authToken = process.env.TWILIO_AUTH_TOKEN;
+    const fromNumber = process.env.FROM_NUMBER;
+    const numbersString = process.env.NUMBERS_TO_SEND_TO;
 
     if (!accountSid || !authToken || !fromNumber || !numbersString) {
-      throw new Error('Missing required environment variables')
+      throw new Error('Missing required environment variables');
     }
-    const client = twilio(accountSid, authToken)
-    const { year, make, model, vin, partNumber } = await request.json()
+    
+    const client = twilio(accountSid, authToken);
+    
+    // Updated destructuring based on the new payload
+    const { workOrderNumber, partName, make, model, vin, partNumber } = await request.json();
+    
+    // Updated message based on the new payload
     const message = `
 Hi,
 
-We're looking for the following truck part:
-
-Year: ${year}
+Work Order Number: ${workOrderNumber}
+Part Name: ${partName}
 Make: ${make}
 Model: ${model}
 VIN: ${vin}
@@ -28,32 +31,35 @@ Do you have this in stock? Please respond with 1 if you do, and 2 if you don't.
 
 Thank you!
 Partsoft - Casey Johnson
-        `
+    `;
+
     // const imageUrl = "https://content.churchofjesuschrist.org/acp/bc/cp/Asia%20Area/Area/Gospel%20Topics/Baptism/1200x1920/john-baptizes-christ-39544-print.jpg";
 
-    const pairs = numbersString.split(',')
+    const pairs = numbersString.split(',');
     const vendorsAndNumbers = pairs.map((pair) => {
-      const [name, number] = pair.split(':')
-      return { name, number }
-    })
+      const [name, number] = pair.split(':');
+      return { name, number };
+    });
 
     for (let { name, number } of vendorsAndNumbers) {
-      console.log('Sending message to', name, 'at', number)
+      console.log('Sending message to', name, 'at', number);
       await client.messages.create({
         body: message,
         from: fromNumber,
         to: number.trim(),
         // mediaUrl: imageUrl,
-      })
+      });
     }
+    
     return new Response(JSON.stringify({ message: 'Messages sent' }), {
       status: 200,
-    })
+    });
+    
   } catch (error) {
-    console.error('Error:', error.message)
+    console.error('Error:', error.message);
     return new Response(JSON.stringify({ message: error.message }), {
       status: 500,
-    })
+    });
   }
 }
 

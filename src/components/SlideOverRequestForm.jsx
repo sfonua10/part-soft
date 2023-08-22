@@ -16,6 +16,10 @@ export default function SlideOverRequestForm({ open, setOpen }) {
   const [showToast, setShowToast] = useState(false)
   const [toastMessage, setToastMessage] = useState('')
 
+  const [workOrderNumber, setWorkOrderNumber] = useState('');
+  const [partName, setPartName] = useState('');
+  // const [pictures, setPictures] = useState([]); // this needs special handling, assuming URLs
+
   const handleSubmit = async (e) => {
     e.preventDefault()
 
@@ -23,19 +27,14 @@ export default function SlideOverRequestForm({ open, setOpen }) {
     setError(null)
     setSuccess(false)
 
-    const year = e.target.year.value
-    const make = e.target.make.value
-    const model = e.target.model.value
-    const vin = e.target.vin.value
-    const partNumber = e.target['part-number'].value
-
     // Create a simple JavaScript object
     const formPayload = {
-      year: year,
-      make: make,
-      model: model,
-      vin: vin,
-      partNumber: partNumber,
+      workOrderNumber: e.target.workOrderNumber.value,
+      partName: e.target.partName.value,
+      make: e.target.make.value,
+      model: e.target.model.value,
+      vin: e.target.vin.value,
+      partNumber: e.target['part-number'].value,
       // images: imagesBase64,
     }
 
@@ -56,6 +55,8 @@ export default function SlideOverRequestForm({ open, setOpen }) {
       setModel('')
       setVin('')
       setPartNumber('')
+      setWorkOrderNumber('')
+      setPartName('')
       setToastMessage('Form submitted successfully!')
       setShowToast(true)
       setTimeout(() => setShowToast(false), 3000) // Hide toast after 3 seconds
@@ -96,7 +97,7 @@ export default function SlideOverRequestForm({ open, setOpen }) {
                     <div className="px-4 sm:px-6">
                       <div className="flex items-start justify-between">
                         <Dialog.Title className="text-base font-semibold leading-6 text-gray-900">
-                          Panel title
+                        Vehicle Information
                         </Dialog.Title>
                         <div className="ml-3 flex h-7 items-center">
                           <button
@@ -118,13 +119,46 @@ export default function SlideOverRequestForm({ open, setOpen }) {
                       >
                         <div className="space-y-12">
                           <div className="border-b border-gray-900/10 pb-12">
-                            <h2 className="text-base font-semibold leading-7 text-gray-900">
-                              Vehicle Information
-                            </h2>
-
                             {/* Adjust the grid for responsive layout */}
                             <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
-                              {/* Year */}
+                              {/* Work Order */}
+                              <div>
+                                <label
+                                  htmlFor="workOrderNumber"
+                                  className="block text-sm font-medium leading-6 text-gray-900"
+                                >
+                                  Work Order #
+                                </label>
+                                <div className="mt-2">
+                                  <input
+                                    type="text"
+                                    name="workOrderNumber"
+                                    id="workOrderNumber"
+                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                    value={workOrderNumber}
+                                    onChange={(e) => setWorkOrderNumber(e.target.value)}
+                                  />
+                                </div>
+                              </div>
+                              {/* Part Name */}
+                              <div>
+                                <label
+                                  htmlFor="partName"
+                                  className="block text-sm font-medium leading-6 text-gray-900"
+                                >
+                                  Part Name
+                                </label>
+                                <div className="mt-2">
+                                  <input
+                                    type="text"
+                                    name="partName"
+                                    id="partName"
+                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                    value={partName}
+                                    onChange={(e) => setPartName(e.target.value)}
+                                  />
+                                </div>
+                              </div>
                               <div>
                                 <label
                                   htmlFor="year"
