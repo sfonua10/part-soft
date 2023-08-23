@@ -1,13 +1,33 @@
 import mongoose from 'mongoose';
 
 const VendorSchema = new mongoose.Schema({
-  name: String,
-  partAvailable: String,
-  price: String,
-  orderStatus: String,
-  phone: String, // added fields
-  email: String,
-  primaryContact: String,
+  name: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  phone: {
+    type: String,
+    required: true,
+    trim: true,
+    match: /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/ // regex to validate phone numbers
+  },
+  email: {
+    type: String,
+    required: true,
+    trim: true,
+    match: /^\S+@\S+\.\S+$/ // regex to validate email addresses
+  },
+  primaryContact: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  specialization: { 
+    type: String,
+    trim: true,
+    default: ''
+  }
   //... any other fields you need
 });
 

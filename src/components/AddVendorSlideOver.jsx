@@ -2,13 +2,8 @@
 import { Fragment, useState, useEffect } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
-
-export default function AddVendorSliderOver({
-  open,
-  setOpen,
-  vendor,
-  setVendors,
-}) {
+import Notification from './Notification'
+export default function AddVendorSliderOver({ open, setOpen, vendor }) {
   const [errors, setErrors] = useState({})
   const [name, setName] = useState(vendor?.name || '')
   const [phone, setPhone] = useState(vendor?.phone || '')
@@ -16,17 +11,53 @@ export default function AddVendorSliderOver({
   const [primaryContact, setPrimaryContact] = useState(
     vendor?.primaryContact || '',
   )
+  const [specialization, setSpecialization] = useState(
+    vendor?.specialization || '',
+  )
+  const [show, setShow] = useState(false)
+  const [message, setMessage] = useState('')
+  const [type, setType] = useState('success')
+  const [initialState, setInitialState] = useState({
+    name: vendor?.name || '',
+    phone: vendor?.phone || '',
+    email: vendor?.email || '',
+    primaryContact: vendor?.primaryContact || '',
+    specialization: vendor?.specialization || '',
+  })
+
+  const isObjectEmpty = (obj) => Object.keys(obj).length === 0
+
+  const mode = !isObjectEmpty(vendor) ? 'edit' : 'new'
+  useEffect(() => {
+    const newState = {
+      name: vendor?.name || '',
+      phone: vendor?.phone || '',
+      email: vendor?.email || '',
+      primaryContact: vendor?.primaryContact || '',
+      specialization: vendor?.specialization || '',
+    }
+
+    setName(newState.name)
+    setPhone(newState.phone)
+    setEmail(newState.email)
+    setPrimaryContact(newState.primaryContact)
+    setSpecialization(newState.specialization)
+    setInitialState(newState)
+  }, [vendor])
+
   useEffect(() => {
     if (vendor) {
       setName(vendor.name || '')
       setPhone(vendor.phone || '')
       setEmail(vendor.email || '')
       setPrimaryContact(vendor.primaryContact || '')
+      setSpecialization(vendor.specialization || '')
     } else {
       setName('')
       setPhone('')
       setEmail('')
       setPrimaryContact('')
+      setSpecialization('')
     }
   }, [vendor])
   const validateForm = (data) => {
@@ -58,6 +89,7 @@ export default function AddVendorSliderOver({
       phone: e.target.phone.value,
       email: e.target.email.value,
       primaryContact: e.target['primary-contact-name'].value,
+      specialization: e.target['specialization'].value,
       //... add other fields as necessary
     }
 
@@ -78,9 +110,19 @@ export default function AddVendorSliderOver({
         const responseData = await response.json()
 
         // Use responseData if necessary, for example, to get an ID that the server assigned to the new vendor
-        setVendors((prevVendors) => [...prevVendors, responseData])
+        // setVendors((prevVendors) => [...prevVendors, responseData])
         setOpen(false)
+        setShow(true)
+        setMessage('Successfully added the vendor.')
+        setType('success')
+        setTimeout(() => setShow(false), 3000) // to auto-hide after 3 seconds
       } catch (error) {
+        setShow(true)
+        setOpen(false)
+        setMessage('There was a problem adding the vendor. Please try again.')
+        setType('error')
+        setTimeout(() => setShow(false), 5000) // to auto-hide after 5 seconds
+
         console.error('There was a problem with the fetch operation:', error)
         // Handle errors: Show an error message, etc.
       }
@@ -102,193 +144,225 @@ export default function AddVendorSliderOver({
       case 'primary-contact-name':
         setPrimaryContact(value)
         break
+      case 'specialization':
+        setSpecialization(value)
+        break
       // ... handle other fields
       default:
         break
     }
   }
-  return (
-    <Transition.Root show={open} as={Fragment}>
-      <Dialog as="div" className="relative z-10" onClose={setOpen}>
-        <Transition.Child
-          as={Fragment}
-          enter="ease-out duration-300"
-          enterFrom="opacity-0"
-          enterTo="opacity-100"
-          leave="ease-in duration-200"
-          leaveFrom="opacity-100"
-          leaveTo="opacity-0"
-        >
-          <div
-            className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
-            onClick={() => setOpen(false)} // This allows the modal to close when the background is clicked
-          />
-        </Transition.Child>
 
-        <div className="fixed inset-0 overflow-hidden">
-          <div className="absolute inset-0 overflow-hidden">
-            <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10 sm:pl-16">
-              <Transition.Child
-                as={Fragment}
-                enter="transform transition ease-in-out duration-500 sm:duration-700"
-                enterFrom="translate-x-full"
-                enterTo="translate-x-0"
-                leave="transform transition ease-in-out duration-500 sm:duration-700"
-                leaveFrom="translate-x-0"
-                leaveTo="translate-x-full"
-              >
-                <Dialog.Panel className="pointer-events-auto w-screen max-w-2xl">
-                  <div className="flex h-full flex-col overflow-y-scroll bg-white py-6 shadow-xl">
-                    <div className="px-4 sm:px-6">
-                      <div className="flex items-start justify-between">
-                        <Dialog.Title className="text-base font-semibold leading-6 text-gray-900">
-                          Panel title
-                        </Dialog.Title>
-                        <div className="ml-3 flex h-7 items-center">
-                          <button
-                            type="button"
-                            className="relative rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                            onClick={() => setOpen(false)}
-                          >
-                            <span className="absolute -inset-2.5" />
-                            <span className="sr-only">Close panel</span>
-                            <XMarkIcon className="h-6 w-6" aria-hidden="true" />
-                          </button>
+  const formIsUnchanged = () => {
+    return (
+      name === initialState.name &&
+      phone === initialState.phone &&
+      email === initialState.email &&
+      primaryContact === initialState.primaryContact &&
+      specialization === initialState.specialization
+    )
+  }
+  console.log('formIsUnchanged', formIsUnchanged())
+  return (
+    <>
+      <Transition.Root show={open} as={Fragment}>
+        <Dialog as="div" className="relative z-10" onClose={setOpen}>
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div
+              className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+              onClick={() => setOpen(false)} // This allows the modal to close when the background is clicked
+            />
+          </Transition.Child>
+
+          <div className="fixed inset-0 overflow-hidden">
+            <div className="absolute inset-0 overflow-hidden">
+              <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10 sm:pl-16">
+                <Transition.Child
+                  as={Fragment}
+                  enter="transform transition ease-in-out duration-500 sm:duration-700"
+                  enterFrom="translate-x-full"
+                  enterTo="translate-x-0"
+                  leave="transform transition ease-in-out duration-500 sm:duration-700"
+                  leaveFrom="translate-x-0"
+                  leaveTo="translate-x-full"
+                >
+                  <Dialog.Panel className="pointer-events-auto w-screen max-w-2xl">
+                    <div className="flex h-full flex-col overflow-y-scroll bg-white py-6 shadow-xl">
+                      <div className="px-4 sm:px-6">
+                        <div className="flex items-start justify-between">
+                          <Dialog.Title className="text-base font-semibold leading-6 text-gray-900">
+                            {mode === 'edit' ? 'Edit Vendor' : 'Add a Vendor'}
+                          </Dialog.Title>
+                          <div className="ml-3 flex h-7 items-center">
+                            <button
+                              type="button"
+                              className="relative rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                              onClick={() => setOpen(false)}
+                            >
+                              <span className="absolute -inset-2.5" />
+                              <span className="sr-only">Close panel</span>
+                              <XMarkIcon
+                                className="h-6 w-6"
+                                aria-hidden="true"
+                              />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="relative mt-6 flex-1 px-4 sm:px-6">
+                        <h2 className="sr-only">Vendors</h2>
+
+                        <div>
+                          <form onSubmit={handleAddVendor}>
+                            {/* <h2 className="text-lg font-medium text-gray-900">
+                            Add a Vendor
+                          </h2> */}
+                            <div className="mt-4 grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-4">
+                              <div className="sm:col-span-2">
+                                <label
+                                  htmlFor="vendor-name"
+                                  className="block text-sm font-medium text-gray-700"
+                                >
+                                  Vendor Name
+                                </label>
+                                <div className="mt-1">
+                                  <input
+                                    type="text"
+                                    value={name || ''}
+                                    onChange={handleInputChange}
+                                    id="vendor-name"
+                                    name="vendor-name"
+                                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                  />
+                                  {errors.name && (
+                                    <p className="mt-1 text-xs text-red-500">
+                                      {errors.name}
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+
+                              <div className="sm:col-span-2">
+                                <label
+                                  htmlFor="primary-contact-name"
+                                  className="block text-sm font-medium text-gray-700"
+                                >
+                                  Primary Contact Name
+                                </label>
+                                <div className="mt-1">
+                                  <input
+                                    type="text"
+                                    value={primaryContact || ''}
+                                    onChange={handleInputChange}
+                                    id="primary-contact-name"
+                                    name="primary-contact-name"
+                                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                  />
+                                </div>
+                              </div>
+
+                              <div>
+                                <label
+                                  htmlFor="phone"
+                                  className="block text-sm font-medium text-gray-700"
+                                >
+                                  Phone Number
+                                </label>
+                                <div className="mt-1">
+                                  <input
+                                    type="tel"
+                                    value={phone || ''}
+                                    onChange={handleInputChange}
+                                    name="phone"
+                                    id="phone"
+                                    autoComplete="tel"
+                                    placeholder="+1 (555) 123-4567"
+                                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                  />
+                                </div>
+                              </div>
+
+                              <div>
+                                <label
+                                  htmlFor="email"
+                                  className="block text-sm font-medium text-gray-700"
+                                >
+                                  Email
+                                </label>
+                                <div className="mt-1">
+                                  <input
+                                    type="email"
+                                    value={email || ''}
+                                    onChange={handleInputChange}
+                                    name="email"
+                                    id="email"
+                                    autoComplete="email"
+                                    placeholder="contact@vendor.com"
+                                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                  />
+                                </div>
+                              </div>
+
+                              <div className="sm:col-span-2">
+                                <label
+                                  htmlFor="specialization"
+                                  className="block text-sm font-medium text-gray-700"
+                                >
+                                  Vendor Specialization
+                                </label>
+                                <div className="mt-1">
+                                  <textarea
+                                    name="specialization"
+                                    id="specialization"
+                                    onChange={handleInputChange}
+                                    value={specialization || ''}
+                                    rows="3"
+                                    placeholder="Brake parts, engine components..."
+                                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                  ></textarea>
+                                </div>
+                              </div>
+
+                              <div className="sm:col-span-2">
+                                <button
+                                  type="submit"
+                                  disabled={formIsUnchanged()}
+                                  className={`mt-4 rounded-md px-4 py-2 text-white focus:border-indigo-700 focus:outline-none focus:ring focus:ring-indigo-200 
+                                  ${
+                                    formIsUnchanged()
+                                      ? 'cursor-not-allowed bg-gray-500'
+                                      : 'bg-indigo-600 hover:bg-indigo-700'
+                                  }`}
+                                >
+                                  {mode === 'edit' ? 'Update' : 'Add'}
+                                </button>
+                              </div>
+                            </div>
+                          </form>
                         </div>
                       </div>
                     </div>
-                    <div className="relative mt-6 flex-1 px-4 sm:px-6">
-                      <h2 className="sr-only">Vendors</h2>
-
-                      <div>
-                        <form onSubmit={handleAddVendor}>
-                          <h2 className="text-lg font-medium text-gray-900">
-                            Add a Vendor
-                          </h2>
-                          <div className="mt-4 grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-4">
-                            <div className="sm:col-span-2">
-                              <label
-                                htmlFor="vendor-name"
-                                className="block text-sm font-medium text-gray-700"
-                              >
-                                Vendor Name
-                              </label>
-                              <div className="mt-1">
-                                <input
-                                  type="text"
-                                  value={name || ''}
-                                  onChange={handleInputChange}
-                                  id="vendor-name"
-                                  name="vendor-name"
-                                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                />
-                                {errors.name && (
-                                  <p className="mt-1 text-xs text-red-500">
-                                    {errors.name}
-                                  </p>
-                                )}
-                              </div>
-                            </div>
-
-                            <div className="sm:col-span-2">
-                              <label
-                                htmlFor="primary-contact-name"
-                                className="block text-sm font-medium text-gray-700"
-                              >
-                                Primary Contact Name
-                              </label>
-                              <div className="mt-1">
-                                <input
-                                  type="text"
-                                  value={primaryContact || ''}
-                                  onChange={handleInputChange}
-                                  id="primary-contact-name"
-                                  name="primary-contact-name"
-                                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                />
-                              </div>
-                            </div>
-
-                            <div>
-                              <label
-                                htmlFor="phone"
-                                className="block text-sm font-medium text-gray-700"
-                              >
-                                Phone Number
-                              </label>
-                              <div className="mt-1">
-                                <input
-                                  type="tel"
-                                  value={phone || ''}
-                                  onChange={handleInputChange}
-                                  name="phone"
-                                  id="phone"
-                                  autoComplete="tel"
-                                  placeholder="+1 (555) 123-4567"
-                                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                />
-                              </div>
-                            </div>
-
-                            <div>
-                              <label
-                                htmlFor="email"
-                                className="block text-sm font-medium text-gray-700"
-                              >
-                                Email
-                              </label>
-                              <div className="mt-1">
-                                <input
-                                  type="email"
-                                  value={email || ''}
-                                  onChange={handleInputChange}
-                                  name="email"
-                                  id="email"
-                                  autoComplete="email"
-                                  placeholder="contact@vendor.com"
-                                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                />
-                              </div>
-                            </div>
-
-                            <div className="sm:col-span-2">
-                              <label
-                                htmlFor="specialization"
-                                className="block text-sm font-medium text-gray-700"
-                              >
-                                Vendor Specialization
-                              </label>
-                              <div className="mt-1">
-                                <textarea
-                                  name="specialization"
-                                  id="specialization"
-                                  onChange={handleInputChange}
-                                  rows="3"
-                                  placeholder="Brake parts, engine components..."
-                                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                ></textarea>
-                              </div>
-                            </div>
-
-                            <div className="sm:col-span-2">
-                              <button
-                                type="submit"
-                                className="mt-4 rounded-md bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700 focus:border-indigo-700 focus:outline-none focus:ring focus:ring-indigo-200"
-                              >
-                                Add
-                              </button>
-                            </div>
-                          </div>
-                        </form>
-                      </div>
-                    </div>
-                  </div>
-                </Dialog.Panel>
-              </Transition.Child>
+                  </Dialog.Panel>
+                </Transition.Child>
+              </div>
             </div>
           </div>
-        </div>
-      </Dialog>
-    </Transition.Root>
+        </Dialog>
+      </Transition.Root>
+      <Notification
+        show={show}
+        setShow={setShow}
+        type={type}
+        message={message}
+      />
+    </>
   )
 }

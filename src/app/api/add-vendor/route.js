@@ -2,8 +2,11 @@ import { connectToDB } from '@/utils/database'
 import Vendor from '@/models/vendor'
 
 export async function POST(req) {
-  const { name, phone, email, primaryContact } = await req.json()
-
+  // Destructure all the needed fields from the request
+  const { name, phone, email, primaryContact, specialization } = await req.json()
+  if (name === "ErrorTest") {
+    throw new Error("This is a test error!")
+  }
   try {
     await connectToDB()
 
@@ -12,6 +15,7 @@ export async function POST(req) {
       phone,
       email,
       primaryContact,
+      specialization,
     })
 
     await newVendor.save()
