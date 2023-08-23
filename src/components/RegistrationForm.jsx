@@ -12,11 +12,20 @@ export const metadata = {
 }
 
 const RegistrationForm = () => {
-  const router = useRouter();
+  const router = useRouter()
   const [email, setEmail] = useState('')
   const [companyName, setCompanyName] = useState('')
   const [password, setPassword] = useState('')
   const [isAgreed, setIsAgreed] = useState(false)
+  const [hasUppercase, setHasUppercase] = useState(false)
+  const [hasNumber, setHasNumber] = useState(false)
+  const [hasMinimumLength, setHasMinimumLength] = useState(false)
+  const [passwordTouched, setPasswordTouched] = useState(false)
+
+  const isCompanyNameValid = (name) => {
+    return name.length >= 2 && name.length <= 100
+  }
+
   const isBusinessEmail = (email) => {
     const freeEmailProviders = ['gmail.com', 'yahoo.com', 'outlook.com']
     const domain = email.split('@')[1]
@@ -28,8 +37,28 @@ const RegistrationForm = () => {
     return regex.test(password)
   }
 
+  const handlePasswordChange = (e) => {
+    const pass = e.target.value
+    setPassword(pass)
+
+    // Set the password as touched once the user starts typing
+    if (!passwordTouched && pass !== '') {
+      setPasswordTouched(true)
+    }
+
+    setHasUppercase(/[A-Z]/.test(pass))
+    setHasNumber(/\d/.test(pass))
+    setHasMinimumLength(pass.length >= 8)
+  }
+
   const handleSubmit = async (event) => {
     event.preventDefault()
+
+    if (!isCompanyNameValid(companyName)) {
+      alert('Company name should be between 2 to 100 characters.')
+      return
+    }
+
     if (!isBusinessEmail(email)) {
       alert('Please use a business email.')
       return
@@ -65,7 +94,6 @@ const RegistrationForm = () => {
 
       if (response.ok) {
         // handle successful registration logic here
-        alert('Registration successful! Redirecting to dashboard...')
         router.push('/dashboard')
       } else {
         // handle errors from the server
@@ -110,6 +138,11 @@ const RegistrationForm = () => {
           required
           onChange={(e) => setCompanyName(e.target.value)}
         />
+        {companyName && !isCompanyNameValid(companyName) && (
+          <p className="text-xs text-red-500">
+            Company name should be between 2 to 100 characters.
+          </p>
+        )}
         <TextField
           className="col-span-full"
           label="Email address"
@@ -119,6 +152,9 @@ const RegistrationForm = () => {
           required
           onChange={(e) => setEmail(e.target.value)}
         />
+        {email && !isBusinessEmail(email) && (
+          <p className="text-xs text-red-500">Please use a business email.</p>
+        )}
         <TextField
           className="col-span-full"
           label="Password"
@@ -126,10 +162,15 @@ const RegistrationForm = () => {
           type="password"
           autoComplete="new-password"
           required
-          onChange={(e) => setPassword(e.target.value)}
-          // You can uncomment the helperText to guide users about password requirements.
-          // helperText="Must include at least one number, one uppercase letter, and be at least 8 characters long."
+          onChange={handlePasswordChange}
         />
+        {passwordTouched && (
+          <ul className="mt-1 text-xs text-red-500">
+            {!hasUppercase && <li>Must contain an uppercase letter.</li>}
+            {!hasNumber && <li>Must contain a number.</li>}
+            {!hasMinimumLength && <li>Must be at least 8 characters long.</li>}
+          </ul>
+        )}
 
         <div className="col-span-full">
           <input

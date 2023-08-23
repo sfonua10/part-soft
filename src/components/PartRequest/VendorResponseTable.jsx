@@ -38,10 +38,10 @@ const VendorResponseTable = ({ vendorResponses }) => {
                   Vendor Name
                 </th>
                 <th className="px-3 py-3 text-left text-sm font-semibold text-gray-900">
-                  Availability
+                  Order Status
                 </th>
                 <th className="px-3 py-3 text-left text-sm font-semibold text-gray-900">
-                  Order Status
+                  Availability
                 </th>
                 <th className="px-3 py-3 text-left text-sm font-semibold text-gray-900">
                   Price ($)
@@ -66,15 +66,15 @@ const VendorResponseTable = ({ vendorResponses }) => {
                     {/* <td className={`px-3 py-4 text-sm ${styles.text} ${styles.background} ${styles.ring}`}>
                                             {response.availability}
                                         </td> */}
+                    <td className="px-3 py-4 text-sm text-gray-500">
+                      {response.orderStatus}
+                    </td>
                     <td className="whitespace-nowrap px-3 py-5 text-sm text-gray-500">
                       <span
                         className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${styles.text} ${styles.background} ${styles.ring}`}
                       >
                         {response.availability}
                       </span>
-                    </td>
-                    <td className="px-3 py-4 text-sm text-gray-500">
-                      {response.orderStatus}
                     </td>
                     <td className="px-3 py-4 text-sm text-gray-500">
                       {response.price}

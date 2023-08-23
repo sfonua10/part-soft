@@ -3,6 +3,7 @@ export const data = [
       "partRequest": {
         "workOrderNumber": "12345",
         "partName": "Brake Pad",
+        "partNumber": "BP2020FDM",
         "make": "Ford",
         "model": "Mustang",
         "year": "2020",
@@ -38,44 +39,45 @@ export const data = [
         }
       ]
     },
-    // {
-    //   "partRequest": {
-    //     "workOrderNumber": "67890",
-    //     "partName": "Oil Filter",
-    //     "make": "Honda",
-    //     "model": "Civic",
-    //     "year": "2019",
-    //     "vin": "YYYYYYYY"
-    //   },
-    //   "vendorResponses": [
-    //     {
-    //       "_id": "vendor_a_id",
-    //       "vendorName": "Vendor A",
-    //       "availability": "In Stock",
-    //       "orderStatus": "Confirmed",
-    //       "price": 15,
-    //       "delivery": "3 days",
-    //       "partAvailable": "yes"
-    //     },
-    //     {
-    //       "_id": "vendor_d_id",
-    //       "vendorName": "Vendor D",
-    //       "availability": "Pending",
-    //       "orderStatus": "N/A",
-    //       "price": "N/A",
-    //       "delivery": "N/A",
-    //       "partAvailable": "N/A"
-    //     },
-    //     {
-    //       "_id": "vendor_e_id",
-    //       "vendorName": "Vendor E",
-    //       "availability": "Out of Stock",
-    //       "orderStatus": "Cancelled",
-    //       "price": "N/A",
-    //       "delivery": "N/A",
-    //       "partAvailable": "no"
-    //     }
-    //   ]
-    // }
+    {
+      "partRequest": {
+        "workOrderNumber": "67890",
+        "partName": "Oil Filter",
+       "partNumber": "SP2021FXL",
+        "make": "Honda",
+        "model": "Civic",
+        "year": "2019",
+        "vin": "YYYYYYYY"
+      },
+      "vendorResponses": [
+        {
+          "_id": "vendor_a_id",
+          "vendorName": "Vendor A",
+          "availability": "In Stock",
+          "orderStatus": "Confirmed",
+          "price": 15,
+          "delivery": "3 days",
+          "partAvailable": "yes"
+        },
+        {
+          "_id": "vendor_d_id",
+          "vendorName": "Vendor D",
+          "availability": "Pending",
+          "orderStatus": "N/A",
+          "price": "N/A",
+          "delivery": "N/A",
+          "partAvailable": "N/A"
+        },
+        {
+          "_id": "vendor_e_id",
+          "vendorName": "Vendor E",
+          "availability": "Out of Stock",
+          "orderStatus": "Cancelled",
+          "price": "N/A",
+          "delivery": "N/A",
+          "partAvailable": "no"
+        }
+      ]
+    }
   ]
   
