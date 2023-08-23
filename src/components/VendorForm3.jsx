@@ -1,16 +1,44 @@
 'use client'
 import { useState } from 'react'
+import { mutate } from 'swr'
 import AddVendorSliderOver from './AddVendorSlideOver'
 
-
-export default function VendorForm3({ vendors, setVendors}) {
+export default function VendorForm3({ data }) {
   const [open, setOpen] = useState(false)
   const [selectedVendor, setSelectedVendor] = useState({})
 
   const addNewVendor = () => {
     setSelectedVendor({})
-    setOpen(true);
+    setOpen(true)
   }
+  
+  const deleteVendor = async (vendorToDelete) => {
+    try {
+      const response = await fetch('/api/delete-vendor', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(vendorToDelete),
+      });
+  
+      const responseData = await response.json();
+  
+      if (response.ok) {
+        console.log('Successfully deleted vendor:', responseData);
+        // Use mutate to re-fetch the data after successfully deleting a vendor
+        mutate('/api/vendor-info');
+      } else {
+        console.error('Error deleting vendor:', responseData.message);
+        // Handle the error in the UI, like showing an error message.
+      }
+    } catch (error) {
+      console.error('Failed to delete vendor:', error);
+      // Handle the error in the UI, like showing an error message.
+    }
+  }
+  
+  
   return (
     <>
       <div className="px-4 sm:px-6 lg:px-8">
@@ -66,14 +94,26 @@ export default function VendorForm3({ vendors, setVendors}) {
                     </th>
                     <th
                       scope="col"
+                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                    >
+                      Part Specialization
+                    </th>
+                    <th
+                      scope="col"
                       className="relative py-3.5 pl-3 pr-4 sm:pr-6 lg:pr-8"
                     >
                       <span className="sr-only">Edit</span>
                     </th>
+                    <th
+                      scope="col"
+                      className="relative py-3.5 pl-3 pr-4 sm:pr-6 lg:pr-8"
+                    >
+                      <span className="sr-only">Actions</span>
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 bg-white">
-                  {vendors.map((vendor) => (
+                  {data?.map((vendor) => (
                     <tr key={vendor.email}>
                       <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8">
                         {vendor.name}
@@ -86,6 +126,9 @@ export default function VendorForm3({ vendors, setVendors}) {
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                         {vendor.primaryContact}
+                      </td>
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                        {vendor.specialization}
                       </td>
                       <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
                         <a
@@ -100,6 +143,18 @@ export default function VendorForm3({ vendors, setVendors}) {
                           Edit<span className="sr-only">, {vendor.name}</span>
                         </a>
                       </td>
+                      <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
+                        <a
+                          href="#"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            deleteVendor(vendor)
+                          }}
+                          className="text-red-600 hover:text-red-900"
+                        >
+                          Delete<span className="sr-only">, {vendor.name}</span>
+                        </a>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -108,7 +163,11 @@ export default function VendorForm3({ vendors, setVendors}) {
           </div>
         </div>
       </div>
-      <AddVendorSliderOver open={open} setOpen={setOpen} vendor={selectedVendor} setVendors={setVendors} />
+      <AddVendorSliderOver
+        open={open}
+        setOpen={setOpen}
+        vendor={selectedVendor}
+      />
     </>
   )
 }

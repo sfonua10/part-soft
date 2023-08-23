@@ -1,24 +1,14 @@
-"use client"
-import { useState} from 'react'
-import VendorForm from '@/components/VendorForm'
-import VendorForm2 from '@/components/VendorForm2'
+'use client'
+// import { useState, useEffect } from 'react';
+import useSWR from 'swr'
 import VendorForm3 from '@/components/VendorForm3'
 
 const MangeVendors = () => {
-  const people = [
-    {
-      _id: '1234',
-      name: 'AutoZone',
-      phone: '801-722-9592',
-      email: 'lindsay.walton@example.com',
-      primaryContact: 'Lindsay Walton',
-    },
-    // More people...
-  ]
-  const [ vendors, setVendors ] = useState(people)
-  return (
-    <VendorForm3 vendors={vendors} setVendors={setVendors} />
-  )
+  const fetcher = (url) => fetch(url).then((res) => res.json())
+
+  const { data, error } = useSWR('/api/vendor-info', fetcher)
+
+  return <VendorForm3 data={data} />
 }
 
 export default MangeVendors
