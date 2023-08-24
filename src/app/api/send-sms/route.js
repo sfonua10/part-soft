@@ -14,7 +14,7 @@ export async function POST(request) {
     const client = twilio(accountSid, authToken);
     
     // Updated destructuring based on the new payload
-    const { workOrderNumber, partName, make, model, vin, partNumber } = await request.json();
+    const { workOrderNumber, partName, make, model, vin, partNumber, vendors } = await request.json();
     
     // Updated message based on the new payload
     const message = `
@@ -35,18 +35,14 @@ Partsoft - Casey Johnson
 
     // const imageUrl = "https://content.churchofjesuschrist.org/acp/bc/cp/Asia%20Area/Area/Gospel%20Topics/Baptism/1200x1920/john-baptizes-christ-39544-print.jpg";
 
-    const pairs = numbersString.split(',');
-    const vendorsAndNumbers = pairs.map((pair) => {
-      const [name, number] = pair.split(':');
-      return { name, number };
-    });
+    const activeVendors = vendors.filter(vendor => vendor.isActive);
 
-    for (let { name, number } of vendorsAndNumbers) {
-      console.log('Sending message to', name, 'at', number);
+    for (let vendor of activeVendors) {
+      console.log('Sending message to', vendor.name, 'at', vendor.phone);
       await client.messages.create({
         body: message,
         from: fromNumber,
-        to: number.trim(),
+        to: vendor.phone.trim(),
         // mediaUrl: imageUrl,
       });
     }
