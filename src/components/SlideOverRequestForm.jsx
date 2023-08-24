@@ -4,7 +4,7 @@ import { Dialog, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import { PhotoIcon } from '@heroicons/react/24/solid'
 
-export default function SlideOverRequestForm({ open, setOpen }) {
+export default function SlideOverRequestForm({ open, setOpen, activeVendors }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(false)
@@ -35,6 +35,7 @@ export default function SlideOverRequestForm({ open, setOpen }) {
       model: e.target.model.value,
       vin: e.target.vin.value,
       partNumber: e.target['part-number'].value,
+      vendors: activeVendors,
       // images: imagesBase64,
     }
 

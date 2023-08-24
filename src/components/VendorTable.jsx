@@ -3,7 +3,7 @@ import { useState } from 'react'
 import SlideOverRequestForm from './SlideOverRequestForm'
 import PartRequestWithVendorResponses from './PartRequest'
 
-export default function VendorTable({ data }) {
+export default function VendorTable({ data, activeVendors }) {
   const [open, setOpen] = useState(false)
 
   return (
@@ -28,12 +28,12 @@ export default function VendorTable({ data }) {
           </button>
         </div>
       </div>
-      {data.map((item, index) => (
+      {data?.map((item, index) => (
         <div key={index} className="mb-8">
           <PartRequestWithVendorResponses data={item} />
         </div>
       ))}
-      <SlideOverRequestForm open={open} setOpen={setOpen} />
+      <SlideOverRequestForm open={open} setOpen={setOpen} activeVendors={activeVendors} />
     </>
   )
 }

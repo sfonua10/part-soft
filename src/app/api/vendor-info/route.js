@@ -1,8 +1,19 @@
 import Vendor from "@/models/vendor";
 
-export async function GET() {
+export async function GET(request) {
     try {
-      const vendors = await Vendor.find({ isActive: true });
+      //Get the activeOnly query parameter from the request
+      const url = new URL(request.url);
+      const activeOnly = url.searchParams.get('activeOnly');
+
+      let query = {};
+
+      if (activeOnly === 'true') {
+        query.isActive = true;
+      }
+
+      const vendors = await Vendor.find(query);
+      
       return new Response(JSON.stringify(vendors), { status: 200 });
     } catch (error) {
       console.error("Error fetching vendors:", error.message);
