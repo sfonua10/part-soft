@@ -1,13 +1,13 @@
 import twilio from 'twilio'
+import PartRequest from '@/models/partRequest';
 
 export async function POST(request) {
   try {
     const accountSid = process.env.TWILIO_ACCOUNT_SID;
     const authToken = process.env.TWILIO_AUTH_TOKEN;
     const fromNumber = process.env.FROM_NUMBER;
-    const numbersString = process.env.NUMBERS_TO_SEND_TO;
 
-    if (!accountSid || !authToken || !fromNumber || !numbersString) {
+    if (!accountSid || !authToken || !fromNumber) {
       throw new Error('Missing required environment variables');
     }
     
@@ -34,6 +34,20 @@ Partsoft - Casey Johnson
     `;
 
     // const imageUrl = "https://content.churchofjesuschrist.org/acp/bc/cp/Asia%20Area/Area/Gospel%20Topics/Baptism/1200x1920/john-baptizes-christ-39544-print.jpg";
+    
+    // Create a new PartRequest
+    const partRequest = new PartRequest({
+      workOrderNumber, // use workOrderNumber as an identifier
+      partName,
+      make,
+      model,
+      vin,
+      partNumber,
+      // ... any other fields you might need
+    });
+
+    // Save the PartRequest to the database
+    await partRequest.save();
 
     const activeVendors = vendors.filter(vendor => vendor.isActive);
 

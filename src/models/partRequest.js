@@ -48,6 +48,6 @@ const partRequestSchema = new mongoose.Schema({
     vendorResponses: [vendorResponseSchema]
 });
 
-const PartRequest = mongoose.model('PartRequest', partRequestSchema);
+const PartRequest = mongoose.models.PartRequest || mongoose.model('PartRequest', partRequestSchema);
 
-module.exports = PartRequest;
+export default PartRequest;
