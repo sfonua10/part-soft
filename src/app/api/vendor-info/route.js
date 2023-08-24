@@ -2,7 +2,7 @@ import Vendor from "@/models/vendor";
 
 export async function GET() {
     try {
-      const vendors = await Vendor.find({});
+      const vendors = await Vendor.find({ isActive: true });
       return new Response(JSON.stringify(vendors), { status: 200 });
     } catch (error) {
       console.error("Error fetching vendors:", error.message);

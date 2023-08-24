@@ -3,7 +3,7 @@ import Vendor from '@/models/vendor'
 
 export async function POST(req) {
   // Destructure all the needed fields from the request
-  const { name, phone, email, primaryContact, specialization } = await req.json()
+  const { name, phone, email, primaryContact, specialization, isActive } = await req.json()
   if (name === "ErrorTest") {
     throw new Error("This is a test error!")
   }
@@ -16,6 +16,7 @@ export async function POST(req) {
       email,
       primaryContact,
       specialization,
+      isActive
     })
 
     await newVendor.save()

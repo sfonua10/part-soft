@@ -3,6 +3,8 @@ import { Fragment, useState, useEffect } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import Notification from './Notification'
+import ActiveVendorToggle from './manage-vendors/ActiveVendorToggle'
+
 export default function AddVendorSliderOver({ open, setOpen, vendor }) {
   const [errors, setErrors] = useState({})
   const [name, setName] = useState(vendor?.name || '')
@@ -24,6 +26,7 @@ export default function AddVendorSliderOver({ open, setOpen, vendor }) {
     primaryContact: vendor?.primaryContact || '',
     specialization: vendor?.specialization || '',
   })
+  const [activeVendor, setActiveVendor] = useState(false)
 
   const isObjectEmpty = (obj) => Object.keys(obj).length === 0
 
@@ -52,12 +55,14 @@ export default function AddVendorSliderOver({ open, setOpen, vendor }) {
       setEmail(vendor.email || '')
       setPrimaryContact(vendor.primaryContact || '')
       setSpecialization(vendor.specialization || '')
+      setActiveVendor(vendor.isActive || false) // Assuming 'isActive' is the property from your data
     } else {
       setName('')
       setPhone('')
       setEmail('')
       setPrimaryContact('')
       setSpecialization('')
+      setActiveVendor(false)
     }
   }, [vendor])
   const validateForm = (data) => {
@@ -90,6 +95,7 @@ export default function AddVendorSliderOver({ open, setOpen, vendor }) {
       email: e.target.email.value,
       primaryContact: e.target['primary-contact-name'].value,
       specialization: e.target['specialization'].value,
+      isActive: activeVendor
       //... add other fields as necessary
     }
 
@@ -162,7 +168,7 @@ export default function AddVendorSliderOver({ open, setOpen, vendor }) {
       specialization === initialState.specialization
     )
   }
-  console.log('formIsUnchanged', formIsUnchanged())
+
   return (
     <>
       <Transition.Root show={open} as={Fragment}>
@@ -330,7 +336,7 @@ export default function AddVendorSliderOver({ open, setOpen, vendor }) {
                                   ></textarea>
                                 </div>
                               </div>
-
+                              <ActiveVendorToggle activeVendor={activeVendor} setActiveVendor={setActiveVendor}/>
                               <div className="sm:col-span-2">
                                 <button
                                   type="submit"
