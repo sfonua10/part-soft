@@ -7,6 +7,7 @@ import {
   Bars3Icon,
   HomeIcon,
   UsersIcon,
+  EnvelopeIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline'
 // import VendorTable from './VendorTable'
@@ -41,6 +42,12 @@ export default function DashboardLayout({ children }) {
   const pathname = usePathname()
   const navigationItems = [
     { name: 'Dashboard', href: '/dashboard', icon: HomeIcon, current: true },
+    {
+      name: 'Request Part',
+      href: '/dashboard/request-part',
+      icon: EnvelopeIcon,
+      current: false,
+    },
     {
       name: 'Manage Vendors',
       href: '/dashboard/manage-vendors',
