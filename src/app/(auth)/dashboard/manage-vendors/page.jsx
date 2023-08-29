@@ -10,7 +10,7 @@ const MangeVendors = () => {
     revalidateOnFocus: true
     //TODO: figure out how to show latest data when vendor is added, only revalidate when we know they succesfully added a vendor
   })
-console.log('data ==>', data)
+
   return <VendorForm2 data={data} />
 }
 

@@ -18,7 +18,7 @@ export default function VendorTable({ data, activeVendors }) {
             price, and vendor role for each.{' '}
           </p> */}
         </div>
-        <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
+        {/* <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
           <button
             type="button"
             className="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
@@ -26,14 +26,17 @@ export default function VendorTable({ data, activeVendors }) {
           >
             Request Part
           </button>
-        </div>
+        </div> */}
       </div>
-      {data?.map((item, index) => (
+      {data?.map((workOrder, index) => (
         <div key={index} className="mb-8">
-          <PartRequestWithVendorResponses data={item} />
+          {workOrder.parts.map((part, partIndex) => (
+            <PartRequestWithVendorResponses key={partIndex} data={part} />
+          ))}
         </div>
       ))}
-      <SlideOverRequestForm open={open} setOpen={setOpen} activeVendors={activeVendors} />
+
+      {/* <SlideOverRequestForm open={open} setOpen={setOpen} activeVendors={activeVendors} /> */}
     </>
   )
 }
