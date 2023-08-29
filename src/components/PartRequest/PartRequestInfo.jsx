@@ -3,11 +3,12 @@ import { ArrowDownIcon, ArrowUpIcon } from '@heroicons/react/24/solid'
 import React from 'react'
 
 const PartRequestInfo = ({ partRequest, onToggleTable, isTableVisible }) => {
+  
   return (
     <div className="pb-4 pt-4 sm:flex sm:items-center">
       <div className="flex items-center justify-between px-3 sm:flex-auto">
         <p className="text-sm leading-5 text-gray-700">
-          Work Order Number:{' '}
+          Work Order Number:
           <span className="font-medium">{partRequest.workOrderNumber}</span> |
           Part Name: <span className="font-medium">{partRequest.partName}</span>{' '}
           | Part Number:{' '}

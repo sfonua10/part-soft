@@ -2,32 +2,54 @@
 
 import { Fragment, useState } from 'react'
 import useSWR from 'swr'
-const fetcher = (url) => fetch(url).then((res) => res.json());
+const fetcher = (url) => fetch(url).then((res) => res.json())
 
 export default function RequestPart() {
   const [parts, setParts] = useState([{}])
   const [errors, setErrors] = useState({})
   const [isLoading, setIsLoading] = useState(false)
-  const [workOrderNumber, setWorkOrderNumber] = useState('');
-
-  const { data: activeVendors, error } = useSWR('/api/vendor-info?activeOnly=true', fetcher, {
-    refreshInterval: 1000
+  const [workOrderNumber, setWorkOrderNumber] = useState('')
+  const [vehicle, setVehicle] = useState({
+    make: '',
+    model: '',
+    year: '',
+    vin: '',
   })
-  
+
+  const { data: activeVendors, error } = useSWR(
+    '/api/vendor-info?activeOnly=true',
+    fetcher,
+    {
+      refreshInterval: 1000,
+    },
+  )
+
   const addPart = (e) => {
     e.preventDefault()
     setParts([...parts, {}])
+  }
+  const handleVehicleInputChange = (e) => {
+    const { name, value } = e.target
+    const error = validateField(name, value)
+
+    // Update the vehicle state with the new value
+    setVehicle((prev) => ({ ...prev, [name]: value }))
+
+    // Update the errors state for vehicle fields
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: error, // Update to directly set the error on the field name
+    }))
   }
 
   const validateField = (name, value) => {
     let error = ''
     switch (name) {
-      case 'part-name':
-      case 'part-number':
+      case 'work-order-number':
+      case 'vin':
       case 'make':
       case 'model':
-      case 'vin':
-        if (!value) error = 'This field is required'
+        if (!value.trim()) error = 'This field is required'
         break
       case 'year':
         if (!/^\d{4}$/.test(value)) error = 'Year should be a 4-digit number'
@@ -44,12 +66,12 @@ export default function RequestPart() {
   const handleInputChange = (e, index) => {
     const { name, value } = e.target
     const error = validateField(name, value)
-  
+
     // Update the parts state with the new value
-    const newParts = [...parts];
-    newParts[index][name] = value;
-    setParts(newParts);
-  
+    const newParts = [...parts]
+    newParts[index][name] = value
+    setParts(newParts)
+
     // Update the errors state
     setErrors((prevErrors) => ({
       ...prevErrors,
@@ -59,36 +81,31 @@ export default function RequestPart() {
       },
     }))
   }
-  
 
   const handleSubmit = async (e) => {
     e.preventDefault()
 
     // Check for any validation errors first
     // If there are any errors, do not proceed with submission
-    const hasErrors = Object.values(errors).some(partErrors =>
-        Object.values(partErrors).some(errorMessage => errorMessage !== "")
-      );
-      
-      if (hasErrors) {
-        alert('Please correct the errors before submitting.');
-        return;
-      }
-      
+    const hasErrors = Object.values(errors).some((partErrors) =>
+      Object.values(partErrors).some((errorMessage) => errorMessage !== ''),
+    )
 
-      const formData = {
-          workOrderNumber,
-          parts: parts.map((part, index) => ({
-              partName: part['part-name'],
-              partNumber: part['part-number'],
-              make: part.make,
-              model: part.model,
-              year: part.year,
-              vin: part.vin,
-            })),
-        vendors: activeVendors
-      };
-      
+    if (hasErrors) {
+      alert('Please correct the errors before submitting.')
+      return
+    }
+
+    const formData = {
+      workOrderNumber,
+      vehicle, // Adding vehicle details separately
+      parts: parts.map((part, index) => ({
+        partName: part['part-name'],
+        partNumber: part['part-number'],
+      })),
+      vendors: activeVendors,
+    }
+
     try {
       setIsLoading(true)
 
@@ -109,18 +126,21 @@ export default function RequestPart() {
         setIsLoading(false)
         return
       }
-      console.log(data.message) 
+      console.log(data.message)
       setWorkOrderNumber('')
       setParts([
         {
           'part-name': '',
           'part-number': '',
-          make: '',
-          model: '',
-          year: '',
-          vin: '',
         },
       ])
+           // Resetting vehicle information
+           setVehicle({
+            make: '',
+            model: '',
+            year: '',
+            vin: '',
+          })
     } catch (error) {
       console.error('Error:', error)
       setIsLoading(false)
@@ -266,12 +286,12 @@ export default function RequestPart() {
           className="px-4 pb-36 pt-16 sm:px-6 lg:col-start-1 lg:row-start-1 lg:px-0 lg:pb-16"
         >
           <div className="mx-auto max-w-lg lg:max-w-none">
-            <section aria-labelledby="contact-info-heading">
+            <section aria-labelledby="vehicle-info-heading">
               <h2
-                id="contact-info-heading"
+                id="vehicle-info-heading"
                 className="text-lg font-medium text-gray-900"
               >
-                Requestor information
+                Vehicle information
               </h2>
 
               <div className="mt-6">
@@ -287,10 +307,113 @@ export default function RequestPart() {
                     id="work-order-number"
                     name="work-order-number"
                     value={workOrderNumber}
-                    onChange={(e) => setWorkOrderNumber(e.target.value)}                
+                    onChange={(e) => setWorkOrderNumber(e.target.value)}
                     autoComplete="work-order-number"
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   />
+                  {errors.workOrderNumber && (
+                    <p className="mt-1 text-xs text-red-500">
+                      {errors.workOrderNumber}
+                    </p>
+                  )}
+                </div>
+
+                {/* VIN */}
+                <div className="mt-4">
+                  <label
+                    htmlFor="vin"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    VIN
+                  </label>
+                  <div className="mt-1">
+                    <input
+                      type="text"
+                      id="vin"
+                      name="vin"
+                      value={vehicle.vin}
+                      onChange={handleVehicleInputChange}
+                      autoComplete="vin"
+                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    />
+                    {errors.vin && (
+                      <p className="mt-1 text-xs text-red-500">{errors.vin}</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Make */}
+                <div className="mt-4">
+                  <label
+                    htmlFor="make"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Make
+                  </label>
+                  <div className="mt-1">
+                    <input
+                      type="text"
+                      id="make"
+                      name="make"
+                      value={vehicle.make}
+                      onChange={handleVehicleInputChange}
+                      autoComplete="make"
+                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    />
+                    {errors.make && (
+                      <p className="mt-1 text-xs text-red-500">{errors.make}</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Model */}
+                <div className="mt-4">
+                  <label
+                    htmlFor="model"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Model
+                  </label>
+                  <div className="mt-1">
+                    <input
+                      type="text"
+                      id="model"
+                      name="model"
+                      value={vehicle.model}
+                      onChange={handleVehicleInputChange}
+                      autoComplete="model"
+                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    />
+                    {errors.model && (
+                      <p className="mt-1 text-xs text-red-500">
+                        {errors.model}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Year */}
+                <div className="mt-4">
+                  <label
+                    htmlFor="year"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Year
+                  </label>
+                  <div className="mt-1">
+                    <input
+                      type="text"
+                      id="year"
+                      name="year"
+                      value={vehicle.year}
+                      onChange={handleVehicleInputChange}
+                      autoComplete="year"
+                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    />
+                    {errors.year && (
+                      <p className="mt-1 text-xs text-red-500">{errors.year}</p>
+                    )}
+                  </div>
                 </div>
               </div>
             </section>
@@ -309,7 +432,7 @@ export default function RequestPart() {
                   </h2>
                   <div
                     key={index}
-                    className="mt-6 grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-3"
+                    className="mt-6 grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2"
                   >
                     <div>
                       <label
@@ -324,7 +447,6 @@ export default function RequestPart() {
                           id="part-name"
                           name="part-name"
                           value={part['part-name'] || ''}
-
                           onChange={(e) => handleInputChange(e, index)}
                           className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
                             errors[index]?.['part-name'] ? 'border-red-500' : ''
@@ -363,113 +485,6 @@ export default function RequestPart() {
                         {errors[index]?.['part-number'] && (
                           <div className="text-sm text-red-500">
                             {errors[index]['part-number']}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    <div>
-                      <label
-                        htmlFor="make"
-                        className="block text-sm font-medium text-gray-700"
-                      >
-                        Make
-                      </label>
-                      <div className="mt-1">
-                        <input
-                          type="text"
-                          id="make"
-                          name="make"
-                          value={part.make || ''}
-                          autoComplete="make"
-                          onChange={(e) => handleInputChange(e, index)}
-                          className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
-                            errors[index]?.['make'] ? 'border-red-500' : ''
-                          }`}
-                        />
-                        {errors[index]?.['make'] && (
-                          <div className="text-sm text-red-500">
-                            {errors[index]['make']}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <div>
-                      <label
-                        htmlFor="model"
-                        className="block text-sm font-medium text-gray-700"
-                      >
-                        Model
-                      </label>
-                      <div className="mt-1">
-                        <input
-                          type="text"
-                          id="model"
-                          name="model"
-                          value={part.model || ''}
-                          autoComplete="address-level2"
-                          onChange={(e) => handleInputChange(e, index)}
-                          className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
-                            errors[index]?.['model'] ? 'border-red-500' : ''
-                          }`}
-                        />
-                        {errors[index]?.['model'] && (
-                          <div className="text-sm text-red-500">
-                            {errors[index]['model']}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    <div>
-                      <label
-                        htmlFor="year"
-                        className="block text-sm font-medium text-gray-700"
-                      >
-                        Year
-                      </label>
-                      <div className="mt-1">
-                        <input
-                          type="text"
-                          id="year"
-                          name="year"
-                          value={part.year || ''}
-                          autoComplete="address-level1"
-                          onChange={(e) => handleInputChange(e, index)}
-                          className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
-                            errors[index]?.['year'] ? 'border-red-500' : ''
-                          }`}
-                        />
-                        {errors[index]?.['year'] && (
-                          <div className="text-sm text-red-500">
-                            {errors[index]['year']}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    <div>
-                      <label
-                        htmlFor="vin"
-                        className="block text-sm font-medium text-gray-700"
-                      >
-                        Vin
-                      </label>
-                      <div className="mt-1">
-                        <input
-                          type="text"
-                          id="vin"
-                          name="vin"
-                          value={part.vin || ''}
-                          autoComplete="vin"
-                          onChange={(e) => handleInputChange(e, index)}
-                          className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
-                            errors[index]?.['vin'] ? 'border-red-500' : ''
-                          }`}
-                        />
-                        {errors[index]?.['vin'] && (
-                          <div className="text-sm text-red-500">
-                            {errors[index]['vin']}
                           </div>
                         )}
                       </div>

@@ -39,11 +39,27 @@ const partSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    make: String,
-    model: String,
-    year: String,
-    vin: String,
     vendorResponses: [vendorResponseSchema]
+});
+
+// Vehicle Schema
+const vehicleSchema = new mongoose.Schema({
+    vin: {
+        type: String,
+        required: true
+    },
+    make: {
+        type: String,
+        required: true
+    },
+    model: {
+        type: String,
+        required: true
+    },
+    year: {
+        type: Number,
+        required: true
+    }
 });
 
 // Work Order Schema
@@ -52,6 +68,7 @@ const workOrderSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    vehicle: vehicleSchema,  // Embed vehicle schema here
     parts: [partSchema]
 });
 

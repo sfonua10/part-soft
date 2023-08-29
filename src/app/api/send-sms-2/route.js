@@ -12,15 +12,12 @@ export async function POST(request) {
     }
 
     const client = twilio(accountSid, authToken)
-    const { workOrderNumber, parts, vendors } = await request.json()
+    const { workOrderNumber, vehicle, parts, vendors } = await request.json()
 
     let partMessages = parts
       .map((part) => {
         return `
 Part Name: ${part.partName}
-Make: ${part.make}
-Model: ${part.model}
-VIN: ${part.vin}
 Part Number: ${part.partNumber}
 ------------
 `
@@ -31,9 +28,12 @@ Part Number: ${part.partNumber}
 Hi,
 
 Work Order Number: ${workOrderNumber}
+Make: ${vehicle.make}
+Model: ${vehicle.model}
+VIN: ${vehicle.vin}
 ${partMessages}
 
-Do you have these in stock? Please respond with 1 if you do, and 2 if you don't.
+Do you have these parts in stock? Please respond with 1 if you do, and 2 if you don't.
 
 Thank you!
 Partsoft - Casey Johnson
@@ -50,6 +50,7 @@ Partsoft - Casey Johnson
 
     const workOrder = new WorkOrder({
       workOrderNumber,
+      vehicle,  // Add the vehicle directly to the work order
       parts: parts.map((part) => ({
         ...part,
         vendorResponses,
