@@ -1,9 +1,10 @@
 'use client'
 import { Fragment, useState, useEffect } from 'react'
+import { mutate } from 'swr'
 import { Dialog, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import Notification from './Notification'
-import ActiveVendorToggle from './manage-vendors/ActiveVendorToggle'
+// import ActiveVendorToggle from './manage-vendors/ActiveVendorToggle'
 
 export default function AddVendorSliderOver({ open, setOpen, vendor }) {
   const [errors, setErrors] = useState({})
@@ -26,7 +27,7 @@ export default function AddVendorSliderOver({ open, setOpen, vendor }) {
     primaryContact: vendor?.primaryContact || '',
     specialization: vendor?.specialization || '',
   })
-  const [activeVendor, setActiveVendor] = useState(false)
+  // const [activeVendor, setActiveVendor] = useState(false)
 
   const isObjectEmpty = (obj) => Object.keys(obj).length === 0
 
@@ -55,14 +56,12 @@ export default function AddVendorSliderOver({ open, setOpen, vendor }) {
       setEmail(vendor.email || '')
       setPrimaryContact(vendor.primaryContact || '')
       setSpecialization(vendor.specialization || '')
-      setActiveVendor(vendor.isActive || false) // Assuming 'isActive' is the property from your data
     } else {
       setName('')
       setPhone('')
       setEmail('')
       setPrimaryContact('')
       setSpecialization('')
-      setActiveVendor(false)
     }
   }, [vendor])
   const validateForm = (data) => {
@@ -95,7 +94,7 @@ export default function AddVendorSliderOver({ open, setOpen, vendor }) {
       email: e.target.email.value,
       primaryContact: e.target['primary-contact-name'].value,
       specialization: e.target['specialization'].value,
-      isActive: activeVendor
+      isActive: false,
       //... add other fields as necessary
     }
 
@@ -114,6 +113,7 @@ export default function AddVendorSliderOver({ open, setOpen, vendor }) {
         }
 
         const responseData = await response.json()
+        mutate('/api/vendor-info', async data => [...data, newVendor], false);
 
         // Use responseData if necessary, for example, to get an ID that the server assigned to the new vendor
         // setVendors((prevVendors) => [...prevVendors, responseData])
@@ -168,7 +168,6 @@ export default function AddVendorSliderOver({ open, setOpen, vendor }) {
       specialization === initialState.specialization
     )
   }
-
   return (
     <>
       <Transition.Root show={open} as={Fragment}>
@@ -290,9 +289,14 @@ export default function AddVendorSliderOver({ open, setOpen, vendor }) {
                                     name="phone"
                                     id="phone"
                                     autoComplete="tel"
-                                    placeholder="+1 (555) 123-4567"
+                                    placeholder="1 (555) 123-4567"
                                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                   />
+                                  {errors.phone && (
+                                    <p className="mt-1 text-xs text-red-500">
+                                      {errors.phone}
+                                    </p>
+                                  )}
                                 </div>
                               </div>
 
@@ -336,7 +340,10 @@ export default function AddVendorSliderOver({ open, setOpen, vendor }) {
                                   ></textarea>
                                 </div>
                               </div>
-                              <ActiveVendorToggle activeVendor={activeVendor} setActiveVendor={setActiveVendor}/>
+                              {/* <ActiveVendorToggle
+                                activeVendor={activeVendor}
+                                setActiveVendor={setActiveVendor}
+                              /> */}
                               <div className="sm:col-span-2">
                                 <button
                                   type="submit"

@@ -7,8 +7,7 @@ const MangeVendors = () => {
   const fetcher = (url) => fetch(url).then((res) => res.json())
 
   const { data, error } = useSWR('/api/vendor-info', fetcher, {
-    revalidateOnFocus: true
-    //TODO: figure out how to show latest data when vendor is added, only revalidate when we know they succesfully added a vendor
+    revalidateOnMount: false
   })
 
   return <VendorForm2 data={data} />
