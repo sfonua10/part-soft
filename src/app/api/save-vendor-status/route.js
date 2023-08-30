@@ -1,7 +1,7 @@
 import { connectToDB } from '@/utils/database'
 import Vendor from '@/models/vendor' // Assuming you have a Vendor model similar to the User model
 
-export async function POST(req, res) {
+export async function PUT(req, res) {
   const changedVendors = await req.json()
 
   try {
@@ -9,7 +9,10 @@ export async function POST(req, res) {
 
     // Loop through each vendor and update their status
     for (const vendor of changedVendors) {
-      await Vendor.findByIdAndUpdate(vendor._id, { isActive: vendor.isActive })
+      await Vendor.findByIdAndUpdate(vendor._id, {
+        isActive: vendor.isActive,
+        isSaved: vendor.isSaved 
+      });
     }
 
     return new Response(

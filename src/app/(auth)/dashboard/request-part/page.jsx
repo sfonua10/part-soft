@@ -1,7 +1,7 @@
 'use client'
 
-import { Fragment, useState, useEffect } from 'react'
-import useSWR from 'swr'
+import { useState, useEffect, useMemo } from 'react'
+import useSWR, { mutate } from 'swr'
 import Notification from '@/components/Notification'
 import SplitBackground from '@/components/RequestPart/SplitBackground'
 import PartRequestSection from '@/components/RequestPart/PartRequestSection'
@@ -26,23 +26,44 @@ export default function RequestPart() {
     vin: '',
   })
   const [hasVendorChanges, setHasVendorChanges] = useState(false)
+  const [vendorChangesSaved, setVendorChangesSaved] = useState(false)
   const [notification, setNotification] = useState({
     show: false,
     type: 'success',
     message: '',
   })
+  const [isFormFilled, setIsFormFilled] = useState(false)
 
+  useEffect(() => {
+    setIsFormFilled(isFormValid())
+  }, [workOrderNumber, vehicle, parts])
   // Update myVendors once vendors is loaded
   useEffect(() => {
     if (vendors) {
       setMyVendors(vendors)
     }
   }, [vendors])
+  const isFormValid = () => {
+    // Ensure the vehicle details are filled out
+    const vehicleValid =
+      workOrderNumber &&
+      vehicle.vin &&
+      vehicle.make &&
+      vehicle.model &&
+      vehicle.year
 
+    // Ensure at least one part request is filled out with both name and number
+    const atLeastOnePartValid = parts.some(
+      (part) => part['part-name'] && part['part-number'],
+    )
+
+    return vehicleValid && atLeastOnePartValid
+  }
   const addPart = (e) => {
     e.preventDefault()
     setParts([...parts, {}])
   }
+  
   const handleVehicleInputChange = (e) => {
     const { name, value } = e.target
     const error = validateField(name, value)
@@ -155,19 +176,23 @@ export default function RequestPart() {
       setIsLoading(false)
     }
   }
-  function handleCheckboxChange(vendorId) {
-    setMyVendors((prevVendors) => {
-      return prevVendors.map((vendor) => {
-        if (vendor._id === vendorId) {
-          return {
-            ...vendor,
-            isActive: !vendor.isActive,
-          }
-        }
-        return vendor
-      })
-    })
-    setHasVendorChanges(true)
+
+  const handleCheckboxChange = (vendorId) => {
+    // Update the specific vendor's isActive status in myVendors
+    const updatedVendors = myVendors.map((vendor) =>
+      vendor._id === vendorId
+        ? { ...vendor, isActive: !vendor.isActive }
+        : vendor,
+    )
+
+    setMyVendors(updatedVendors)
+
+    // Check if there's any change between vendors and updatedVendors
+    const changeDetected = updatedVendors.some(
+      (vendor, index) => vendor.isActive !== vendors[index].isActive,
+    )
+
+    setHasVendorChanges(changeDetected)
   }
 
   function saveSelections() {
@@ -177,35 +202,40 @@ export default function RequestPart() {
       return originalVendor && originalVendor.isActive !== myVendor.isActive
     })
 
+    // Update the isSaved status for each changed vendor
+    const updatedVendors = changedVendors.map((vendor) => ({
+      ...vendor,
+      isSaved: vendor.isActive,
+    }))
     // If no vendors changed, then don't make an API call
-    if (changedVendors.length === 0) {
+    if (updatedVendors.length === 0) {
       console.log('No changes detected')
       return
     }
-
     // Make an API call to save these changes
     fetch('/api/save-vendor-status', {
-      method: 'POST',
-      body: JSON.stringify(changedVendors),
+      method: 'PUT',
+      body: JSON.stringify(updatedVendors),
       headers: {
         'Content-Type': 'application/json',
       },
     })
       .then((response) => {
-        console.log('response', response)
         if (!response.ok) {
           throw new Error('Network response was not ok') // If HTTP status is not in the 200-299 range
         }
         return response.json()
       })
       .then((data) => {
-        console.log('data ===>', data)
         if (data.success) {
+          // mutate('/api/save-vendor-status')
+          mutate('/api/vendor-info')
           setNotification({
             show: true,
             type: 'success',
             message: data.message,
           })
+          setVendorChangesSaved(true)
         } else {
           setNotification({
             show: true,
@@ -223,6 +253,18 @@ export default function RequestPart() {
           message: 'An unexpected error occurred. Please try again.',
         })
       })
+  }
+  const baseButtonStyles =
+    'w-full rounded-md border border-transparent px-4 py-2 text-sm font-medium shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-50 sm:order-last sm:ml-6 sm:w-auto'
+  const isRequestPartEnabled =
+    isFormFilled && myVendors.some((vendor) => vendor.isSaved)
+
+  const getButtonStyles = (condition) => {
+    return `${baseButtonStyles} ${
+      condition
+        ? 'bg-indigo-600 text-white'
+        : 'cursor-not-allowed bg-indigo-300 opacity-50'
+    }`
   }
 
   return (
@@ -244,8 +286,10 @@ export default function RequestPart() {
           message={notification.message}
           setShow={(show) => setNotification((prev) => ({ ...prev, show }))}
         />
-      <form onSubmit={handleSubmit} className="px-4 pb-36 pt-16 sm:px-6 lg:col-start-2 lg:row-start-1 lg:order-1 lg:px-0 lg:pb-16">
-
+        <form
+          onSubmit={handleSubmit}
+          className="px-4 pb-36 pt-16 sm:px-6 lg:col-start-1 lg:row-start-1 lg:px-0 lg:pb-16"
+        >
           <div className="mx-auto max-w-lg lg:max-w-none">
             <VehicleInfo
               vehicle={vehicle}
@@ -275,13 +319,17 @@ export default function RequestPart() {
             <div className="mt-10 border-t border-gray-200 pt-6 sm:flex sm:items-center sm:justify-between">
               <button
                 type="submit"
-                disabled={isLoading}
-                className="w-full rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-50 sm:order-last sm:ml-6 sm:w-auto"
+                disabled={!isRequestPartEnabled || !isFormFilled}
+                className={getButtonStyles(
+                  isRequestPartEnabled && isFormFilled,
+                )}
               >
                 Request Part
               </button>
               <p className="mt-4 text-center text-sm text-gray-500 sm:mt-0 sm:text-left">
-                This will send a sms to your active vendors
+                {vendorChangesSaved
+                  ? 'Ensure vendor changes are saved before requesting a part.'
+                  : 'Vendor changes detected. Save them first!'}
               </p>
             </div>
           </div>

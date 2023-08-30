@@ -95,6 +95,7 @@ export default function AddVendorSliderOver({ open, setOpen, vendor }) {
       primaryContact: e.target['primary-contact-name'].value,
       specialization: e.target['specialization'].value,
       isActive: false,
+      isSaved: false
       //... add other fields as necessary
     }
 
