@@ -37,17 +37,17 @@ export function PartRow({ response }) {
           </span>
         </td>
         <td className="px-3 py-4 text-sm text-gray-500">
-          {response.orderStatus}
+          {response.price}
         </td>
         <td className="px-3 py-4 text-sm text-gray-500">
-          {response.price}
+          {response.orderStatus}
         </td>
         <td className="px-3 py-4 text-sm text-gray-500">
           {response.delivery}
         </td>
-        <td className="px-3 py-4 text-sm text-gray-500">
+        {/* <td className="px-3 py-4 text-sm text-gray-500">
           {response.partAvailable}
-        </td>
+        </td> */}
       </tr>
     );
   }

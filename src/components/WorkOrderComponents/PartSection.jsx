@@ -18,7 +18,7 @@ export function PartSection({ part }) {
           <EyeIcon className="h-5 w-5 cursor-pointer" onClick={() => setShowPartTable(true)} />
         }
       </h3>
-      {showPartTable && <PartTable responses={part.responses} />}
+      {showPartTable && <PartTable responses={part.vendorResponses} />}
     </div>
   );
 }

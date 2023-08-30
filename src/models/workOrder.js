@@ -68,6 +68,11 @@ const workOrderSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    identifier: {    // Unique Identifier for the work order
+        type: String,
+        unique: true,
+        required: true
+    },
     vehicle: vehicleSchema,  // Embed vehicle schema here
     parts: [partSchema]
 });
