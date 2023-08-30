@@ -62,14 +62,37 @@ export async function POST(request) {
     price: price
   };
 
-  const updatedWorkOrder = await WorkOrder.findOneAndUpdate(
-    {
-      identifier: identifier,
-      'parts.partNumber': partNumber
-    },
-    { $push: { 'parts.$.vendorResponses': vendorResponseData } },
-    { new: true }
-  );
+const vendorResponseIndex = part.vendorResponses.findIndex(response => response.vendorName === vendorName);
+
+let updatedWorkOrder;
+
+if (vendorResponseIndex !== -1) {
+    // If the vendor response already exists, update it.
+    const updateKey = `parts.$.vendorResponses.${vendorResponseIndex}`;
+    updatedWorkOrder = await WorkOrder.findOneAndUpdate(
+        {
+            identifier: identifier,
+            'parts.partNumber': partNumber
+        },
+        {
+            [`${updateKey}.availability`]: availability,
+            [`${updateKey}.orderStatus`]: orderStatus,
+            [`${updateKey}.partAvailable`]: availabilityResponse.toLowerCase(),
+            [`${updateKey}.price`]: price
+        },
+        { new: true }
+    );
+} else {
+    // If the vendor response doesn't exist, add a new one.
+    updatedWorkOrder = await WorkOrder.findOneAndUpdate(
+        {
+            identifier: identifier,
+            'parts.partNumber': partNumber
+        },
+        { $push: { 'parts.$.vendorResponses': vendorResponseData } },
+        { new: true }
+    );
+}
 
   let responseMessage;
   if (updatedWorkOrder) {
