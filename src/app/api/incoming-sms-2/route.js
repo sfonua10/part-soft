@@ -1,63 +1,95 @@
 import twilio from 'twilio';
-import PartRequest from '@/models/partRequest';
+import WorkOrder from '@/models/workOrder';
 import Vendor from '@/models/vendor';
 
 export async function POST(request) {
-  // Get the sender's phone number and the message body from the POST request
   const formData = new URLSearchParams(await request.text());
-  const senderNumber = request.headers.get('From') || formData.get('From');
+  const senderNumber = formData.get('From');
   const messageBody = formData.get('Body');
+
   console.log(`Received message from: ${senderNumber}, message: ${messageBody}`);
 
-  // Use the sender's phone number to look up the vendor's name in the Vendor model
+  const [identifier, partLetter, availabilityResponse, ...priceParts] = messageBody.trim().split(' ');
+
+  const workOrder = await WorkOrder.findOne({ identifier: new RegExp('^' + identifier + '$', 'i') }); // Case-insensitive search
+
+  if (!workOrder) {
+    return replyWithError("Invalid identifier. Please check and try again.");
+  }
+
   const vendorInfo = await Vendor.findOne({ phone: senderNumber });
-  const vendorName = vendorInfo ? vendorInfo.name : null;
-  console.log(`Vendor found in DB: ${vendorName}`);
+  const vendorName = vendorInfo ? vendorInfo.name : 'Unknown Vendor';
 
-  const [workOrderNumber, response] = (messageBody || "").split(':');
-  let availability, partAvailable, responseMessage;
+  let price;
+  if (priceParts.length) {
+    const priceString = priceParts.join('');
+    price = parseFloat(priceString.replace("$", ""));
+    if (isNaN(price)) {
+      return replyWithError("Invalid price format. Please reply with the format 'Identifier PartLetter YES/NO $Price'. Thank you!");
+    }
+  } else {
+    price = null;
+  }
 
-  switch (response) {
-    case '1':
-      responseMessage = "Thank you for confirming availability. We'll reach out soon for further details and to discuss the purchase.";
+  const normalizedPartLetter = partLetter.toUpperCase();
+  const part = workOrder.parts[normalizedPartLetter.charCodeAt(0) - 65];
+
+  if (!part) {
+    return replyWithError(`No part found for letter ${normalizedPartLetter}. Please ensure the part letter is correct.`);
+  }
+  
+  const partNumber = part.partNumber;
+
+  let availability, orderStatus;
+  switch (availabilityResponse.toUpperCase()) {
+    case 'YES':
       availability = 'In Stock';
-      partAvailable = 'yes';
+      orderStatus = 'Confirmed';
       break;
-    case '2':
-      responseMessage = "Thank you for letting us know. We'll explore other options. If you come across this part in the future, please keep us informed.";
+    case 'NO':
       availability = 'Out of Stock';
-      partAvailable = 'no';
+      orderStatus = 'N/A';
       break;
     default:
-      responseMessage = "We didn't recognize your response. Please reply with '1' for YES or '2' for NO. Thank you!";
-      break;
+      return replyWithError("We didn't recognize your response. Please reply with the format 'Identifier PartLetter YES/NO $Price'. Thank you!");
   }
 
   const vendorResponseData = {
     vendorName: vendorName,
     availability: availability,
-    partAvailable: partAvailable,
-    // ... any other required fields you need to set
+    orderStatus: orderStatus,
+    partAvailable: availabilityResponse.toLowerCase(),
+    price: price
   };
 
-  console.log(`Trying to find partRequest with workOrderNumber: ${workOrderNumber}`);
-  
-  // Find the corresponding PartRequest using the workOrderNumber and update it
-  const updatedPartRequest = await PartRequest.findOneAndUpdate(
-    { workOrderNumber: workOrderNumber },
-    { $push: { vendorResponses: vendorResponseData } },
-    { new: true, upsert: true }
+  const updatedWorkOrder = await WorkOrder.findOneAndUpdate(
+    {
+      identifier: identifier,
+      'parts.partNumber': partNumber
+    },
+    { $push: { 'parts.$.vendorResponses': vendorResponseData } },
+    { new: true }
   );
 
-  if (updatedPartRequest) {
-    console.log('Found and updated matching partRequest.');
+  let responseMessage;
+  if (updatedWorkOrder) {
+    responseMessage = `Successfully updated part ${normalizedPartLetter} with availability: ${availability} and price: $${price}.`;
   } else {
-    console.log('No matching partRequest found.');
+    responseMessage = `Error updating part ${normalizedPartLetter}. Please ensure the identifier and part letter are correct.`;
   }
 
-  // Send a response back to the vendor using Twilio's API
   const twiml = new twilio.twiml.MessagingResponse();
   twiml.message(responseMessage);
+  return new Response(twiml.toString(), {
+    headers: { 'Content-Type': 'text/xml' },
+    status: 200,
+  });
+}
+
+// Helper function to reply with an error
+function replyWithError(message) {
+  const twiml = new twilio.twiml.MessagingResponse();
+  twiml.message(message);
   return new Response(twiml.toString(), {
     headers: { 'Content-Type': 'text/xml' },
     status: 200,

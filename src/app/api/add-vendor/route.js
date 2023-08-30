@@ -9,10 +9,11 @@ export async function POST(req) {
   }
   try {
     await connectToDB()
-
+    // Format the phone number to E.164 if it doesn't start with a '+'
+    const formattedPhone = phone.startsWith('+') ? phone : `+${phone}`;
     const newVendor = new Vendor({
       name,
-      phone,
+      phone: formattedPhone,
       email,
       primaryContact,
       specialization,

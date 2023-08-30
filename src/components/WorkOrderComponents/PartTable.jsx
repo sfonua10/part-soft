@@ -21,13 +21,13 @@ export function PartTable({ responses }) {
             scope="col"
             className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
           >
-            Order Status
+            Price ($)
           </th>
           <th
             scope="col"
             className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
           >
-            Price ($)
+            Order Status
           </th>
           <th
             scope="col"
@@ -35,12 +35,12 @@ export function PartTable({ responses }) {
           >
             Delivery Time
           </th>
-          <th
+          {/* <th
             scope="col"
             className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
           >
             Part Available
-          </th>
+          </th> */}
         </tr>
       </thead>
       <tbody>
