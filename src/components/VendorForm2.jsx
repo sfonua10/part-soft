@@ -7,7 +7,7 @@ export default function VendorForm2({ data }) {
   const [open, setOpen] = useState(false)
   const [selectedPeople, setSelectedPeople] = useState(data || [])
   const [selectedVendor, setSelectedVendor] = useState({})
-  console.log('selectedPeople', selectedPeople)
+
   const addNewVendor = () => {
     setSelectedVendor({})
     setOpen(true)
