@@ -2,7 +2,7 @@ const VendorSection = ({ myVendors, handleCheckboxChange, saveSelections, hasVen
     <section
       aria-labelledby="summary-heading"
       className="px-4 pb-36 pt-16 sm:px-6 lg:col-start-1 lg:row-start-1 lg:order-2 lg:px-0 lg:pb-16"
-
+//if i want to revert the order again, use the one commented below instead of the one above
     //   className="bg-gray-50 px-4 pb-10 pt-16 sm:px-6 lg:col-start-2 lg:row-start-1 lg:bg-transparent lg:px-0 lg:pb-16"
     >
       <div className="mx-auto max-w-lg lg:max-w-none">
