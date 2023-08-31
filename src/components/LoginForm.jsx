@@ -106,7 +106,7 @@ const LoginForm = () => {
             </span>
           </Button>
         </div>
-        <div>
+        {/* <div>
           <div className="relative">
             <div
               className="absolute inset-0 flex items-center"
@@ -140,7 +140,7 @@ const LoginForm = () => {
               <span className="text-sm font-semibold leading-6">Google</span>
             </a>
           </div>
-        </div>
+        </div> */}
       </form>
     </>
   )

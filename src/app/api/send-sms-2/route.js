@@ -1,9 +1,5 @@
 import twilio from 'twilio';
 import WorkOrder from '@/models/workOrder';
-import { customAlphabet } from 'nanoid';
-
-const alphabet = 'abcdefghijklmnopqrstuvwxyz'; // 26 characters
-const nanoid = customAlphabet(alphabet, 4);
 
 export async function POST(request) {
   try {
@@ -18,23 +14,19 @@ export async function POST(request) {
     const client = twilio(accountSid, authToken);
     const { workOrderNumber, vehicle, parts, vendors } = await request.json();
 
-    // Generate a unique identifier for this Work Order
-    const uniqueIdentifier = nanoid();
-    // const shortIdentifier = workOrderNumber[0] + workOrderNumber.slice(-3); // Example: "W345"
-
     let partDescriptions, responseExample;
     if (parts.length === 1) {
       partDescriptions = `Part Name: ${parts[0].partName}
 Part Number: ${parts[0].partNumber}
 -----------`;
-      responseExample = `${uniqueIdentifier} YES $120`;
+      responseExample = `Yes $120`;
     } else {
       partDescriptions = parts
         .map((part, index) => `${String.fromCharCode(65 + index)}. 
     Part Name: ${part.partName}
     Part Number: ${part.partNumber}`)
         .join('\n') + "\n-----------";
-      responseExample = `${uniqueIdentifier} A YES $120`;
+      responseExample = `A Yes $120`;
     }
     
     const messageTemplate = (vendorName) => `
@@ -54,7 +46,7 @@ ${partDescriptions}
 Example Reply: "${responseExample}".
 
 Thanks,
-Partsoft - Casey Johnson      
+United Diesel - Casey Johnson      
     `;
 
     const activeVendors = vendors?.filter((vendor) => vendor.isActive);
@@ -69,7 +61,6 @@ Partsoft - Casey Johnson
 
     const workOrder = new WorkOrder({
       workOrderNumber,
-      identifier: uniqueIdentifier,  // Store the unique identifier in the Work Order
       vehicle,
       parts: parts.map((part) => ({
         ...part,

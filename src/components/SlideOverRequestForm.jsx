@@ -103,7 +103,7 @@ export default function SlideOverRequestForm({ open, setOpen, activeVendors }) {
                         <div className="ml-3 flex h-7 items-center">
                           <button
                             type="button"
-                            className="relative rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                            className="relative rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:ring-offset-2"
                             onClick={() => setOpen(false)}
                           >
                             <span className="absolute -inset-2.5" />
@@ -135,7 +135,7 @@ export default function SlideOverRequestForm({ open, setOpen, activeVendors }) {
                                     type="text"
                                     name="workOrderNumber"
                                     id="workOrderNumber"
-                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#2563eb] sm:text-sm sm:leading-6"
                                     value={workOrderNumber}
                                     onChange={(e) => setWorkOrderNumber(e.target.value)}
                                   />
@@ -154,7 +154,7 @@ export default function SlideOverRequestForm({ open, setOpen, activeVendors }) {
                                     type="text"
                                     name="partName"
                                     id="partName"
-                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#2563eb] sm:text-sm sm:leading-6"
                                     value={partName}
                                     onChange={(e) => setPartName(e.target.value)}
                                   />
@@ -172,7 +172,7 @@ export default function SlideOverRequestForm({ open, setOpen, activeVendors }) {
                                     type="text"
                                     name="year"
                                     id="year"
-                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#2563eb] sm:text-sm sm:leading-6"
                                     value={year}
                                     onChange={(e) => setYear(e.target.value)}
                                   />
@@ -192,7 +192,7 @@ export default function SlideOverRequestForm({ open, setOpen, activeVendors }) {
                                     type="text"
                                     name="make"
                                     id="make"
-                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#2563eb] sm:text-sm sm:leading-6"
                                     value={make}
                                     onChange={(e) => setMake(e.target.value)}
                                   />
@@ -212,7 +212,7 @@ export default function SlideOverRequestForm({ open, setOpen, activeVendors }) {
                                     type="text"
                                     name="model"
                                     id="model"
-                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#2563eb] sm:text-sm sm:leading-6"
                                     value={model}
                                     onChange={(e) => setModel(e.target.value)}
                                   />
@@ -232,7 +232,7 @@ export default function SlideOverRequestForm({ open, setOpen, activeVendors }) {
                                     type="text"
                                     name="vin"
                                     id="vin"
-                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#2563eb] sm:text-sm sm:leading-6"
                                     value={vin}
                                     onChange={(e) => setVin(e.target.value)}
                                   />
@@ -252,7 +252,7 @@ export default function SlideOverRequestForm({ open, setOpen, activeVendors }) {
                                     type="text"
                                     name="part-number"
                                     id="part-number"
-                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#2563eb] sm:text-sm sm:leading-6"
                                     value={partNumber}
                                     onChange={(e) =>
                                       setPartNumber(e.target.value)

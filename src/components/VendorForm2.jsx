@@ -54,14 +54,14 @@ export default function VendorForm2({ data }) {
             </h1>
             <p className="mt-2 text-sm text-gray-700">
               A list of all the Vendors in your account including their name,
-              phone, email and primaryContact.{' '}
+              phone, email and primary contact.{' '}
             </p>
           </div>
           <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
             <button
               onClick={addNewVendor}
               type="button"
-              className="block rounded-md bg-indigo-600 px-3 py-1.5 text-center text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              className="block rounded-md bg-[#2563eb] px-3 py-1.5 text-center text-sm font-semibold leading-6 text-white shadow-sm hover:bg-[#2563eb] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563eb]"
             >
               Add Vendor
             </button>
@@ -151,7 +151,7 @@ export default function VendorForm2({ data }) {
                               setSelectedVendor(vendor)
                               setOpen(true)
                             }}
-                            className="text-indigo-600 hover:text-indigo-900"
+                            className="text-[#2563eb] hover:text-[#2563eb]"
                           >
                             Edit<span className="sr-only">, {vendor.name}</span>
                           </a>

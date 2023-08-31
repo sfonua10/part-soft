@@ -1,10 +1,10 @@
 const baseButtonStyles =
-  'w-full rounded-md border border-transparent px-4 py-2 text-sm font-medium shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-50 sm:order-last sm:ml-6 sm:w-auto'
+  'w-full rounded-md border border-transparent px-4 py-2 text-sm font-medium shadow-sm hover:bg--[#2563eb] focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:ring-offset-2 focus:ring-offset-gray-50 sm:order-last sm:ml-6 sm:w-auto'
 const getButtonStyles = (condition) => {
   return `${baseButtonStyles} ${
     condition
-      ? 'bg-indigo-600 text-white'
-      : 'cursor-not-allowed bg-indigo-300 opacity-50'
+      ? 'bg-[#2563eb] text-white'
+      : 'cursor-not-allowed bg-[#2563eb] opacity-50'
   }`
 }
 const VendorSection = ({
@@ -42,7 +42,7 @@ const VendorSection = ({
                   type="checkbox"
                   checked={vendor.isActive}
                   onChange={() => handleCheckboxChange(vendor._id)}
-                  className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                  className="h-4 w-4 rounded border-gray-300 text-[#2563eb] focus:ring-[#2563eb]"
                 />
               </div>
             </div>

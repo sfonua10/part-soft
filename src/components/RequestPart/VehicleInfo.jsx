@@ -19,7 +19,7 @@ const VehicleInfo = ({ vehicle, handleVehicleInputChange, errors, workOrderNumbe
           value={workOrderNumber}
           onChange={(e) => setWorkOrderNumber(e.target.value)}
           autoComplete="work-order-number"
-          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#2563eb] focus:ring-[#2563eb] sm:text-sm"
         />
         {errors.workOrderNumber && (
           <p className="mt-1 text-xs text-red-500">{errors.workOrderNumber}</p>
@@ -41,7 +41,7 @@ const VehicleInfo = ({ vehicle, handleVehicleInputChange, errors, workOrderNumbe
             value={vehicle.vin}
             onChange={handleVehicleInputChange}
             autoComplete="vin"
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#2563eb] focus:ring-[#2563eb] sm:text-sm"
           />
           {errors.vin && (
             <p className="mt-1 text-xs text-red-500">{errors.vin}</p>
@@ -64,7 +64,7 @@ const VehicleInfo = ({ vehicle, handleVehicleInputChange, errors, workOrderNumbe
             value={vehicle.make}
             onChange={handleVehicleInputChange}
             autoComplete="make"
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#2563eb] focus:ring-[#2563eb] sm:text-sm"
           />
           {errors.make && (
             <p className="mt-1 text-xs text-red-500">{errors.make}</p>
@@ -87,7 +87,7 @@ const VehicleInfo = ({ vehicle, handleVehicleInputChange, errors, workOrderNumbe
             value={vehicle.model}
             onChange={handleVehicleInputChange}
             autoComplete="model"
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#2563eb] focus:ring-[#2563eb] sm:text-sm"
           />
           {errors.model && (
             <p className="mt-1 text-xs text-red-500">{errors.model}</p>
@@ -110,7 +110,7 @@ const VehicleInfo = ({ vehicle, handleVehicleInputChange, errors, workOrderNumbe
             value={vehicle.year}
             onChange={handleVehicleInputChange}
             autoComplete="year"
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#2563eb] focus:ring-[#2563eb] sm:text-sm"
           />
           {errors.year && (
             <p className="mt-1 text-xs text-red-500">{errors.year}</p>

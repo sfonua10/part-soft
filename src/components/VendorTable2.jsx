@@ -1,15 +1,23 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { WorkOrderHeader } from './WorkOrderComponents/WorkOrderHeader'
 import { PartSection } from './WorkOrderComponents/PartSection'
 
 export default function VendorTable2({ data }) {
     const initialShowWorkOrdersState = data?.reduce((acc, order) => {
-        acc[order.workOrderNumber] = false;
+        acc[order.workOrderNumber] = true;
         return acc;
       }, {});
     
       const [showWorkOrdersState, setShowWorkOrdersState] = useState(initialShowWorkOrdersState);
+      useEffect(() => {
+        const newShowWorkOrdersState = data?.reduce((acc, order) => {
+            acc[order.workOrderNumber] = true;
+            return acc;
+        }, {});
+        
+        setShowWorkOrdersState(newShowWorkOrdersState);
+    }, [data]);
     
       const toggleWorkOrder = (workOrderNumber) => {
         setShowWorkOrdersState(prevState => ({
@@ -41,7 +49,7 @@ export default function VendorTable2({ data }) {
       }
       return (
         <div className="px-4 sm:px-6 lg:px-8 rounded-md border border-gray-200">
-          {/* <button onClick={deleteAllWorkOrders}>Delete all workorders</button> */}
+          <button onClick={deleteAllWorkOrders}>Delete all workorders</button>
           {data?.map((order) => (
             <div key={order.workOrderNumber} className="mb-6">
               <WorkOrderHeader 

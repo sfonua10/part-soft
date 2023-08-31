@@ -60,7 +60,7 @@ export default function VendorForm() {
                     type="text"
                     id="vendor-name"
                     name="vendor-name"
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#2563eb] focus:ring-[#2563eb] sm:text-sm"
                   />
                 </div>
               </div>
@@ -77,7 +77,7 @@ export default function VendorForm() {
                     type="text"
                     id="primary-contact-name"
                     name="primary-contact-name"
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#2563eb] focus:ring-[#2563eb] sm:text-sm"
                   />
                 </div>
               </div>
@@ -96,7 +96,7 @@ export default function VendorForm() {
                     id="phone"
                     autoComplete="tel"
                     placeholder="+1 (555) 123-4567"
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#2563eb] focus:ring-[#2563eb] sm:text-sm"
                   />
                 </div>
               </div>
@@ -115,7 +115,7 @@ export default function VendorForm() {
                     id="email"
                     autoComplete="email"
                     placeholder="contact@vendor.com"
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#2563eb] focus:ring-[#2563eb] sm:text-sm"
                   />
                 </div>
               </div>
@@ -133,7 +133,7 @@ export default function VendorForm() {
                     id="specialization"
                     rows="3"
                     placeholder="Brake parts, engine components..."
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#2563eb] focus:ring-[#2563eb] sm:text-sm"
                   ></textarea>
                 </div>
               </div>
@@ -141,7 +141,7 @@ export default function VendorForm() {
               <div className="sm:col-span-2">
                 <button
                   type="submit"
-                  className="mt-4 rounded-md bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700 focus:border-indigo-700 focus:outline-none focus:ring focus:ring-indigo-200"
+                  className="mt-4 rounded-md bg-[#2563eb] px-4 py-2 text-white hover:bg--[#2563eb] focus:border--[#2563eb] focus:outline-none focus:ring focus:ring-[#2563eb]"
                 >
                   Submit
                 </button>
@@ -176,7 +176,7 @@ export default function VendorForm() {
                         type="checkbox"
                         checked={person.active}
                         onChange={() => handleVendorToggle(person.id)}
-                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                        className="h-4 w-4 rounded border-gray-300 text-[#2563eb] focus:ring-[#2563eb]"
                       />
                     </div>
                   </div>
@@ -185,7 +185,7 @@ export default function VendorForm() {
               <div className="mt-4 flex justify-end">
                 <button
                   type="submit"
-                  className="rounded-md bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700 focus:border-indigo-700 focus:outline-none focus:ring focus:ring-indigo-200"
+                  className="rounded-md bg-[#2563eb] px-4 py-2 text-white hover:bg--[#2563eb] focus:border--[#2563eb] focus:outline-none focus:ring focus:ring-[#2563eb]"
                 >
                   Save
                 </button>

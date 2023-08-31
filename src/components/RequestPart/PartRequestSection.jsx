@@ -25,7 +25,7 @@ const PartRequestSection = ({ parts, handleInputChange, errors }) => (
                 name="part-name"
                 value={part['part-name'] || ''}
                 onChange={(e) => handleInputChange(e, index)}
-                className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+                className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-[#2563eb] focus:ring-[#2563eb] sm:text-sm ${
                   errors[index]?.['part-name'] ? 'border-red-500' : ''
                 }`}
                 autoComplete="address-level2"
@@ -53,7 +53,7 @@ const PartRequestSection = ({ parts, handleInputChange, errors }) => (
                 value={part['part-number'] || ''}
                 autoComplete="address-level1"
                 onChange={(e) => handleInputChange(e, index)}
-                className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+                className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-[#2563eb] focus:ring-[#2563eb] sm:text-sm ${
                   errors[index]?.['part-number'] ? 'border-red-500' : ''
                 }`}
               />

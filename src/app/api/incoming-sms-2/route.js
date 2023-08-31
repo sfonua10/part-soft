@@ -2,6 +2,19 @@ import twilio from 'twilio';
 import WorkOrder from '@/models/workOrder';
 import Vendor from '@/models/vendor';
 
+function extractAvailabilityAndPrice(str) {
+  const regex = /([yY](es)?|[nN]o?)(\d+(\.\d{0,2})?)?/;
+  const match = str.match(regex);
+  
+  if (match) {
+      const availability = match[1];
+      const price = parseFloat(match[2]);
+      return { availability, price };
+  }
+  
+  return { availability: str, price: null }; // default case
+}
+
 export async function POST(request) {
   const formData = new URLSearchParams(await request.text());
   const senderNumber = formData.get('From');
@@ -9,54 +22,56 @@ export async function POST(request) {
 
   console.log(`Received message from: ${senderNumber}, message: ${messageBody}`);
 
-  const [identifier, availabilityResponse, ...priceParts] = messageBody.trim().split(' ');
+  const [responsePart, ...priceParts] = messageBody.trim().split(' ');
+  const { availability: extractedAvailability, price: extractedPrice } = extractAvailabilityAndPrice(responsePart);
 
-  const workOrder = await WorkOrder.findOne({ 
-    identifier: { $regex: '^' + identifier, $options: 'i' } 
-  });
-  
-  console.log(`Searched for identifier: ${identifier}. Found work order:`, workOrder);
-
+  // We will assume the latest work order queried by this vendor is the one being responded to.
+  const workOrder = await WorkOrder.findOne({}).sort({_id: -1});
   if (!workOrder) {
-    return replyWithError("Invalid identifier. Please check and try again.");
+      return replyWithError("Couldn't find a matching work order. Please check and try again.");
   }
-
+  
   const vendorInfo = await Vendor.findOne({ phone: senderNumber });
   const vendorName = vendorInfo ? vendorInfo.name : 'Unknown Vendor';
 
   let price;
-  if (priceParts.length) {
-    const priceString = priceParts.join('');
-    price = parseFloat(priceString.replace("$", ""));
-    if (isNaN(price)) {
-      return replyWithError("Invalid price format. Please reply with the format 'Identifier YES/NO $Price'. Thank you!");
-    }
+  if (extractedPrice) {
+    price = extractedPrice;
+  } else if (priceParts.length) {
+    const priceString = priceParts.join('').replace("$", "");
+    price = parseFloat(priceString);
   } else {
     price = null;
   }
 
+  if (isNaN(price) && price !== null) {
+    return replyWithError("Invalid price format. Please reply with the format 'YES/NO $Price'. You can include the dollar sign or omit it. Thank you!");
+  }
   const part = workOrder.parts[0];
   const partNumber = part.partNumber;
 
   let availability, orderStatus;
-  switch (availabilityResponse.toUpperCase()) {
+  const cleanedAvailabilityResponse = extractedAvailability.trim().toUpperCase();
+  switch (cleanedAvailabilityResponse) {
     case 'YES':
+    case 'Y':
       availability = 'In Stock';
       orderStatus = 'Confirmed';
       break;
     case 'NO':
+    case 'N':
       availability = 'Out of Stock';
       orderStatus = 'N/A';
       break;
     default:
-      return replyWithError("We didn't recognize your response. Please reply with the format 'Identifier YES/NO $Price'. Thank you!");
+      return replyWithError("We didn't recognize your response. Please reply with the format 'YES/NO $Price'. Thank you!");
   }
 
   const vendorResponseData = {
     vendorName: vendorName,
     availability: availability,
     orderStatus: orderStatus,
-    partAvailable: availabilityResponse.toLowerCase(),
+    partAvailable: cleanedAvailabilityResponse.toLowerCase(),
     price: price
   };
 
@@ -69,13 +84,12 @@ export async function POST(request) {
       const updateKey = `parts.$.vendorResponses.${vendorResponseIndex}`;
       updatedWorkOrder = await WorkOrder.findOneAndUpdate(
           {
-              identifier: identifier,
               'parts.partNumber': partNumber
           },
           {
               [`${updateKey}.availability`]: availability,
               [`${updateKey}.orderStatus`]: orderStatus,
-              [`${updateKey}.partAvailable`]: availabilityResponse.toLowerCase(),
+              [`${updateKey}.partAvailable`]: cleanedAvailabilityResponse.toLowerCase(),
               [`${updateKey}.price`]: price
           },
           { new: true }
@@ -84,7 +98,6 @@ export async function POST(request) {
       // If the vendor response doesn't exist, add a new one.
       updatedWorkOrder = await WorkOrder.findOneAndUpdate(
           {
-              identifier: identifier,
               'parts.partNumber': partNumber
           },
           { $push: { 'parts.$.vendorResponses': vendorResponseData } },
@@ -96,7 +109,7 @@ export async function POST(request) {
   if (updatedWorkOrder) {
       responseMessage = `Successfully updated the part with availability: ${availability} and price: $${price}.`;
   } else {
-      responseMessage = `Error updating the part. Please ensure the identifier is correct.`;
+      responseMessage = `Error updating the part. Please ensure you are responding to the correct request.`;
   }
 
   const twiml = new twilio.twiml.MessagingResponse();

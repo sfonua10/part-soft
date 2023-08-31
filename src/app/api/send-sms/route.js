@@ -1,5 +1,9 @@
-import twilio from 'twilio'
-import PartRequest from '@/models/partRequest';
+import twilio from 'twilio';
+import WorkOrder from '@/models/workOrder';
+import { customAlphabet } from 'nanoid';
+
+const alphabet = 'abcdefghijklmnopqrstuvwxyz'; // 26 characters
+const nanoid = customAlphabet(alphabet, 4);
 
 export async function POST(request) {
   try {
@@ -10,61 +14,84 @@ export async function POST(request) {
     if (!accountSid || !authToken || !fromNumber) {
       throw new Error('Missing required environment variables');
     }
-    
+
     const client = twilio(accountSid, authToken);
+    const { workOrderNumber, vehicle, parts, vendors } = await request.json();
+
+    // Generate a unique identifier for this Work Order
+    const uniqueIdentifier = nanoid();
+    // const shortIdentifier = workOrderNumber[0] + workOrderNumber.slice(-3); // Example: "W345"
+
+    let partDescriptions, responseExample;
+    if (parts.length === 1) {
+      partDescriptions = `Part Name: ${parts[0].partName}
+Part Number: ${parts[0].partNumber}
+-----------`;
+      responseExample = `${uniqueIdentifier} YES $120`;
+    } else {
+      partDescriptions = parts
+        .map((part, index) => `${String.fromCharCode(65 + index)}. 
+    Part Name: ${part.partName}
+    Part Number: ${part.partNumber}`)
+        .join('\n') + "\n-----------";
+      responseExample = `${uniqueIdentifier} A YES $120`;
+    }
     
-    // Updated destructuring based on the new payload
-    const { workOrderNumber, partName, make, model, vin, partNumber, vendors } = await request.json();
-    
-    // Updated message based on the new payload
-    const message = `
-Hi,
+    const messageTemplate = (vendorName) => `
+Hi ${vendorName},
 
-Work Order Number: ${workOrderNumber}
-Part Name: ${partName}
-Make: ${make}
-Model: ${model}
-VIN: ${vin}
-Part Number: ${partNumber}
+We're requesting availability and pricing for parts related to:
 
-Do you have this in stock? Please respond with 1 if you do, and 2 if you don't.
+Work Order: ${workOrderNumber}
+Make: ${vehicle.make}
+Model: ${vehicle.model}
+Year: ${vehicle.year}
+VIN: ${vehicle.vin}
 
-Thank you!
-Partsoft - Casey Johnson
+${partDescriptions}
+
+
+Example Reply: "${responseExample}".
+
+Thanks,
+Partsoft - Casey Johnson      
     `;
 
-    // const imageUrl = "https://content.churchofjesuschrist.org/acp/bc/cp/Asia%20Area/Area/Gospel%20Topics/Baptism/1200x1920/john-baptizes-christ-39544-print.jpg";
-    
-    // Create a new PartRequest
-    const partRequest = new PartRequest({
-      workOrderNumber, // use workOrderNumber as an identifier
-      partName,
-      make,
-      model,
-      vin,
-      partNumber,
-      // ... any other fields you might need
+    const activeVendors = vendors?.filter((vendor) => vendor.isActive);
+    let vendorResponses = activeVendors.map((vendor) => ({
+      _id: vendor.id,
+      vendorName: vendor.name,
+      availability: 'Pending',
+      orderStatus: 'Pending',
+      partAvailable: 'N/A',
+      price: null
+    }));
+
+    const workOrder = new WorkOrder({
+      workOrderNumber,
+      identifier: uniqueIdentifier,  // Store the unique identifier in the Work Order
+      vehicle,
+      parts: parts.map((part) => ({
+        ...part,
+        vendorResponses,
+      })),
     });
 
-    // Save the PartRequest to the database
-    await partRequest.save();
-
-    const activeVendors = vendors.filter(vendor => vendor.isActive);
+    await workOrder.save();
 
     for (let vendor of activeVendors) {
       console.log('Sending message to', vendor.name, 'at', vendor.phone);
+      const personalizedMessage = messageTemplate(vendor.name);
       await client.messages.create({
-        body: message,
+        body: personalizedMessage,
         from: fromNumber,
         to: vendor.phone.trim(),
-        // mediaUrl: imageUrl,
       });
     }
-    
+
     return new Response(JSON.stringify({ message: 'Messages sent' }), {
       status: 200,
     });
-    
   } catch (error) {
     console.error('Error:', error.message);
     return new Response(JSON.stringify({ message: error.message }), {
@@ -72,6 +99,7 @@ Partsoft - Casey Johnson
     });
   }
 }
+
 
 //SEt up AWS SDK
 // npm i aws-sdk

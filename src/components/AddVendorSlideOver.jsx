@@ -210,7 +210,7 @@ export default function AddVendorSliderOver({ open, setOpen, vendor }) {
                           <div className="ml-3 flex h-7 items-center">
                             <button
                               type="button"
-                              className="relative rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                              className="relative rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:ring-offset-2"
                               onClick={() => setOpen(false)}
                             >
                               <span className="absolute -inset-2.5" />
@@ -246,7 +246,7 @@ export default function AddVendorSliderOver({ open, setOpen, vendor }) {
                                     onChange={handleInputChange}
                                     id="vendor-name"
                                     name="vendor-name"
-                                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#2563eb] focus:ring-[#2563eb] sm:text-sm"
                                   />
                                   {errors.name && (
                                     <p className="mt-1 text-xs text-red-500">
@@ -270,7 +270,7 @@ export default function AddVendorSliderOver({ open, setOpen, vendor }) {
                                     onChange={handleInputChange}
                                     id="primary-contact-name"
                                     name="primary-contact-name"
-                                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#2563eb] focus:ring-[#2563eb] sm:text-sm"
                                   />
                                 </div>
                               </div>
@@ -291,7 +291,7 @@ export default function AddVendorSliderOver({ open, setOpen, vendor }) {
                                     id="phone"
                                     autoComplete="tel"
                                     placeholder="1 (555) 123-4567"
-                                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#2563eb] focus:ring-[#2563eb] sm:text-sm"
                                   />
                                   {errors.phone && (
                                     <p className="mt-1 text-xs text-red-500">
@@ -317,7 +317,7 @@ export default function AddVendorSliderOver({ open, setOpen, vendor }) {
                                     id="email"
                                     autoComplete="email"
                                     placeholder="contact@vendor.com"
-                                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#2563eb] focus:ring-[#2563eb] sm:text-sm"
                                   />
                                 </div>
                               </div>
@@ -337,7 +337,7 @@ export default function AddVendorSliderOver({ open, setOpen, vendor }) {
                                     value={specialization || ''}
                                     rows="3"
                                     placeholder="Brake parts, engine components..."
-                                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#2563eb] focus:ring-[#2563eb] sm:text-sm"
                                   ></textarea>
                                 </div>
                               </div>
@@ -349,11 +349,11 @@ export default function AddVendorSliderOver({ open, setOpen, vendor }) {
                                 <button
                                   type="submit"
                                   disabled={formIsUnchanged()}
-                                  className={`mt-4 rounded-md px-4 py-2 text-white focus:border-indigo-700 focus:outline-none focus:ring focus:ring-indigo-200 
+                                  className={`mt-4 rounded-md px-4 py-2 text-white focus:border--[#2563eb] focus:outline-none focus:ring focus:ring-[#2563eb] 
                                   ${
                                     formIsUnchanged()
                                       ? 'cursor-not-allowed bg-gray-500'
-                                      : 'bg-indigo-600 hover:bg-indigo-700'
+                                      : 'bg-[#2563eb] hover:bg--[#2563eb]'
                                   }`}
                                 >
                                   {mode === 'edit' ? 'Update' : 'Add'}
