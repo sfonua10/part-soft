@@ -20,35 +20,43 @@ export async function POST(request) {
 
     // Generate a unique identifier for this Work Order
     const uniqueIdentifier = nanoid();
+    // const shortIdentifier = workOrderNumber[0] + workOrderNumber.slice(-3); // Example: "W345"
 
-    let partMessages = parts
-      .map((part, index) => {
-        return `
-${String.fromCharCode(65 + index)}. Part Name: ${part.partName}
-   Part Number: ${part.partNumber}
-`;
-      })
-      .join('');
+    let partDescriptions, responseExample;
+    if (parts.length === 1) {
+      partDescriptions = `Part Name: ${parts[0].partName}
+Part Number: ${parts[0].partNumber}
+-----------`;
+      responseExample = `${uniqueIdentifier} YES $120`;
+    } else {
+      partDescriptions = parts
+        .map((part, index) => `${String.fromCharCode(65 + index)}. 
+    Part Name: ${part.partName}
+    Part Number: ${part.partNumber}`)
+        .join('\n') + "\n-----------";
+      responseExample = `${uniqueIdentifier} A YES $120`;
+    }
+    
+    const messageTemplate = (vendorName) => `
+Hi ${vendorName},
 
-      const message = `
-      Hi,
-      
-      Work Order Number: ${workOrderNumber}
-      Identifier: ${uniqueIdentifier}  <-- You MUST include this in your response!
-      Make: ${vehicle.make}
-      Model: ${vehicle.model}
-      VIN: ${vehicle.vin}
-      ${partMessages}
-      
-      To reply, use the format: 
-      Identifier, Part Letter, YES/NO, Price (if available)
-      Example: "${uniqueIdentifier} A YES $120".
-      
-      Thank you!
-      Partsoft - Casey Johnson
-      `;
-      
-      
+We're requesting availability and pricing for parts related to:
+
+Work Order: ${workOrderNumber}
+Make: ${vehicle.make}
+Model: ${vehicle.model}
+Year: ${vehicle.year}
+VIN: ${vehicle.vin}
+
+${partDescriptions}
+
+
+Example Reply: "${responseExample}".
+
+Thanks,
+Partsoft - Casey Johnson      
+    `;
+
     const activeVendors = vendors?.filter((vendor) => vendor.isActive);
     let vendorResponses = activeVendors.map((vendor) => ({
       _id: vendor.id,
@@ -73,8 +81,9 @@ ${String.fromCharCode(65 + index)}. Part Name: ${part.partName}
 
     for (let vendor of activeVendors) {
       console.log('Sending message to', vendor.name, 'at', vendor.phone);
+      const personalizedMessage = messageTemplate(vendor.name);
       await client.messages.create({
-        body: message,
+        body: personalizedMessage,
         from: fromNumber,
         to: vendor.phone.trim(),
       });

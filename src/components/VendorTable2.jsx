@@ -18,8 +18,30 @@ export default function VendorTable2({ data }) {
         }));
       };
     
+      const deleteAllWorkOrders = async () => {
+        try {
+          const response = await fetch('/api/delete-all-workorders', {
+            method: 'DELETE',
+            header: {
+              'Content-Type': 'application/json'
+            }
+          })
+
+          const result = await response.json();
+          if(response.ok) {
+            console.log(result.message)
+          } else {
+            console.error('Error deleting work orders:', result.message);
+
+          }
+        } catch (error) {
+          console.error('Error deleting work orders:', error.message);
+
+        }
+      }
       return (
         <div className="px-4 sm:px-6 lg:px-8 rounded-md border border-gray-200">
+          {/* <button onClick={deleteAllWorkOrders}>Delete all workorders</button> */}
           {data?.map((order) => (
             <div key={order.workOrderNumber} className="mb-6">
               <WorkOrderHeader 
