@@ -4,7 +4,6 @@ import { mutate } from 'swr'
 import { Dialog, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import Notification from './Notification'
-// import ActiveVendorToggle from './manage-vendors/ActiveVendorToggle'
 
 export default function AddVendorSliderOver({ open, setOpen, vendor }) {
   const [errors, setErrors] = useState({})
@@ -27,7 +26,6 @@ export default function AddVendorSliderOver({ open, setOpen, vendor }) {
     primaryContact: vendor?.primaryContact || '',
     specialization: vendor?.specialization || '',
   })
-  // const [activeVendor, setActiveVendor] = useState(false)
 
   const isObjectEmpty = (obj) => Object.keys(obj).length === 0
 
@@ -83,12 +81,14 @@ export default function AddVendorSliderOver({ open, setOpen, vendor }) {
     // Add more validations as needed...
 
     setErrors(tempErrors)
-    return Object.keys(tempErrors).length === 0 // returns true if no errors
+    return Object.keys(tempErrors).length === 0 
   }
 
-  const handleAddVendor = async (e) => {
-    e.preventDefault()
-    const newVendor = {
+  const handleVendorSubmit = async (e) => {
+    e.preventDefault();
+  
+    const vendorData = {
+      _id: vendor ? vendor._id : undefined, // Add this line
       name: e.target['vendor-name'].value,
       phone: e.target.phone.value,
       email: e.target.email.value,
@@ -96,45 +96,59 @@ export default function AddVendorSliderOver({ open, setOpen, vendor }) {
       specialization: e.target['specialization'].value,
       isActive: false,
       isSaved: false
-      //... add other fields as necessary
-    }
-
-    if (validateForm(newVendor)) {
+    };
+  
+    if (validateForm(vendorData)) {
+      let url, method;
+  
+      if (mode === 'edit' && vendor && vendor._id) {
+        url = `/api/edit-vendor`;
+        method = 'PUT';
+      } else {
+        url = '/api/add-vendor';
+        method = 'POST';
+      }
+  
       try {
-        const response = await fetch('/api/add-vendor', {
-          method: 'POST',
+        const response = await fetch(url, {
+          method: method,
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(newVendor),
-        })
-
+          body: JSON.stringify(vendorData),
+        });
+  
         if (!response.ok) {
-          throw new Error('Network response was not ok')
+          throw new Error('Network response was not ok');
         }
-
-        const responseData = await response.json()
-        mutate('/api/vendor-info', async data => [...data, newVendor], false);
-
-        // Use responseData if necessary, for example, to get an ID that the server assigned to the new vendor
-        // setVendors((prevVendors) => [...prevVendors, responseData])
-        setOpen(false)
-        setShow(true)
-        setMessage('Successfully added the vendor.')
-        setType('success')
-        setTimeout(() => setShow(false), 3000) // to auto-hide after 3 seconds
+  
+        const updatedVendor = await response.json();
+  
+        mutate('/api/vendor-info', async data => {
+          if (mode === 'edit') {
+            return data.map(item => item._id === updatedVendor._id ? updatedVendor : item);
+          } else {
+            return [...data, updatedVendor];
+          }
+        }, false);
+  
+        setOpen(false);
+        setShow(true);
+        setMessage(mode === 'edit' ? 'Successfully updated the vendor.' : 'Successfully added the vendor.');
+        setType('success');
+        setTimeout(() => setShow(false), 3000); 
       } catch (error) {
-        setShow(true)
-        setOpen(false)
-        setMessage('There was a problem adding the vendor. Please try again.')
-        setType('error')
-        setTimeout(() => setShow(false), 5000) // to auto-hide after 5 seconds
-
-        console.error('There was a problem with the fetch operation:', error)
-        // Handle errors: Show an error message, etc.
+        setShow(true);
+        setOpen(false);
+        setMessage('There was a problem with the vendor operation. Please try again.');
+        setType('error');
+        setTimeout(() => setShow(false), 5000);
+        console.error('There was a problem with the fetch operation:', error);
       }
     }
-  }
+  };
+  
+  
   const handleInputChange = (e) => {
     const { name, value } = e.target
 
@@ -227,7 +241,7 @@ export default function AddVendorSliderOver({ open, setOpen, vendor }) {
                         <h2 className="sr-only">Vendors</h2>
 
                         <div>
-                          <form onSubmit={handleAddVendor}>
+                          <form onSubmit={handleVendorSubmit}>
                             {/* <h2 className="text-lg font-medium text-gray-900">
                             Add a Vendor
                           </h2> */}
@@ -341,10 +355,6 @@ export default function AddVendorSliderOver({ open, setOpen, vendor }) {
                                   ></textarea>
                                 </div>
                               </div>
-                              {/* <ActiveVendorToggle
-                                activeVendor={activeVendor}
-                                setActiveVendor={setActiveVendor}
-                              /> */}
                               <div className="sm:col-span-2">
                                 <button
                                   type="submit"

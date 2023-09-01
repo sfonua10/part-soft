@@ -28,7 +28,7 @@ export function CallToAction() {
             feel like you’re doing something productive.
           </p>
           <Button href="/register" color="white" className="mt-10">
-            Get 6 months free
+            Try it now
           </Button>
         </div>
       </Container>

@@ -48,6 +48,7 @@ export default function DashboardLayout({ children }) {
   }, [pathname])
 
   const handleNavClick = (name) => {
+    setSidebarOpen(false); // This closes the sidebar
     setNavigation((prev) =>
       prev.map((item) => ({
         ...item,

@@ -1,199 +1,188 @@
 'use client'
+import { useState, useEffect } from 'react'
+import { mutate } from 'swr'
+import AddVendorSliderOver from './AddVendorSlideOver'
 
-import { useState } from 'react'
+export default function VendorForm({ data }) {
+  const [open, setOpen] = useState(false)
+  const [selectedPeople, setSelectedPeople] = useState(data || [])
+  const [selectedVendor, setSelectedVendor] = useState({})
 
-const vendors = [
-  { id: 1, name: 'Annette Black', active: true },
-  { id: 2, name: 'Cody Fisher', active: false },
-  { id: 3, name: 'Courtney Henry', active: true },
-  { id: 4, name: 'Kathryn Murphy', active: false },
-  { id: 5, name: 'Theresa Webb', active: false },
-]
-
-function classNames(...classes) {
-  return classes.filter(Boolean).join(' ')
-}
-
-export default function VendorForm() {
-  const [vendorList, setVendorList] = useState(vendors)
-
-  const handleAddVendor = (e) => {
-    e.preventDefault()
-    // Logic to add the new vendor to some server or state
+  const addNewVendor = () => {
+    setSelectedVendor({})
+    setOpen(true)
   }
+  useEffect(() => {
+    if (data) {
+      setSelectedPeople(data)
+    }
+  }, [data])
 
-  const handleSaveVendors = (e) => {
-    e.preventDefault()
-    const activeVendors = vendorList.filter((vendor) => vendor.active)
-    // Here you can process the active vendors, like sending them to the server
-    console.log(activeVendors)
-  }
+  const deleteVendor = async (vendorToDelete) => {
+    try {
+      const response = await fetch('/api/delete-vendor', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(vendorToDelete),
+      })
 
-  const handleVendorToggle = (vendorId) => {
-    const updatedVendors = vendorList.map((vendor) => {
-      if (vendor.id === vendorId) {
-        return { ...vendor, active: !vendor.active }
+      const responseData = await response.json()
+
+      if (response.ok) {
+        console.log('Successfully deleted vendor:', responseData)
+        // Use mutate to re-fetch the data after successfully deleting a vendor
+        mutate('/api/vendor-info')
+      } else {
+        console.error('Error deleting vendor:', responseData.message)
+        // Handle the error in the UI, like showing an error message.
       }
-      return vendor
-    })
-    setVendorList(updatedVendors)
+    } catch (error) {
+      console.error('Failed to delete vendor:', error)
+      // Handle the error in the UI, like showing an error message.
+    }
   }
 
   return (
-    <div className="bg-gray-50">
-      <div className="mx-auto max-w-2xl px-4 pb-24 pt-16 sm:px-6 lg:max-w-7xl lg:px-8">
-        <h2 className="sr-only">Vendors</h2>
-
-        <div className="lg:grid lg:grid-cols-2 lg:gap-x-12 xl:gap-x-16">
-          <form onSubmit={handleAddVendor}>
-            <h2 className="text-lg font-medium text-gray-900">Add a Vendor</h2>
-            <div className="mt-4 grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-4">
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="vendor-name"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Vendor Name
-                </label>
-                <div className="mt-1">
-                  <input
-                    type="text"
-                    id="vendor-name"
-                    name="vendor-name"
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#2563eb] focus:ring-[#2563eb] sm:text-sm"
-                  />
-                </div>
-              </div>
-
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="primary-contact-name"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Primary Contact Name
-                </label>
-                <div className="mt-1">
-                  <input
-                    type="text"
-                    id="primary-contact-name"
-                    name="primary-contact-name"
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#2563eb] focus:ring-[#2563eb] sm:text-sm"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label
-                  htmlFor="phone"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Phone Number
-                </label>
-                <div className="mt-1">
-                  <input
-                    type="tel"
-                    name="phone"
-                    id="phone"
-                    autoComplete="tel"
-                    placeholder="+1 (555) 123-4567"
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#2563eb] focus:ring-[#2563eb] sm:text-sm"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Email
-                </label>
-                <div className="mt-1">
-                  <input
-                    type="email"
-                    name="email"
-                    id="email"
-                    autoComplete="email"
-                    placeholder="contact@vendor.com"
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#2563eb] focus:ring-[#2563eb] sm:text-sm"
-                  />
-                </div>
-              </div>
-
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="specialization"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Vendor Specialization
-                </label>
-                <div className="mt-1">
-                  <textarea
-                    name="specialization"
-                    id="specialization"
-                    rows="3"
-                    placeholder="Brake parts, engine components..."
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#2563eb] focus:ring-[#2563eb] sm:text-sm"
-                  ></textarea>
-                </div>
-              </div>
-
-              <div className="sm:col-span-2">
-                <button
-                  type="submit"
-                  className="mt-4 rounded-md bg-[#2563eb] px-4 py-2 text-white hover:bg--[#2563eb] focus:border--[#2563eb] focus:outline-none focus:ring focus:ring-[#2563eb]"
-                >
-                  Submit
-                </button>
+    <>
+      <div className="px-4 sm:px-6 lg:px-8">
+        <div className="sm:flex sm:items-center">
+          <div className="sm:flex-auto">
+            <h1 className="text-base font-semibold leading-6 text-gray-900">
+              Vendors
+            </h1>
+            <p className="mt-2 text-sm text-gray-700">
+              A list of all the Vendors in your account including their name,
+              phone, email and primary contact.{' '}
+            </p>
+          </div>
+          <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
+            <button
+              onClick={addNewVendor}
+              type="button"
+              className="block rounded-md bg-[#2563eb] px-3 py-1.5 text-center text-sm font-semibold leading-6 text-white shadow-sm hover:bg-[#2563eb] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563eb]"
+            >
+              Add Vendor
+            </button>
+          </div>
+        </div>
+        <div className="mt-8 flow-root">
+          <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+            <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+              <div className="relative">
+                <table className="min-w-full table-fixed divide-y divide-gray-300">
+                  <thead>
+                    <tr>
+                      <th
+                        scope="col"
+                        className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 lg:pl-8"
+                      >
+                        Vendor
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                      >
+                        Phone
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                      >
+                        Email
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                      >
+                        Primary Contact
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                      >
+                        Part Specialization
+                      </th>
+                      <th
+                        scope="col"
+                        className="relative py-3.5 pl-3 pr-4 sm:pr-6 lg:pr-8"
+                      >
+                        <span className="sr-only">Edit</span>
+                      </th>
+                      <th
+                        scope="col"
+                        className="relative py-3.5 pl-3 pr-4 sm:pr-6 lg:pr-8"
+                      >
+                        <span className="sr-only">Actions</span>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200 bg-white">
+                    {selectedPeople?.map((vendor) => (
+                      <tr
+                        key={vendor?.email}
+                        className={
+                          selectedPeople?.includes(vendor)
+                            ? 'bg-gray-50'
+                            : undefined
+                        }
+                      >
+                        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8">
+                          {vendor.name}
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          {vendor.phone}
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          {vendor.email}
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          {vendor.primaryContact}
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          {vendor.specialization}
+                        </td>
+                        <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
+                          <a
+                            href="#"
+                            onClick={(e) => {
+                              e.preventDefault()
+                              setSelectedVendor(vendor)
+                              setOpen(true)
+                            }}
+                            className="text-[#2563eb] hover:text-[#2563eb]"
+                          >
+                            Edit<span className="sr-only">, {vendor.name}</span>
+                          </a>
+                        </td>
+                        <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
+                          <a
+                            href="#"
+                            onClick={(e) => {
+                              e.preventDefault()
+                              deleteVendor(vendor)
+                            }}
+                            className="text-red-600 hover:text-red-900"
+                          >
+                            Delete
+                            <span className="sr-only">, {vendor.name}</span>
+                          </a>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
-          </form>
-
-          {/* Active VendorList */}
-          <form onSubmit={handleSaveVendors} className="mt-10 lg:mt-0">
-            <fieldset>
-              <legend className="text-lg font-medium text-gray-900">
-                My Vendors
-              </legend>
-              <div className="mt-4 divide-y divide-gray-200 border-b border-t border-gray-200">
-                {vendorList.map((person, personIdx) => (
-                  <div
-                    key={person._id}
-                    className="relative flex items-start py-4"
-                  >
-                    <div className="min-w-0 flex-1 text-sm leading-6">
-                      <label
-                        htmlFor={`person-${person._id}`}
-                        className="block text-sm font-medium text-gray-700"
-                      >
-                        {person.name}
-                      </label>
-                    </div>
-                    <div className="ml-3 flex h-6 items-center">
-                      <input
-                        id={`person-${person._id}`}
-                        name={`person-${person._id}`}
-                        type="checkbox"
-                        checked={person.active}
-                        onChange={() => handleVendorToggle(person.id)}
-                        className="h-4 w-4 rounded border-gray-300 text-[#2563eb] focus:ring-[#2563eb]"
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-4 flex justify-end">
-                <button
-                  type="submit"
-                  className="rounded-md bg-[#2563eb] px-4 py-2 text-white hover:bg--[#2563eb] focus:border--[#2563eb] focus:outline-none focus:ring focus:ring-[#2563eb]"
-                >
-                  Save
-                </button>
-              </div>
-            </fieldset>
-          </form>
+          </div>
         </div>
       </div>
-    </div>
+      <AddVendorSliderOver
+        open={open}
+        setOpen={setOpen}
+        vendor={selectedVendor}
+      />
+    </>
   )
 }

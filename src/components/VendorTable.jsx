@@ -1,42 +1,69 @@
 'use client'
-import { useState } from 'react'
-import SlideOverRequestForm from './SlideOverRequestForm'
-import PartRequestWithVendorResponses from './PartRequest'
+import { useState, useEffect } from 'react'
+import { WorkOrderHeader } from './WorkOrderComponents/WorkOrderHeader'
+import { PartSection } from './WorkOrderComponents/PartSection'
 
-export default function VendorTable({ data, activeVendors }) {
-  const [open, setOpen] = useState(false)
+export default function VendorTable({ data }) {
+  const initialShowWorkOrdersState = data?.reduce((acc, order) => {
+    acc[order.workOrderNumber] = true
+    return acc
+  }, {})
 
+  const [showWorkOrdersState, setShowWorkOrdersState] = useState(
+    initialShowWorkOrdersState,
+  )
+  useEffect(() => {
+    const newShowWorkOrdersState = data?.reduce((acc, order) => {
+      acc[order.workOrderNumber] = true
+      return acc
+    }, {})
+
+    setShowWorkOrdersState(newShowWorkOrdersState)
+  }, [data])
+
+  const toggleWorkOrder = (workOrderNumber) => {
+    setShowWorkOrdersState((prevState) => ({
+      ...prevState,
+      [workOrderNumber]: !prevState?.[workOrderNumber],
+    }))
+  }
+
+  const deleteAllWorkOrders = async () => {
+    try {
+      const response = await fetch('/api/delete-all-workorders', {
+        method: 'DELETE',
+        header: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      const result = await response.json()
+      if (response.ok) {
+        console.log(result.message)
+      } else {
+        console.error('Error deleting work orders:', result.message)
+      }
+    } catch (error) {
+      console.error('Error deleting work orders:', error.message)
+    }
+  }
   return (
-    <>
-      <div className="mb-8 sm:flex sm:items-center">
-        <div className="sm:flex-auto">
-          <h1 className="text-base font-semibold leading-6 text-gray-900">
-            Part Request Status
-          </h1>
-          {/* <p className="mt-2 text-sm text-gray-700">
-            A real-time list of parts showing name, vendor, availability status,
-            price, and vendor role for each.{' '}
-          </p> */}
-        </div>
-        {/* <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
-          <button
-            type="button"
-            className="block rounded-md bg-[#2563eb] px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-[#2563eb] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563eb]"
-            onClick={() => setOpen(true)}
-          >
-            Request Part
-          </button>
-        </div> */}
-      </div>
-      {data?.map((workOrder, index) => (
-        <div key={index} className="mb-8">
-          {workOrder.parts.map((part, partIndex) => (
-            <PartRequestWithVendorResponses key={partIndex} data={part} />
-          ))}
+    <div className="rounded-md border border-gray-200 px-4 sm:px-6 lg:px-8">
+      <button onClick={deleteAllWorkOrders}>Delete all workorders</button>
+      {data?.map((order) => (
+        <div key={order.workOrderNumber} className="mb-6">
+          <WorkOrderHeader
+            order={order}
+            showWorkOrder={showWorkOrdersState?.[order.workOrderNumber]}
+            toggleWorkOrder={toggleWorkOrder}
+          />
+          {showWorkOrdersState?.[order.workOrderNumber] &&
+            order.parts.map((part) => (
+              <PartSection part={part} key={part.partNumber} />
+            ))}
+          {/* <hr className="mb-4 mt-4" /> */}
         </div>
       ))}
-
-      {/* <SlideOverRequestForm open={open} setOpen={setOpen} activeVendors={activeVendors} /> */}
-    </>
+    </div>
   )
 }
