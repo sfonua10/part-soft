@@ -19,14 +19,14 @@ export async function POST(request) {
       partDescriptions = `Part Name: ${parts[0].partName}
 Part Number: ${parts[0].partNumber}
 -----------`;
-      responseExample = `Yes $120`;
+      responseExample = `Yes 124.99`;
     } else {
       partDescriptions = parts
         .map((part, index) => `${String.fromCharCode(65 + index)}. 
     Part Name: ${part.partName}
     Part Number: ${part.partNumber}`)
         .join('\n') + "\n-----------";
-      responseExample = `A Yes $120`;
+      responseExample = `A Yes 120`;
     }
     
     const messageTemplate = (vendorName) => `

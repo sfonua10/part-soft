@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
@@ -12,8 +12,33 @@ const LoginForm = () => {
   const [password, setPassword] = useState('')
   const [emailError, setEmailError] = useState('')
   const [passwordError, setPasswordError] = useState('')
-
   const router = useRouter()
+
+  useEffect(() => {
+    checkJWTValidity();
+  }, []);
+
+  const checkJWTValidity = async () => {
+    try {
+      const jwt = sessionStorage.getItem('jwt');
+  
+      if (!jwt) return;
+
+      const response = await fetch('/api/verify-token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${jwt}`
+        }
+      });
+
+      if (response.ok) {
+        router.push('/dashboard');
+      }
+    } catch (error) {
+      console.error('Error verifying token:', error);
+    }
+  };
 
   async function loginUser(email, password) {
     const response = await fetch('/api/login', {

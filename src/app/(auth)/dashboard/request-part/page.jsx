@@ -328,7 +328,7 @@ export default function RequestPart() {
               <p className="mt-4 text-center text-sm text-gray-500 sm:mt-0 sm:text-left">
                 {vendorChangesSaved
                   ? 'Ensure vendor changes are saved before requesting a part.'
-                  : 'Vendor changes detected. Save them first!'}
+                  : 'This will send a sms text messages to vendors'}
               </p>
             </div>
           </div>

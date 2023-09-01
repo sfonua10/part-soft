@@ -1,3 +1,4 @@
+import { CheckBadgeIcon } from "@heroicons/react/24/outline"
 const baseButtonStyles =
   'w-full rounded-md border border-transparent px-4 py-2 text-sm font-medium shadow-sm hover:bg--[#2563eb] focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:ring-offset-2 focus:ring-offset-gray-50 sm:order-last sm:ml-6 sm:w-auto'
 const getButtonStyles = (condition) => {
@@ -30,9 +31,9 @@ const VendorSection = ({
               <div className="min-w-0 flex-1 text-sm leading-6">
                 <label
                   htmlFor={`person-${vendor._id}`}
-                  className="select-none font-medium text-gray-900"
+                  className="select-none font-medium text-gray-900 flex items-center"
                 >
-                  {vendor.name}
+                  {vendor.name} { vendor.isSaved && <CheckBadgeIcon className="h-6 text-green-400 pl-2" /> }
                 </label>
               </div>
               <div className="ml-3 flex h-6 items-center">
@@ -58,8 +59,8 @@ const VendorSection = ({
         >
           Save Vendors
         </button>
-        <p className="mt-4 text-center text-sm text-gray-500 sm:mt-0 sm:text-left">
-          Confirm any changes made to vendor statuses.
+        <p className="mt-4 text-center text-sm text-gray-500 sm:mt-0 sm:text-left flex">
+          Part request will be sent to vendors with <CheckBadgeIcon className="h-6 text-green-400 pl-2" />
         </p>
       </div>
     </div>
