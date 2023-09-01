@@ -37,7 +37,7 @@ export default function RequestPart() {
   useEffect(() => {
     setIsFormFilled(isFormValid())
   }, [workOrderNumber, vehicle, parts])
-  // Update myVendors once vendors is loaded
+  
   useEffect(() => {
     if (vendors) {
       setMyVendors(vendors)
@@ -153,7 +153,7 @@ export default function RequestPart() {
 
       const data = await response.json()
       if (!response.ok) {
-        console.error('Server Error:', data.error) // Assuming your API returns an error field
+        console.error('Server Error:', data.error)
         alert(data.error)
         setIsLoading(false)
         return
@@ -228,7 +228,6 @@ export default function RequestPart() {
       })
       .then((data) => {
         if (data.success) {
-          // mutate('/api/save-vendor-status')
           mutate('/api/vendor-info')
           setNotification({
             show: true,

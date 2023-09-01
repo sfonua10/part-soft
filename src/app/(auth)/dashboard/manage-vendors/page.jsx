@@ -1,8 +1,8 @@
 'use client'
-// import { useState, useEffect } from 'react';
+
 import useSWR from 'swr'
-// import VendorForm3 from '@/components/VendorForm3'
-import VendorForm2 from '@/components/VendorForm2'
+import VendorForm from '@/components/VendorForm'
+
 const MangeVendors = () => {
   const fetcher = (url) => fetch(url).then((res) => res.json())
 
@@ -10,7 +10,7 @@ const MangeVendors = () => {
     revalidateOnMount: true
   })
 
-  return <VendorForm2 data={data} />
+  return <VendorForm data={data} />
 }
 
 export default MangeVendors
