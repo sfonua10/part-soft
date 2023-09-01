@@ -12,6 +12,7 @@ export default function VendorTable({ data }) {
   const [showWorkOrdersState, setShowWorkOrdersState] = useState(
     initialShowWorkOrdersState,
   )
+
   useEffect(() => {
     const newShowWorkOrdersState = data?.reduce((acc, order) => {
       acc[order.workOrderNumber] = true
@@ -20,6 +21,33 @@ export default function VendorTable({ data }) {
 
     setShowWorkOrdersState(newShowWorkOrdersState)
   }, [data])
+
+  const collapseAllWorkOrders = () => {
+    const newState = { ...showWorkOrdersState }
+    for (let orderNum in newState) {
+      newState[orderNum] = false
+    }
+    setShowWorkOrdersState(newState)
+  }
+
+  const expandAllWorkOrders = () => {
+    const newState = { ...showWorkOrdersState }
+    for (let orderNum in newState) {
+      newState[orderNum] = true
+    }
+    setShowWorkOrdersState(newState)
+  }
+
+  const toggleAllWorkOrders = () => {
+    const anyExpanded = Object.values(showWorkOrdersState).some(
+      (state) => state,
+    )
+    if (anyExpanded) {
+      collapseAllWorkOrders()
+    } else {
+      expandAllWorkOrders()
+    }
+  }
 
   const toggleWorkOrder = (workOrderNumber) => {
     setShowWorkOrdersState((prevState) => ({
@@ -48,22 +76,34 @@ export default function VendorTable({ data }) {
     }
   }
   return (
-    <div className="rounded-md border border-gray-200 px-4 sm:px-6 lg:px-8">
-      <button onClick={deleteAllWorkOrders}>Delete all workorders</button>
-      {data?.map((order) => (
-        <div key={order.workOrderNumber} className="mb-6">
-          <WorkOrderHeader
-            order={order}
-            showWorkOrder={showWorkOrdersState?.[order.workOrderNumber]}
-            toggleWorkOrder={toggleWorkOrder}
-          />
-          {showWorkOrdersState?.[order.workOrderNumber] &&
-            order.parts.map((part) => (
-              <PartSection part={part} key={part.partNumber} />
-            ))}
-          {/* <hr className="mb-4 mt-4" /> */}
-        </div>
-      ))}
-    </div>
+    <>
+      <div className="mb-2 flex justify-end">
+        <button
+          onClick={toggleAllWorkOrders}
+          type="button"
+          className="rounded bg-white px-2 py-1 text-xs font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+        >
+          Toggle all work orders
+        </button>
+      </div>
+      <div className="rounded-md border border-gray-200 px-4 sm:px-6 lg:px-8">
+        {/* <button onClick={deleteAllWorkOrders}>Delete all workorders</button> */}
+
+        {data?.map((order) => (
+          <div key={order.workOrderNumber} className="mb-6">
+            <WorkOrderHeader
+              order={order}
+              showWorkOrder={showWorkOrdersState?.[order.workOrderNumber]}
+              toggleWorkOrder={toggleWorkOrder}
+            />
+            {showWorkOrdersState?.[order.workOrderNumber] &&
+              order.parts.map((part) => (
+                <PartSection part={part} key={part.partNumber} />
+              ))}
+            {/* <hr className="mb-4 mt-4" /> */}
+          </div>
+        ))}
+      </div>
+    </>
   )
 }

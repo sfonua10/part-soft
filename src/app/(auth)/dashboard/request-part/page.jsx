@@ -302,7 +302,7 @@ export default function RequestPart() {
               handleInputChange={handleInputChange}
               errors={errors}
             />
-            <section
+            {/* <section
               aria-labelledby="part-information-heading"
               className="mt-10 text-right"
             >
@@ -313,7 +313,7 @@ export default function RequestPart() {
               >
                 Add Another Part <span aria-hidden="true">→</span>
               </a>
-            </section>
+            </section> */}
 
             <div className="mt-10 border-t border-gray-200 pt-6 sm:flex sm:items-center sm:justify-between">
               <button
