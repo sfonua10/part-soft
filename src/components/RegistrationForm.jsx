@@ -26,11 +26,18 @@ const RegistrationForm = () => {
     return name.length >= 2 && name.length <= 100
   }
 
+  //This is temporary until we expand outside of this organization (united diesel service)
+  //In phase 1, we will only have users with this email to access dashboard
   const isBusinessEmail = (email) => {
-    const freeEmailProviders = ['gmail.com', 'yahoo.com', 'outlook.com']
-    const domain = email.split('@')[1]
-    return !freeEmailProviders.includes(domain)
+    const domain = email.split('@')[1];
+    return domain === 'uniteddieselservice.net';
   }
+  
+  // const isBusinessEmail = (email) => {
+  //   const freeEmailProviders = ['gmail.com', 'yahoo.com', 'outlook.com']
+  //   const domain = email.split('@')[1]
+  //   return !freeEmailProviders.includes(domain)
+  // }
 
   const isPasswordValid = (password) => {
     const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$.!%*#?&]{8,}$/
