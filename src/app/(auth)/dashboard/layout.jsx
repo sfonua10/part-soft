@@ -321,8 +321,8 @@ export default function DashboardLayout({ children }) {
               <span className="sr-only">Open user menu</span>
               <Image
                 className="h-8 w-8 rounded-full bg-gray-50"
-                src={session.user.image}
-                alt={`${session.user.name}'s profile picture`}
+                src={session?.user?.image}
+                alt={`${session?.user?.name}'s profile picture`}
                 width={32}
                 height={32}
               />

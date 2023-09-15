@@ -3,7 +3,7 @@ import Vendor from "@/models/vendor";
 export async function GET(request) {
     try {
       //Get the activeOnly query parameter from the request
-      const url = new URL(request.url);
+      const url = new URL(request?.url);
       const activeOnly = url.searchParams.get('activeOnly');
 
       let query = {};
