@@ -54,8 +54,8 @@ const handler = NextAuth({
 
         // Restrict access based on the email domain
         if (account.provider === 'google') {
-          // if (!profile.email_verified || !profile.email.endsWith("@uniteddieselservice.net")) {
-          if (!profile.email_verified || !profile.email.endsWith("@gmail.com")) {
+          if (!profile.email_verified || !profile.email.endsWith("@uniteddieselservice.net")) {
+          // if (!profile.email_verified || !profile.email.endsWith("@gmail.com")) {
             console.error('Invalid email domain or email not verified');
             return false;
           }
