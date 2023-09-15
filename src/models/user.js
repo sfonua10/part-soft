@@ -8,12 +8,14 @@ const UserSchema = new Schema({
   },
   companyName: {
     type: String,
-    required: [true, 'Company Name is required!'],
+    // required: [true, 'Company Name is required!'],
   },
   password: {
     type: String,
-    required: [true, 'Password is required!'],
+    // required: [true, 'Password is required!'],
   },
+  isNewUser: { type: Boolean, default: true },
+
   // ... (other fields)
 });
 
