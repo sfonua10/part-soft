@@ -9,10 +9,11 @@ import { Logo } from '@/components/Logo'
 import { signIn, useSession } from 'next-auth/react'
 
 const LoginForm = () => {
-  const [email, setEmail] = useState('');
-  const [emailError, setEmailError] = useState('');
-  const { data: session, loading } = useSession();
-  const router = useRouter();
+  const [email, setEmail] = useState('')
+  const [emailError, setEmailError] = useState('')
+  const [role, setRole] = useState(''); 
+  const { data: session, loading } = useSession()
+  const router = useRouter()
 
   useEffect(() => {
     checkJWTValidity()
@@ -25,7 +26,7 @@ const LoginForm = () => {
       router.push('/dashboard')
     }
   }, [loading, session])
-  
+
   const checkJWTValidity = async () => {
     try {
       const jwt = sessionStorage.getItem('jwt')
@@ -49,18 +50,18 @@ const LoginForm = () => {
   }
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setEmailError('');
+    e.preventDefault()
+    setEmailError('')
 
     try {
-      await signIn('email', { email }); // Updated to use 'email' provider and only pass email
-      alert('Magic link sent to your email.');
+      await signIn('email', { email }) // Updated to use 'email' provider and only pass email
+      alert('Magic link sent to your email.')
     } catch (error) {
-      setEmailError('Failed to send magic link.');
-      console.error('Error logging in:', error);
+      setEmailError('Failed to send magic link.')
+      console.error('Error logging in:', error)
     }
-  };
-  
+  }
+
   return (
     <>
       <div className="flex">
@@ -68,11 +69,9 @@ const LoginForm = () => {
           <Logo className="h-10 w-auto" />
         </Link>
       </div>
-      <h2 className="mt-20 text-lg font-semibold text-gray-900">
-        Log in
-      </h2>
+      <h2 className="mt-20 text-lg font-semibold text-gray-900">Log in</h2>
       <form onSubmit={handleSubmit} className="mt-10 grid grid-cols-1 gap-y-8">
-        {/* <TextField
+        <TextField
           label="Enter your email"
           name="email"
           type="email"
@@ -82,13 +81,36 @@ const LoginForm = () => {
           onChange={(e) => setEmail(e.target.value)}
           error={emailError}
         />
+        {/* <div>
+          <label
+            htmlFor="role"
+            className="block text-sm font-medium leading-6 text-gray-900"
+          >
+            Role
+          </label>
+          <select
+            id="role"
+            name="role"
+            required
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-600 sm:text-sm sm:leading-6"
+            defaultValue="Canada"
+          >
+            <option value="" disabled>
+              Select your role
+            </option>
+            <option value="mechanic">Mechanic</option>
+            <option value="parts-manager">Parts Manager</option>
+          </select>
+        </div> */}
         <div>
           <Button type="submit" variant="solid" color="blue" className="w-full">
             <span>
-              Sign in <span aria-hidden="true">&rarr;</span>
+              Sign in<span aria-hidden="true">&rarr;</span>
             </span>
           </Button>
-        </div> */}
+        </div>
         <div>
           {/* <div className="relative">
             <div
@@ -103,7 +125,7 @@ const LoginForm = () => {
               </span>
             </div>
           </div> */}
-
+          {/* 
           <div className="mt-6 grid grid-cols-2 gap-4">
             <a
               // href="#"
@@ -139,7 +161,7 @@ const LoginForm = () => {
               </svg>
               <span className="text-sm font-semibold leading-6">Google</span>
             </a>
-          </div>
+          </div> */}
         </div>
       </form>
     </>
