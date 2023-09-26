@@ -14,8 +14,10 @@ const UserSchema = new Schema({
     type: String,
     // required: [true, 'Password is required!'],
   },
-  isNewUser: { type: Boolean, default: true },
-
+  role: {
+    type: String,
+    default: 'mechanic'
+  }
   // ... (other fields)
 });
 
