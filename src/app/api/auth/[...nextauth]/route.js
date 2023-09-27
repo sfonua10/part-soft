@@ -1,6 +1,6 @@
 import NextAuth from "next-auth";
-// import GoogleProvider from "next-auth/providers/google";
-import Email from "next-auth/providers/email";
+import GoogleProvider from "next-auth/providers/google";
+// import Email from "next-auth/providers/email";
 import { MongoDBAdapter } from "@auth/mongodb-adapter";
 import User from "@/models/user";
 import { connectToDB } from "@/utils/database";
@@ -9,24 +9,24 @@ import { createTransport } from "nodemailer"
 
 const handler = NextAuth({
   secret: process.env.NEXTAUTH_SECRET,
-  adapter: MongoDBAdapter(clientPromise),
+  // adapter: MongoDBAdapter(clientPromise),
   providers: [
-    Email({
-      server: {
-        host: process.env.SMTP_HOST,
-        port: Number(process.env.SMTP_PORT),
-        auth: {
-          user: process.env.SMTP_USER,
-          pass: process.env.SMTP_PASSWORD,
-        },
-      },
-      from: process.env.EMAIL_FROM,
-      sendVerificationRequest: sendVerificationRequest
-    }),
-    // GoogleProvider({
-    //   clientId: process.env.GOOGLE_ID,
-    //   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    // Email({
+    //   server: {
+    //     host: process.env.SMTP_HOST,
+    //     port: Number(process.env.SMTP_PORT),
+    //     auth: {
+    //       user: process.env.SMTP_USER,
+    //       pass: process.env.SMTP_PASSWORD,
+    //     },
+    //   },
+    //   from: process.env.EMAIL_FROM,
+    //   sendVerificationRequest: sendVerificationRequest
     // }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    }),
   ],
   callbacks: {
     async session({ session, user }) {
@@ -56,13 +56,13 @@ const handler = NextAuth({
         }
 
         // Restrict access based on the email domain
-        if (account.provider === 'google') {
-          if (!profile.email_verified || !profile.email.endsWith("@uniteddieselservice.net")) {
-          // if (!profile.email_verified || !profile.email.endsWith("@gmail.com")) {
-            console.error('Invalid email domain or email not verified');
-            return false;
-          }
-        }
+        // if (account.provider === 'google') {
+        //   // if (!profile.email_verified || !profile.email.endsWith("@uniteddieselservice.net")) {
+        //   if (!profile.email_verified || !profile.email.endsWith("@gmail.com")) {
+        //     console.error('Invalid email domain or email not verified');
+        //     return false;
+        //   }
+        // }
         // Declare variables to store user details
         let email, name, picture;
     
