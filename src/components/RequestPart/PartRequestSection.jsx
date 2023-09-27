@@ -1,12 +1,28 @@
 import { Fragment } from 'react'
+import { XCircleIcon } from '@heroicons/react/24/outline'
 
-const PartRequestSection = ({ parts, handleInputChange, errors }) => (
+const PartRequestSection = ({
+  parts,
+  handleInputChange,
+  handleRemovePart,
+  errors,
+}) => (
   <section aria-labelledby="part-information-heading" className="mt-10">
     {parts.map((part, index) => (
       <Fragment key={index}>
-        <h2 id="part-heading" className="text-lg font-medium text-gray-900">
-          Part Request #{index + 1}
-        </h2>
+        <div className="flex items-center justify-between">
+          <h2 id="part-heading" className="text-lg font-medium text-gray-900">
+            Part Request #{index + 1}
+          </h2>
+          {index !== 0 && (
+            <button
+              onClick={() => handleRemovePart(index)}
+              // className="opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            >
+              <XCircleIcon className="h-6 text-red-600" />
+            </button>
+          )}
+        </div>
         <div
           key={index}
           className="mt-6 grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2"

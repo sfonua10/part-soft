@@ -38,12 +38,12 @@ export default function DashboardLayout({ children }) {
       icon: EnvelopeIcon,
       current: false,
     },
-    {
+    ...(session?.user?.role === 'admin' ? [{
       name: 'Manage Vendors',
       href: '/dashboard/manage-vendors',
       icon: UsersIcon,
       current: false,
-    },
+    }] : []),
   ]
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [navigation, setNavigation] = useState(navigationItems)
