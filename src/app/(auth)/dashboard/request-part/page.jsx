@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import VehicleInfo2 from '@/components/RequestPart/VehicleInfo2'
 import { PlusCircleIcon } from '@heroicons/react/20/solid'
 import PartRequestSection from '@/components/RequestPart/PartRequestSection'
-
+import SuccessModal from '@/components/RequestPart/SuccessModal'
 export default function RequestPart() {
   const [vehicle, setVehicle] = useState({
     make: '',
@@ -17,6 +17,8 @@ export default function RequestPart() {
   const [workOrderNumber, setWorkOrderNumber] = useState('')
   const [errors, setErrors] = useState({})
   const [showAdditionalInfo, setShowAdditionalInfo] = useState(false)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
   const router = useRouter()
 
   useEffect(() => {
@@ -149,7 +151,9 @@ export default function RequestPart() {
         },
       ])
 
-      router.push('/dashboard')
+      // router.push('/dashboard')
+      setIsModalOpen(true)
+
     } catch (error) {
       console.error('Error:', error)
       // setIsLoading(false);
@@ -162,6 +166,13 @@ export default function RequestPart() {
         <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
           Request Parts
         </h1>
+        {isModalOpen && (
+          <SuccessModal
+            isModalOpen={isModalOpen}
+            setIsModalOpen={setIsModalOpen}
+          />
+        )}
+
         <form
           onSubmit={handleSubmit}
           className="mt-12 lg:grid lg:grid-cols-12 lg:items-start lg:gap-x-12 xl:gap-x-16"

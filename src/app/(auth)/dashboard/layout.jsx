@@ -46,6 +46,12 @@ export default function DashboardLayout({ children }) {
           current: true,
         },
         {
+          name: 'Dashboard2',
+          href: '/dashboard2',
+          icon: HomeIcon,
+          current: true,
+        },
+        {
           name: 'Parts Request Queue',
           href: '/dashboard/parts-request-queue',
           icon: ListBulletIcon,
