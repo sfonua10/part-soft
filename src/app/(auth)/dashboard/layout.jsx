@@ -52,8 +52,8 @@ export default function DashboardLayout({ children }) {
           current: true,
         },
         {
-          name: 'Parts Request Queue',
-          href: '/dashboard/parts-request-queue',
+          name: 'Work Order Listings',
+          href: '/dashboard/work-order-listings',
           icon: ListBulletIcon,
           current: false,
         },
