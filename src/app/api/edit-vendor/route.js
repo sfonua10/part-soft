@@ -6,8 +6,8 @@ export async function PUT(req) {
 
   try {
     // Destructure all the needed fields from the request
-    const { _id, name, phone, email, primaryContact, specialization, isActive, isSaved } = await req.json();
-    console.log('Parsed request body:', { _id, name, phone, email, primaryContact, specialization, isActive, isSaved });
+    const { _id, name, phone, email, primaryContact, specialization} = await req.json();
+    console.log('Parsed request body:', { _id, name, phone, email, primaryContact, specialization});
 
     if (!_id) {
       console.error('Vendor ID missing in request body');
@@ -31,9 +31,7 @@ export async function PUT(req) {
       phone: formattedPhone,
       email,
       primaryContact,
-      specialization,
-      isActive,
-      isSaved
+      specialization
     };
     console.log('Update values:', updateValues);
 

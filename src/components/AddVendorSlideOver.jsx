@@ -93,9 +93,7 @@ export default function AddVendorSliderOver({ open, setOpen, vendor }) {
       phone: e.target.phone.value,
       email: e.target.email.value,
       primaryContact: e.target['primary-contact-name'].value,
-      specialization: e.target['specialization'].value,
-      isActive: false,
-      isSaved: false
+      specialization: e.target['specialization'].value
     };
   
     if (validateForm(vendorData)) {

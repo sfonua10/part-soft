@@ -28,15 +28,7 @@ const VendorSchema = new mongoose.Schema({
     type: String,
     trim: true,
     default: ''
-  },
-  isActive: {
-    type: Boolean,
-    default: true
-  },
-  isSaved: {
-    type: Boolean,
-    default: false
-  },
+  }
   //... any other fields you need
 });
 

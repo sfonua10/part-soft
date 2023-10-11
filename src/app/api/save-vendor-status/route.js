@@ -1,38 +1,28 @@
-import { connectToDB } from '@/utils/database'
-import Vendor from '@/models/vendor' // Assuming you have a Vendor model similar to the User model
+// import { connectToDB } from '@/utils/database'
+// import Vendor from '@/models/vendor' // Assuming you have a Vendor model similar to the User model
 
-export async function PUT(req, res) {
-  const changedVendors = await req.json()
+// export async function PUT() {
+//   try {
+//     await connectToDB()
 
-  try {
-    await connectToDB()
-
-    // Loop through each vendor and update their status
-    for (const vendor of changedVendors) {
-      await Vendor.findByIdAndUpdate(vendor._id, {
-        isActive: vendor.isActive,
-        isSaved: vendor.isSaved 
-      });
-    }
-
-    return new Response(
-      JSON.stringify({
-        success: true,
-        message: 'Vendor statuses updated successfully.',
-      }),
-      {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-      },
-    )
-  } catch (error) {
-    console.error('Error updating vendor statuses:', error)
-    return new Response(
-      JSON.stringify({ success: false, message: 'An error occurred.' }),
-      {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' },
-      },
-    )
-  }
-}
+//     return new Response(
+//       JSON.stringify({
+//         success: true,
+//         message: 'Vendor statuses updated successfully.',
+//       }),
+//       {
+//         status: 200,
+//         headers: { 'Content-Type': 'application/json' },
+//       },
+//     )
+//   } catch (error) {
+//     console.error('Error updating vendor statuses:', error)
+//     return new Response(
+//       JSON.stringify({ success: false, message: 'An error occurred.' }),
+//       {
+//         status: 500,
+//         headers: { 'Content-Type': 'application/json' },
+//       },
+//     )
+//   }
+// }

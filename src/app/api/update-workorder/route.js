@@ -14,6 +14,7 @@ export async function PUT(req, res) {
         'vehicle.make': updatedWorkOrder.vehicle.make,
         'vehicle.model': updatedWorkOrder.vehicle.model,
         'vehicle.year': updatedWorkOrder.vehicle.year,
+        'status': updatedWorkOrder.status
       }, 
       { new: true }  // This option returns the modified document
     );

@@ -16,11 +16,12 @@ const PartsList = ({ parts, allVendors, onVendorChange }) => {
                 cacheOptions={false}
                 isMulti
                 options={allVendors}
-                value={part.selectedVendors.map((vendor) => ({
-                  label: vendor,
-                  value: vendor,
-                }))}
+                value={part.selectedVendors ? part.selectedVendors.map((vendor) => ({
+                  label: vendor.name,
+                  value: vendor._id,
+                })) : []}
                 onChange={(selected) => onVendorChange(selected, part._id)}
+                placeholder="Select Vendor"
               />
             </li>
           )
