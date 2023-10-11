@@ -57,8 +57,7 @@ Thanks,
 Partsoft - Casey Johnson      
     `;
 
-    const activeVendors = vendors?.filter((vendor) => vendor.isActive);
-    let vendorResponses = activeVendors.map((vendor) => ({
+    let vendorResponses = vendors.map((vendor) => ({
       _id: vendor.id,
       vendorName: vendor.name,
       availability: 'Pending',
@@ -79,7 +78,7 @@ Partsoft - Casey Johnson
 
     await workOrder.save();
 
-    for (let vendor of activeVendors) {
+    for (let vendor of vendors) {
       console.log('Sending message to', vendor.name, 'at', vendor.phone);
       const personalizedMessage = messageTemplate(vendor.name);
       await client.messages.create({

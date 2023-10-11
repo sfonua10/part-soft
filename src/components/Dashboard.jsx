@@ -9,6 +9,7 @@ export default function Dashboard() {
   const { data: workOrdersData, error, isLoading } = useSWR('/api/get-workorders', fetcher, {
     refreshInterval: 10000
   });
+  console.log('workOrdersData', workOrdersData)
   if (error) {
     return <div>Error loading data: {error.message}</div>;
   }

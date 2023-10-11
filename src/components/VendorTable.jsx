@@ -87,7 +87,7 @@ export default function VendorTable({ data }) {
         </button>
       </div>
       <div className="rounded-md border border-gray-200 px-4 sm:px-6 lg:px-8">
-        {/* <button onClick={deleteAllWorkOrders}>Delete all workorders</button> */}
+        <button onClick={deleteAllWorkOrders}>Delete all workorders</button>
 
         {data?.map((order) => (
           <div key={order.workOrderNumber} className="mb-6">

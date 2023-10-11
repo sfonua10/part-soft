@@ -45,15 +45,15 @@ export default function DashboardLayout({ children }) {
           icon: HomeIcon,
           current: true,
         },
+        // {
+        //   name: 'Dashboard2',
+        //   href: '/dashboard2',
+        //   icon: HomeIcon,
+        //   current: true,
+        // },
         {
-          name: 'Dashboard2',
-          href: '/dashboard2',
-          icon: HomeIcon,
-          current: true,
-        },
-        {
-          name: 'Parts Request Queue',
-          href: '/dashboard/parts-request-queue',
+          name: 'Work Order Listings',
+          href: '/dashboard/work-order-listings',
           icon: ListBulletIcon,
           current: false,
         },

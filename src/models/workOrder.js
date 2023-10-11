@@ -39,27 +39,23 @@ const partSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    selectedVendors: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Vendor'  // Linking to my Vendor model
+    }],
+    notificationsSent: {
+        type: Date,  // Stores the date when the notifications were sent
+        default: null
+    },
     vendorResponses: [vendorResponseSchema]
 });
 
 // Vehicle Schema
 const vehicleSchema = new mongoose.Schema({
-    vin: {
-        type: String,
-        required: true
-    },
-    make: {
-        type: String,
-        required: true
-    },
-    model: {
-        type: String,
-        required: true
-    },
-    year: {
-        type: Number,
-        required: true
-    }
+    make: String,
+    model: String,
+    year: String,
+    vin: String,
 });
 
 // Work Order Schema
@@ -68,7 +64,13 @@ const workOrderSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    vehicle: vehicleSchema,  // Embed vehicle schema here
+    status: {
+        type: String,
+        enum: ['Created', 'Vehicle Details Added', 'Sent to Vendor'],
+        default: 'Created',
+        required: true
+    },
+    vehicle: vehicleSchema,
     parts: [partSchema]
 });
 

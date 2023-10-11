@@ -124,7 +124,7 @@ export default function RequestPart() {
       // setIsLoading(true);  // Assume setIsLoading is a function to toggle a loading state
 
       // Send the data to the server
-      const response = await fetch('/api/part-requests', {
+      const response = await fetch('/api/work-orders', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
