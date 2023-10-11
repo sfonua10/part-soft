@@ -1,6 +1,11 @@
 import { connectToDB } from '@/utils/database'
 import Vendor from '@/models/vendor'
 
+const formatToE164 = (phone) => {
+  const numbersOnly = phone.replace(/\D/g, ''); // Removes all non-numeric characters
+  return numbersOnly.startsWith('1') ? `+${numbersOnly}` : `+1${numbersOnly}`;
+};
+
 export async function POST(req) {
   // Destructure all the needed fields from the request
   const { name, phone, email, primaryContact, specialization } = await req.json()
@@ -10,7 +15,7 @@ export async function POST(req) {
   try {
     await connectToDB()
     // Format the phone number to E.164 if it doesn't start with a '+'
-    const formattedPhone = phone.startsWith('+') ? phone : `+${phone}`;
+    const formattedPhone = formatToE164(phone);
     const newVendor = new Vendor({
       name,
       phone: formattedPhone,
