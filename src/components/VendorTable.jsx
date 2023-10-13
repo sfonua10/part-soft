@@ -78,13 +78,13 @@ export default function VendorTable({ data }) {
   return (
     <>
       <div className="mb-2 flex justify-between">
-        {/* <button
+        <button
           onClick={deleteAllWorkOrders}
           type="button"
           className="rounded bg-white px-2 py-1 text-xs font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
         >
           Delete all workorders
-        </button> */}
+        </button>
         <button
           onClick={toggleAllWorkOrders}
           type="button"
