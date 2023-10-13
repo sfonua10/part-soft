@@ -1,87 +1,101 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
 
 // Vendor Response Schema
 const vendorResponseSchema = new mongoose.Schema({
-    _id: String,
-    vendorName: String,
-    availability: {
-        type: String,
-        enum: ['In Stock', 'Out of Stock', 'Pending'],
-        required: true
-    },
-    orderStatus: {
-        type: String,
-        enum: ['Pending', 'N/A', 'Confirmed', 'Cancelled'],
-        required: true
-    },
-    price: {
-        type: Number,
-        default: null,
-    },
-    delivery: {
-        type: String,
-        default: null
-    },
-    partAvailable: {
-        type: String,
-        enum: ['yes', 'no', 'N/A'],
-        required: true
-    }
-});
+  _id: String,
+  vendorName: String,
+  availability: {
+    type: String,
+    enum: ['In Stock', 'Out of Stock', 'Pending'],
+    required: true,
+  },
+  orderStatus: {
+    type: String,
+    enum: ['Pending', 'N/A', 'Confirmed', 'Cancelled'],
+    required: true,
+  },
+  price: {
+    type: Number,
+    default: null,
+  },
+  delivery: {
+    type: String,
+    default: null,
+  },
+  partAvailable: {
+    type: String,
+    enum: ['yes', 'no', 'N/A'],
+    required: true,
+  },
+})
 
 // Part Schema
 const partSchema = new mongoose.Schema({
-    partName: {
-        type: String,
-        required: true
+  partName: {
+    type: String,
+    required: true,
+  },
+  partNumber: {
+    type: String,
+    required: true,
+  },
+  selectedVendors: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Vendor', // Linking to my Vendor model
     },
-    partNumber: {
-        type: String,
-        required: true
-    },
-    selectedVendors: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Vendor'  // Linking to my Vendor model
-    }],
-    notificationsSent: {
-        type: Date,  // Stores the date when the notifications were sent
-        default: null
-    },
-    vendorResponses: [vendorResponseSchema]
-});
+  ],
+  notificationsSent: {
+    type: Date, // Stores the date when the notifications were sent
+    default: null,
+  },
+  vendorResponses: [vendorResponseSchema],
+})
 
 // Vehicle Schema
 const vehicleSchema = new mongoose.Schema({
-    make: String,
-    model: String,
-    year: String,
-    vin: String,
-});
+  make: String,
+  model: String,
+  year: String,
+  vin: String,
+})
 
 // Work Order Schema
 const workOrderSchema = new mongoose.Schema({
-    workOrderNumber: {
-        type: String,
-        required: true
-    },
-    status: {
-        type: String,
-        enum: ['Awaiting Parts Manager Review', 'Reviewed', 'Vendor Notified'],
-        default: 'Awaiting Parts Manager Review',
-        required: true
-    },
-    mechanicName: {
-        type: String,
-        required: true,
-      },
-    dateSubmitted: {
-        type: Date,
-        default: Date.now 
-    },
-    vehicle: vehicleSchema,
-    parts: [partSchema]
-});
+  workOrderNumber: {
+    type: String,
+    required: true,
+  },
+  status: {
+    type: String,
+    enum: [
+      'Awaiting Parts Manager Review',
+      'Vehicle Details Added',
+      'Parts and Vendors Updated',
+      'Reviewed',
+      'Vendor Notified',
+    ],
+    default: 'Awaiting Parts Manager Review',
+    required: true,
+  },
+  mechanicName: {
+    type: String,
+    required: true,
+  },
+  dateSubmitted: {
+    type: Date,
+    default: Date.now,
+  },
+  vehicle: vehicleSchema,
+  selectedPart: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Part',
+    default: null,
+  },
+  parts: [partSchema],
+})
 
-const WorkOrder = mongoose.models.WorkOrder || mongoose.model('WorkOrder', workOrderSchema);
+const WorkOrder =
+  mongoose.models.WorkOrder || mongoose.model('WorkOrder', workOrderSchema)
 
-export default WorkOrder;
+export default WorkOrder

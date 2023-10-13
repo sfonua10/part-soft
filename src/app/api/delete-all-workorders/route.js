@@ -1,4 +1,3 @@
-import mongoose from 'mongoose';
 import WorkOrder from '@/models/workOrder';
 
 export async function DELETE(request) {
