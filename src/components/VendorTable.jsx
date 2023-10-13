@@ -77,7 +77,14 @@ export default function VendorTable({ data }) {
   }
   return (
     <>
-      <div className="mb-2 flex justify-end">
+      <div className="mb-2 flex justify-between">
+        {/* <button
+          onClick={deleteAllWorkOrders}
+          type="button"
+          className="rounded bg-white px-2 py-1 text-xs font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+        >
+          Delete all workorders
+        </button> */}
         <button
           onClick={toggleAllWorkOrders}
           type="button"
@@ -87,8 +94,6 @@ export default function VendorTable({ data }) {
         </button>
       </div>
       <div className="rounded-md border border-gray-200 px-4 sm:px-6 lg:px-8">
-        <button onClick={deleteAllWorkOrders}>Delete all workorders</button>
-
         {data?.map((order) => (
           <div key={order.workOrderNumber} className="mb-6">
             <WorkOrderHeader

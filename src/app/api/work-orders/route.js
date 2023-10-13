@@ -2,7 +2,7 @@ import { connectToDB } from '@/utils/database'
 import WorkOrder from '@/models/workOrder'
 
 export async function POST(req) {
-  const { workOrderNumber, vehicle, parts } = await req.json()
+  const { workOrderNumber, vehicle, parts, mechanicName } = await req.json()
 
   try {
     await connectToDB()
@@ -11,6 +11,7 @@ export async function POST(req) {
       workOrderNumber,
       vehicle,
       parts,
+      mechanicName
     })
 
     await newWorkOrder.save()
