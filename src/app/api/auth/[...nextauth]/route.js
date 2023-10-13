@@ -1,10 +1,10 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 // import Email from "next-auth/providers/email";
-import { MongoDBAdapter } from "@auth/mongodb-adapter";
+// import { MongoDBAdapter } from "@auth/mongodb-adapter";
 import User from "@/models/user";
 import { connectToDB } from "@/utils/database";
-import clientPromise from "@/utils/mongodb";
+// import clientPromise from "@/utils/mongodb";
 import { createTransport } from "nodemailer"
 
 const handler = NextAuth({
@@ -36,14 +36,14 @@ const handler = NextAuth({
         if (sessionUser) {
           session.user.id = sessionUser._id.toString();
           session.user.role = sessionUser.role;
+          session.user.name = sessionUser.name; 
         } else {
           console.error('No user found in database');
         }
       } else {
         console.error('No email found in session user');
       }
-      console.log('session callback', session); // Log the session data
-
+    
       return session;
     },
     async signIn({ account, profile, user, credentials, error }) {   
@@ -87,7 +87,8 @@ const handler = NextAuth({
             await User.create({
               email,
               username: name?.replace(" ", "").toLowerCase(),
-              image: picture
+              image: picture,
+              name: name,
             });
           }
         } else {

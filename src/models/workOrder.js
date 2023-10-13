@@ -66,9 +66,17 @@ const workOrderSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['Created', 'Vehicle Details Added', 'Sent to Vendor'],
-        default: 'Created',
+        enum: ['Awaiting Parts Manager Review', 'Reviewed', 'Vendor Notified'],
+        default: 'Awaiting Parts Manager Review',
         required: true
+    },
+    mechanicName: {
+        type: String,
+        required: true,
+      },
+    dateSubmitted: {
+        type: Date,
+        default: Date.now 
     },
     vehicle: vehicleSchema,
     parts: [partSchema]

@@ -3,10 +3,12 @@ import React, { useState, useEffect } from 'react'
 import useSWR from 'swr'
 import VehicleInfo from '@/components/RequestPart/VehicleInfo'
 import PartsList from '@/components/WorkOrderListings/PartsList'
+import { useRouter } from 'next/navigation'
 
 const fetcher = (url) => fetch(url).then((res) => res.json())
 
 const WorkOrderDetailsPage = ({ params }) => {
+  const router = useRouter();
   const workOrderNumber = params.workOrderId
   const { data: workOrder, error } = useSWR(
     workOrderNumber
@@ -30,6 +32,7 @@ const WorkOrderDetailsPage = ({ params }) => {
   const [parts, setParts] = useState([])
   const [vendors, setVendors] = useState([])
   const [isLoading, setIsLoading] = useState(false)
+  const [isVehicleUpdated, setIsVehicleUpdated] = useState(false)
 
   useEffect(() => {
     if (workOrder) {
@@ -47,13 +50,12 @@ const WorkOrderDetailsPage = ({ params }) => {
     if (vendorData) {
       const transformedVendors = vendorData.map((vendor) => ({
         label: vendor.name,
-        value: vendor._id,  // <-- Change value to vendor's _id for uniqueness
-        data: vendor  // <-- Store the entire vendor object here
-      }));
-      setVendors(transformedVendors);
+        value: vendor._id, // <-- Change value to vendor's _id for uniqueness
+        data: vendor, // <-- Store the entire vendor object here
+      }))
+      setVendors(transformedVendors)
     }
-  }, [vendorData]);
-  
+  }, [vendorData])
 
   const handleVehicleInputChange = (e) => {
     const { name, value } = e.target
@@ -63,33 +65,27 @@ const WorkOrderDetailsPage = ({ params }) => {
     }))
   }
   const handleVendorChange = (selectedVendors, partId) => {
-    console.log('Handling vendor change for part:', partId);  // Logs the part ID for which vendors are being changed
-    console.log('Selected vendors:', selectedVendors);  // Logs the vendors selected (probably before they're processed)
-
     setParts((prevParts) => {
       const updatedParts = prevParts.map((part) => {
         if (part._id === partId) {
           const vendorsForPart = selectedVendors.map((selectedVendor) => {
-            const vendor = vendorData.find(v => v._id === selectedVendor.value);
-            return vendor;  // <-- Store the entire vendor object
-          });
-
-          console.log('Vendors mapped for part', partId, ':', vendorsForPart);  // Logs the processed vendor objects for the specific part
+            const vendor = vendorData.find(
+              (v) => v._id === selectedVendor.value,
+            )
+            return vendor
+          })
 
           return {
             ...part,
             selectedVendors: vendorsForPart,
-          };
+          }
         }
-        return part;
-      });
+        return part
+      })
 
-      console.log('Updated parts after vendor selection:', updatedParts);  // Logs the entire parts list after the change
-      return updatedParts;
-    });
-};
-
-  
+      return updatedParts
+    })
+  }
 
   const handleUpdateWorkOrder = async () => {
     try {
@@ -102,11 +98,16 @@ const WorkOrderDetailsPage = ({ params }) => {
           _id: workOrder._id,
           vehicle: vehicle,
           status: 'Vehicle Details Added',
+          parts: parts.map(part => ({
+            _id: part._id,
+            selectedVendors: part.selectedVendors
+          }))
         }),
       })
 
       const data = await response.json()
       if (data.success) {
+        setIsVehicleUpdated(true)
         // Handle success - maybe show a notification or refresh the data
       } else {
         // Handle error
@@ -117,17 +118,6 @@ const WorkOrderDetailsPage = ({ params }) => {
   }
 
   const handleRequestPart = async () => {
-    console.log('handleRequestPart called');
-
-    // const hasErrors = Object.values(errors).some((partErrors) =>
-    //   Object.values(partErrors).some((errorMessage) => errorMessage !== ''),
-    // )
-
-    // if (hasErrors) {
-    //   alert('Please correct the errors before submitting.')
-    //   return
-    // }
-
     const formData = {
       workOrderNumber: workOrderNum,
       vehicle,
@@ -156,6 +146,8 @@ const WorkOrderDetailsPage = ({ params }) => {
         alert(data.error)
         setIsLoading(false)
         return
+      } else if(data.success) {
+        router.push('/dashboard')
       }
 
       setWorkOrderNum('')
@@ -214,7 +206,12 @@ const WorkOrderDetailsPage = ({ params }) => {
           workOrderNumber={workOrderNum}
           setWorkOrderNumber={setWorkOrderNum}
         />
-        <div className="mt-10 border-t border-gray-200 pt-6 sm:flex sm:items-center sm:justify-between">
+        <PartsList
+          parts={parts}
+          allVendors={vendors}
+          onVendorChange={handleVendorChange}
+        />
+        <div className="mt-10 flex justify-between gap-4 border-t border-gray-200 pt-6">
           <button
             type="submit"
             disabled={!isFormFilled()}
@@ -222,21 +219,20 @@ const WorkOrderDetailsPage = ({ params }) => {
           >
             Update Vehicle
           </button>
+          <button
+            type="button"
+            disabled={
+              !allPartsHaveVendors() || !isFormFilled() || !isVehicleUpdated
+            }
+            className={getButtonStyles(
+              allPartsHaveVendors() && isFormFilled() && isVehicleUpdated,
+            )}
+            onClick={handleRequestPart}
+          >
+            Request Part
+          </button>
         </div>
       </form>
-      <PartsList
-        parts={parts}
-        allVendors={vendors}
-        onVendorChange={handleVendorChange}
-      />
-      <button
-        type="button"
-        disabled={!allPartsHaveVendors() || !isFormFilled()}
-        className={getButtonStyles(allPartsHaveVendors() && isFormFilled())}
-        onClick={handleRequestPart}
-      >
-        Request Part
-      </button>
     </div>
   )
 }

@@ -3,7 +3,7 @@ export function WorkOrderHeader({ order, showWorkOrder, toggleWorkOrder }) {
       <div className="justify-between sm:flex sm:items-center">
         <div>
           <h1 className="text-base font-semibold leading-6 text-gray-900">
-            Work Order Number: {order.workOrderNumber}
+            Work Order #: {order.workOrderNumber}
           </h1>
           <h2 className="mt-2 text-sm text-gray-700">
             Vehicle: {order.vehicle.make} {order.vehicle.model} {order.vehicle.year} | VIN: {order.vehicle.vin}

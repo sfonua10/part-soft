@@ -10,10 +10,13 @@ function isVehicleInfoMissing(vehicle) {
 }
 
 export default function PartsRequestQueue() {
-  const { data: workOrders, error } = useSWR('/api/get-workorders', fetcher);
+  const { data: workOrders, error } = useSWR('/api/get-workorders', fetcher)
 
-  if (error) return <div>Error loading work orders</div>;
-  if (!workOrders) return <div>Loading...</div>;
+  if (error) return <div>Error loading work orders</div>
+  if (!workOrders) return <div>Loading...</div>
+  const sortedData = [...workOrders].sort(
+    (a, b) => new Date(b.dateSubmitted) - new Date(a.dateSubmitted),
+  )
 
   return (
     <div className="px-4 sm:px-6 lg:px-8">
@@ -38,7 +41,19 @@ export default function PartsRequestQueue() {
                     scope="col"
                     className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0"
                   >
-                    Order Number
+                    Work Order #
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                  >
+                    Mechanic Name
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                  >
+                    Date Submitted
                   </th>
                   <th
                     scope="col"
@@ -58,42 +73,64 @@ export default function PartsRequestQueue() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {workOrders.map((order) => (
-                  <tr key={order._id}>
-                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
-                      {order.workOrderNumber}
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      {order.vehicle.make} {order.vehicle.model}
-                      {order.vehicle.year} {order.vehicle.vin}
-                      {isVehicleInfoMissing(order.vehicle) && (
-                        <div className="mt-2">
-                          <div className="flex items-center text-red-500">
-                            <XCircleIcon
-                              className="mr-2 h-5 w-5"
-                              aria-hidden="true"
-                            />
-                            Missing required vehicle information
+                {sortedData.map((order) => {
+                  const date = new Date(order.dateSubmitted)
+
+                  const formattedDate = `${
+                    date.getMonth() + 1
+                  }/${date.getDate()}/${date.getFullYear()} ${
+                    date.getHours() % 12 || 12
+                  }:${date.getMinutes().toString().padStart(2, '0')} ${
+                    date.getHours() >= 12 ? 'PM' : 'AM'
+                  }`
+                  return (
+                    <tr
+                      key={order._id}
+                      className={`${
+                        isVehicleInfoMissing(order.vehicle) ? 'bg-red-50' : ''
+                      }`}
+                    >
+                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
+                        {order.workOrderNumber}
+                      </td>
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                        {order.mechanicName}
+                      </td>
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                        {formattedDate}
+                      </td>
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                        {order.vehicle.make} {order.vehicle.model}
+                        {order.vehicle.year} {order.vehicle.vin}
+                        {isVehicleInfoMissing(order.vehicle) && (
+                          <div className="mt-2">
+                            <div className="flex items-center text-red-500">
+                              <XCircleIcon
+                                className="mr-2 h-5 w-5"
+                                aria-hidden="true"
+                              />
+                              Missing required vehicle information
+                            </div>
                           </div>
-                        </div>
-                      )}
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      {order.parts.map((part) => part.partName).join(', ')}
-                    </td>
-                    <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
-                      <Link
-                        className="text-blue-600 hover:text-blue-900"
-                        href={`/dashboard/work-order-listings/${order.workOrderNumber}`}
-                      >
-                        Edit
-                        <span className="sr-only">
-                          Order {order.workOrderNumber}
-                        </span>
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
+                        )}
+                      </td>
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                        {order.parts.map((part) => part.partName).join(', ')}
+                      </td>
+                      <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
+                        <Link
+                          className="text-blue-600 hover:text-blue-900"
+                          href={`/dashboard/work-order-listings/${order.workOrderNumber}`}
+                        >
+                          Edit
+                          <span className="sr-only">
+                            Order {order.workOrderNumber}
+                          </span>
+                        </Link>
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>

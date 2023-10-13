@@ -1,10 +1,11 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 import VehicleInfo2 from '@/components/RequestPart/VehicleInfo2'
 import { PlusCircleIcon } from '@heroicons/react/20/solid'
 import PartRequestSection from '@/components/RequestPart/PartRequestSection'
 import SuccessModal from '@/components/RequestPart/SuccessModal'
+
 export default function RequestPart() {
   const [vehicle, setVehicle] = useState({
     make: '',
@@ -18,8 +19,7 @@ export default function RequestPart() {
   const [errors, setErrors] = useState({})
   const [showAdditionalInfo, setShowAdditionalInfo] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
-
-  const router = useRouter()
+  const { data: session } = useSession()
 
   useEffect(() => {
     const isAnyPartValid = parts.some((part) => {
@@ -86,30 +86,6 @@ export default function RequestPart() {
       workOrderNumber,
     )
 
-    // Assuming you have validation functions for these fields as well
-    // const vehicleError = validateVehicle(vehicle);
-    // const partsError = validateParts(parts);
-    // const vendorsError = validateVendors(vendors);
-
-    // if (workOrderNumberError || vehicleError || partsError || vendorsError) {
-    //     // Collect all errors into one object
-    //     const newErrors = {
-    //         workOrderNumber: workOrderNumberError,
-    //         vehicle: vehicleError,
-    //         parts: partsError,
-    //         vendors: vendorsError,
-    //     };
-
-    //     // Update state with the new errors
-    //     setErrors((prevErrors) => ({
-    //         ...prevErrors,
-    //         ...newErrors,
-    //     }));
-
-    //     return;
-    // }
-
-    // Construct the formData object
     const formData = {
       workOrderNumber,
       vehicle,
@@ -117,13 +93,10 @@ export default function RequestPart() {
         partName: part['part-name'],
         partNumber: part['part-number'],
       })),
-      // vendors: vendors,
+      mechanicName: session?.user?.name,
     }
 
     try {
-      // setIsLoading(true);  // Assume setIsLoading is a function to toggle a loading state
-
-      // Send the data to the server
       const response = await fetch('/api/work-orders', {
         method: 'POST',
         headers: {
@@ -131,8 +104,6 @@ export default function RequestPart() {
         },
         body: JSON.stringify(formData),
       })
-
-      // setIsLoading(false);
 
       // Handle the response
       const data = await response.json()
@@ -150,13 +121,9 @@ export default function RequestPart() {
           'part-number': '',
         },
       ])
-
-      // router.push('/dashboard')
       setIsModalOpen(true)
-
     } catch (error) {
       console.error('Error:', error)
-      // setIsLoading(false);
     }
   }
 
@@ -226,7 +193,7 @@ export default function RequestPart() {
             </h2>
             <div className="mt-4">
               <h3 className="text-sm font-medium text-gray-900">
-                Work Order Number
+                Work Order #
               </h3>
               <p className="text-sm text-gray-600">
                 {workOrderNumber || 'Not provided'}
