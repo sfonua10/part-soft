@@ -86,22 +86,33 @@ export default function DashboardLayout({ children }) {
       ])
     }
   }, [session])
+
   useEffect(() => {
     setNavigation((prev) =>
-      prev.map((item) => ({
-        ...item,
-        current: item.href === pathname,
-      })),
+      prev.map((item) => {
+        const isExactMatch = pathname === item.href
+        const isSubpathOfAnother =
+          item.href !== '/dashboard' && pathname.startsWith(item.href + '/')
+        return {
+          ...item,
+          current: isExactMatch || isSubpathOfAnother,
+        }
+      }),
     )
   }, [pathname])
 
-  const handleNavClick = (name) => {
-    setSidebarOpen(false) // This closes the sidebar
+  const handleNavClick = (href) => {
+    setSidebarOpen(false)
     setNavigation((prev) =>
-      prev.map((item) => ({
-        ...item,
-        current: item.name === name,
-      })),
+      prev.map((item) => {
+        const isExactMatch = href === item.href
+        const isSubpathOfAnother =
+          item.href !== '/dashboard' && href.startsWith(item.href + '/')
+        return {
+          ...item,
+          current: isExactMatch || isSubpathOfAnother,
+        }
+      }),
     )
   }
 

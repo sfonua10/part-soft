@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation'
 import VendorSelection from '@/components/WorkOrderListings/VendorSelection'
 import Summary from '@/components/Summary'
 import BulletSteps from '@/components/WorkOrderListings/BulletSteps'
+import Link from 'next/link'
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -81,8 +82,8 @@ export default function PartsSelection() {
     if (result.success) {
       //   setIsPartsUpdated(true)
       //   // Update session storage or any other storage mechanism you're using
-      //   sessionStorage.setItem('workOrderData', JSON.stringify(workOrder))
-      //   sessionStorage.setItem('vendorData', JSON.stringify(vendorData))
+      // sessionStorage.setItem('workOrderData', JSON.stringify(result.workOrder));
+      // sessionStorage.setItem('vendorData', JSON.stringify(vendorData))
 
       //   // Redirecting to a next page or you can perform another action
       //   router.push(`/dashboard/work-order-listings/${workOrder._id}/next-page-or-action`)
@@ -172,9 +173,13 @@ export default function PartsSelection() {
             onVendorChange={handleVendorChange}
           />
           <div className="mt-10 flex justify-between gap-4 border-gray-200 pt-6">
-            <button type="text" className={getButtonStyles(true)}>
+            <Link
+              className={getButtonStyles(true)}
+              href={`/dashboard/work-order-listings/${dataFromPreviousPage.workOrderNumber}`}
+            >
               Back
-            </button>
+            </Link>
+
             <button
               disabled={!selectedPart?._id || selectedVendorIds.length === 0}
               className={getButtonStyles(
@@ -189,6 +194,7 @@ export default function PartsSelection() {
 
         <div>
           <Summary
+            workOrderNumber={dataFromPreviousPage.workOrderNumber}
             vendorData={vendorData}
             vehicle={dataFromPreviousPage.vehicle || {}}
             selectedPart={selectedPart}

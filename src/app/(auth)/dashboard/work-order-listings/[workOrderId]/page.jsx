@@ -31,6 +31,7 @@ const WorkOrderDetailsPage = ({ params }) => {
     vin: '',
   })
   const [workOrderNum, setWorkOrderNum] = useState('')
+  const [hasDataChanged, setHasDataChanged] = useState(false)
 
   useEffect(() => {
     if (workOrder) {
@@ -45,9 +46,18 @@ const WorkOrderDetailsPage = ({ params }) => {
       ...prev,
       [name]: value,
     }))
+    setHasDataChanged(true)
   }
 
   const handleUpdateWorkOrder = async () => {
+    // Only proceed if data has changed
+    if (!hasDataChanged) {
+      router.push(
+        `/dashboard/work-order-listings/${workOrderNumber}/parts-selection`,
+      )
+      return
+    }
+
     const workOrderDetails = {
       _id: workOrder._id,
       vehicle: vehicle,
@@ -85,7 +95,7 @@ const WorkOrderDetailsPage = ({ params }) => {
         : 'cursor-not-allowed bg-[#2563eb] opacity-50'
     }`
   }
-  
+
   const isFormFilled = () => {
     return vehicle.make && vehicle.model && vehicle.year && vehicle.vin
   }
@@ -107,7 +117,7 @@ const WorkOrderDetailsPage = ({ params }) => {
               workOrderNumber={workOrderNum}
               setWorkOrderNumber={setWorkOrderNum}
             />
-            <div className="mt-10 flex justify-between gap-4 border-t border-gray-200 pt-6">
+            <div className="mt-10 flex justify-end gap-4 border-t border-gray-200 pt-6">
               <button
                 type="submit"
                 disabled={!isFormFilled()}

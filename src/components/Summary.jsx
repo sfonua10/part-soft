@@ -6,7 +6,6 @@ const Summary = ({
   selectedPart = {},
   vendorData,
 }) => {
-  console.log('selectedPart', selectedPart)
   function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1)
   }
@@ -44,44 +43,54 @@ const Summary = ({
         </dl>
       </div>
 
-      <div className="mt-4">
-        <h3 className="text-sm font-medium text-gray-900">Selected Part</h3>
-        <dl className="mt-2 space-y-2">
-          <div className="flex items-center justify-between">
-            <dt className="text-sm text-gray-600">Part Name</dt>
-            <dd className="text-sm font-medium text-gray-900">
-              {selectedPart.partName || 'N/A'}
-            </dd>
-          </div>
-          <div className="flex items-center justify-between">
-            <dt className="text-sm text-gray-600">Part Num.</dt>
-            <dd className="text-sm font-medium text-gray-900">
-              {selectedPart.partNumber || 'N/A'}
-            </dd>
-          </div>
-          {/* If you want to display additional details from selectedPart, you can add more divs here. */}
-        </dl>
-      </div>
+      {selectedPart.partName && (
+        <div className="mt-4">
+          <h3 className="text-sm font-medium text-gray-900">Selected Part</h3>
+          <dl className="mt-2 space-y-2">
+            <div className="flex items-center justify-between">
+              <dt className="text-sm text-gray-600">Part Name</dt>
+              <dd className="text-sm font-medium text-gray-900">
+                {selectedPart.partName || 'N/A'}
+              </dd>
+            </div>
+            <div className="flex items-center justify-between">
+              <dt className="text-sm text-gray-600">Part Num.</dt>
+              <dd className="text-sm font-medium text-gray-900">
+                {selectedPart.partNumber || 'N/A'}
+              </dd>
+            </div>
+            {/* If you want to display additional details from selectedPart, you can add more divs here. */}
+          </dl>
+        </div>
+      )}
 
-      <div className="mt-4">
-        <h3 className="text-sm font-medium text-gray-900">Selected Vendors</h3>
-        <dl className="mt-2 space-y-2">
-          {selectedPart.selectedVendors?.map((vendorId, index) => {
-            const vendor = vendorData.find((v) => v._id === vendorId)
-            if (vendor) {
-              return (
-                <div key={index} className="flex items-center justify-between">
-                  <dt className="text-sm text-gray-600">Vendor Name</dt>
-                  <dd className="text-sm font-medium text-gray-900">
-                    {vendor.name || 'N/A'}
-                  </dd>
-                </div>
-              )
-            }
-            return null
-          })}
-        </dl>
-      </div>
+      {selectedPart?.selectedVendors &&
+        selectedPart.selectedVendors.length > 0 && (
+          <div className="mt-4">
+            <h3 className="text-sm font-medium text-gray-900">
+              Selected Vendors
+            </h3>
+            <dl className="mt-2 space-y-2">
+              {selectedPart.selectedVendors.map((vendorId, index) => {
+                const vendor = vendorData.find((v) => v._id === vendorId)
+                if (vendor) {
+                  return (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between"
+                    >
+                      <dt className="text-sm text-gray-600">Vendor Name</dt>
+                      <dd className="text-sm font-medium text-gray-900">
+                        {vendor.name || 'N/A'}
+                      </dd>
+                    </div>
+                  )
+                }
+                return null
+              })}
+            </dl>
+          </div>
+        )}
 
       {/* <div className="mt-6">
         <button
