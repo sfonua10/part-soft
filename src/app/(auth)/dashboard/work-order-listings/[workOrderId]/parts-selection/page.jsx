@@ -31,7 +31,7 @@ export default function PartsSelection() {
   const router = useRouter()
 
   useEffect(() => {
-    const workOrderData = JSON.parse(sessionStorage.getItem('workOrderData'))
+    const workOrderData = JSON.parse(sessionStorage.getItem('workOrderDetails'))
     const vendors = JSON.parse(sessionStorage.getItem('vendorData')) || []
 
     setDataFromPreviousPage(workOrderData)
@@ -78,15 +78,12 @@ export default function PartsSelection() {
     }
 
     const result = await updateWorkOrder(updatedWorkOrderDetails)
-
     if (result.success) {
       //   setIsPartsUpdated(true)
       //   // Update session storage or any other storage mechanism you're using
-      // sessionStorage.setItem('workOrderData', JSON.stringify(result.workOrder));
+      sessionStorage.setItem('workOrderDetails', JSON.stringify(result.data.workOrder));
+      sessionStorage.setItem('selectedPart', JSON.stringify(selectedPart));
       // sessionStorage.setItem('vendorData', JSON.stringify(vendorData))
-
-      //   // Redirecting to a next page or you can perform another action
-      //   router.push(`/dashboard/work-order-listings/${workOrder._id}/next-page-or-action`)
       router.push(
         `/dashboard/work-order-listings/${dataFromPreviousPage.workOrderNumber}/parts-selection/review-message-and-send`,
       )
@@ -97,7 +94,7 @@ export default function PartsSelection() {
 
   return (
     <>
-      <BulletSteps />
+      {/* <BulletSteps /> */}
       <div className="gap-12 lg:grid lg:grid-cols-2">
         <div>
           <RadioGroup

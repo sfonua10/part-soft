@@ -29,7 +29,7 @@ export default function Dashboard() {
   return (
     <div>
       <ReviewTable data={workOrdersAwaitingReview} />
-      <VendorTable data={workOrdersData} />
+      {/* <VendorTable data={workOrdersData} /> */}
     </div>
   )
 }

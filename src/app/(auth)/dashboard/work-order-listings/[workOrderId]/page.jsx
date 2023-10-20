@@ -4,7 +4,7 @@ import useSWR from 'swr'
 import VehicleInfo from '@/components/RequestPart/VehicleInfo'
 import { useRouter } from 'next/navigation'
 import Summary from '@/components/Summary'
-import BulletSteps from '@/components/WorkOrderListings/BulletSteps'
+// import BulletSteps from '@/components/WorkOrderListings/BulletSteps'
 import { updateWorkOrder } from '@/utils/helpers/apiHelper'
 
 const fetcher = (url) => fetch(url).then((res) => res.json())
@@ -67,7 +67,7 @@ const WorkOrderDetailsPage = ({ params }) => {
     const result = await updateWorkOrder(workOrderDetails)
 
     if (result.success) {
-      sessionStorage.setItem('workOrderData', JSON.stringify(workOrder))
+      sessionStorage.setItem('workOrderDetails', JSON.stringify({ ...workOrder, vehicle: vehicle }))
       sessionStorage.setItem('vendorData', JSON.stringify(vendorData))
       router.push(
         `/dashboard/work-order-listings/${workOrderNumber}/parts-selection`,
@@ -103,8 +103,8 @@ const WorkOrderDetailsPage = ({ params }) => {
   return (
     <div className="bg-white">
       <div className="mx-auto max-w-2xl px-4 pb-24 pt-16 sm:px-6 lg:max-w-7xl lg:px-8">
-        <BulletSteps />
-        <h1>Work Order Details Page {workOrderNumber}</h1>
+        {/* <BulletSteps /> */}
+        <h1 className='text-2xl'>Work Order Details Page {workOrderNumber}</h1>
         <form
           onSubmit={handleFormSubmit}
           className="mt-12 lg:grid lg:grid-cols-12 lg:items-start lg:gap-x-12 xl:gap-x-16"
