@@ -17,7 +17,29 @@ export default function PartsRequestQueue() {
   const sortedData = [...workOrders].sort(
     (a, b) => new Date(b.dateSubmitted) - new Date(a.dateSubmitted),
   )
-
+  function determineBackgroundColor(order) {
+    // 1. Check if vehicle info is missing
+    // if (isVehicleInfoMissing(order.vehicle)) return 'bg-red-50';
+  
+    // 2. Check if all parts have notificationsSent
+    const allPartsNotified = order.parts.every(part => part.notificationsSent !== null);
+  
+    if (allPartsNotified) return 'bg-green-50';
+  
+    // 3. Check if some parts have notificationsSent
+    const somePartsNotified = order.parts.some(part => part.notificationsSent !== null);
+  
+    if (somePartsNotified) return 'bg-yellow-50';
+  
+    // 4. Check if all parts have notificationsSent set to null
+    const allPartsNotNotified = order.parts.every(part => part.notificationsSent === null);
+  
+    if (allPartsNotNotified) return 'bg-red-50';
+  
+    // Default: No background color
+    return '';
+  }
+  
   return (
     <div className="px-4 sm:px-6 lg:px-8">
       <div className="sm:flex sm:items-center">
@@ -39,7 +61,7 @@ export default function PartsRequestQueue() {
                 <tr>
                   <th
                     scope="col"
-                    className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0"
+                    className="py-3.5 pl-4 pr-3 text-center text-sm font-semibold text-gray-900 sm:pl-0"
                   >
                     Work Order #
                   </th>
@@ -86,11 +108,9 @@ export default function PartsRequestQueue() {
                   return (
                     <tr
                       key={order._id}
-                      className={`${
-                        isVehicleInfoMissing(order.vehicle) ? 'bg-red-50' : ''
-                      }`}
+                      className={determineBackgroundColor(order)}
                     >
-                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
+                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-center font-medium text-gray-900 sm:pl-0">
                         {order.workOrderNumber}
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
@@ -117,7 +137,7 @@ export default function PartsRequestQueue() {
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                         {order.parts.map((part) => part.partName).join(', ')}
                       </td>
-                      <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
+                      <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-left text-sm font-medium sm:pr-0">
                         <Link
                           className="text-blue-600 hover:text-blue-900"
                           href={`/dashboard/work-order-listings/${order.workOrderNumber}`}

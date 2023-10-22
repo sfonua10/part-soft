@@ -51,12 +51,12 @@ const WorkOrderDetailsPage = ({ params }) => {
 
   const handleUpdateWorkOrder = async () => {
     // Only proceed if data has changed
-    if (!hasDataChanged) {
-      router.push(
-        `/dashboard/work-order-listings/${workOrderNumber}/parts-selection`,
-      )
-      return
-    }
+    // if (!hasDataChanged) {
+    //   router.push(
+    //     `/dashboard/work-order-listings/${workOrderNumber}/parts-selection`,
+    //   )
+    //   return
+    // }
 
     const workOrderDetails = {
       _id: workOrder._id,

@@ -31,7 +31,7 @@ const VendorMessage = ({ workOrderNumber, vehicle, selectedPart, vendorData }) =
   Example Reply: "${responseExamples}".
   
   Thanks,
-  Partsoft - Casey Johnson
+  Partsoft - Kacey Johnson
   `
   }
 

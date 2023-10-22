@@ -4,6 +4,9 @@ import Summary from '@/components/Summary'
 import VendorMessage from '@/components/VendorMessage'
 import SendConfirmationModal from '@/components/WorkOrderListings/SendConfirmationModal'
 import { ChevronLeftIcon } from '@heroicons/react/24/outline'
+import { sendCommunication } from '@/utils/communicationMethods'
+import { useRouter } from 'next/navigation'
+
 import Link from 'next/link'
 const baseSendButtonStyles =
   'mt-4 rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700'
@@ -14,6 +17,7 @@ const getSendButtonStyles = (condition) => {
   }`
 }
 export default function ReviewMessageAndSend() {
+  const router = useRouter();
   const [dataFromPreviousPage, setDataFromPreviousPage] = useState({})
   const [vendorData, setVendorData] = useState([])
   const [selectedPart, setSelectedPart] = useState({})
@@ -33,6 +37,39 @@ export default function ReviewMessageAndSend() {
     setVendorData(vendors)
     setSelectedPart(sP)
   }, [])
+  
+  const handleConfirmation = async () => {
+    // Loop through only the selected vendors
+    for (let vendorId of selectedPart.selectedVendors) {
+      // Find the vendor from vendorData using the vendorId
+      const vendor = vendorData.find((v) => v._id === vendorId)
+
+      if (!vendor) {
+        console.error(`Vendor with ID ${vendorId} not found in vendorData`)
+        continue // skip to the next iteration if vendor not found
+      }
+
+      for (let method in communicationMethods) {
+        if (communicationMethods[method]) {
+          // If method is selected
+          const messageData = {
+            _id: dataFromPreviousPage._id,
+            workOrderNumber: dataFromPreviousPage.workOrderNumber,
+            vehicle: dataFromPreviousPage.vehicle,
+            parts: selectedPart, 
+            vendors: [vendor], 
+          }
+          try {
+            await sendCommunication(method, messageData, 'Your message here')
+            // Handle any post-send logic if necessary
+            router.push('/dashboard');
+          } catch (error) {
+            console.error(`Failed to send ${method} to ${vendor.name}`, error)
+          }
+        }
+      }
+    }
+  }
 
   const handleCommunicationChange = (method) => {
     setCommunicationMethods((prevState) => ({
@@ -79,21 +116,21 @@ export default function ReviewMessageAndSend() {
               <legend className="sr-only">Select communication methods</legend>
               <div className="space-y-5">
                 {[
-                  {
-                    id: 'email',
-                    label: 'Email',
-                    desc: 'Send notifications via Email.',
-                  },
+                  // {
+                  //   id: 'email',
+                  //   label: 'Email',
+                  //   desc: 'Send notifications via Email.',
+                  // },
                   {
                     id: 'sms',
                     label: 'SMS',
                     desc: 'Send notifications via SMS.',
                   },
-                  {
-                    id: 'voiceCall',
-                    label: 'Voice Call',
-                    desc: 'Automate voice calls to inform.',
-                  },
+                  // {
+                  //   id: 'voiceCall',
+                  //   label: 'Voice Call',
+                  //   desc: 'Automate voice calls to inform.',
+                  // },
                 ].map((method) => (
                   <div key={method.id} className="relative flex items-start">
                     <div className="flex h-6 items-center">
@@ -137,7 +174,14 @@ export default function ReviewMessageAndSend() {
           </div>
         </div>
       </div>
-      <SendConfirmationModal open={modalOpen} setOpen={setModalOpen} />
+      <SendConfirmationModal
+        open={modalOpen}
+        setOpen={setModalOpen}
+        onConfirm={handleConfirmation}
+        communicationMethods={communicationMethods}
+        vendorData={vendorData}
+        selectedPart={selectedPart}
+      />
     </div>
   )
 }

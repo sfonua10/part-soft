@@ -81,11 +81,11 @@ export default function RequestPart() {
   const handleSubmit = async (event) => {
     event.preventDefault()
 
-    // Validate work order number
-    const workOrderNumberError = validateField(
-      'work-order-number',
-      workOrderNumber,
-    )
+    // // Validate work order number
+    // const workOrderNumberError = validateField(
+    //   'work-order-number',
+    //   workOrderNumber,
+    // )
 
     const formData = {
       workOrderNumber,

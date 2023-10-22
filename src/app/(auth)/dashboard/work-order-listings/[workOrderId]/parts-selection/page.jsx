@@ -25,11 +25,11 @@ const getButtonStyles = (condition) => {
 export default function PartsSelection() {
   const [dataFromPreviousPage, setDataFromPreviousPage] = useState({})
   const [vendorData, setVendorData] = useState([])
-  const parts = dataFromPreviousPage.parts || []
+  const parts = dataFromPreviousPage?.parts || []
   const [selectedPart, setSelectedPart] = useState({})
   const [selectedVendorIds, setSelectedVendorIds] = useState([])
   const router = useRouter()
-
+  
   useEffect(() => {
     const workOrderData = JSON.parse(sessionStorage.getItem('workOrderDetails'))
     const vendors = JSON.parse(sessionStorage.getItem('vendorData')) || []
