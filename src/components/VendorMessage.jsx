@@ -7,7 +7,7 @@ const VendorMessage = ({ workOrderNumber, vehicle, selectedPart, vendorData }) =
     return vendor?.name || 'N/A'
   })
 
-  const generateMessage = (vendorName) => {
+  const generateMessage = () => {
     const partDescriptions = `
   Part Name: ${selectedPart.partName}
   Part Number: ${selectedPart.partNumber}
@@ -16,7 +16,7 @@ const VendorMessage = ({ workOrderNumber, vehicle, selectedPart, vendorData }) =
     const responseExamples = `Yes 124.99` // since it's just one part
 
     return `
-  Hi ${vendorName},
+  Hi [Vendor],
   
   We're requesting availability and pricing for the following part related to:
   
@@ -46,12 +46,12 @@ const VendorMessage = ({ workOrderNumber, vehicle, selectedPart, vendorData }) =
 
       {vendorNames && vendorNames.length > 0 && (
         <ul className="mt-2 space-y-2">
-          {vendorNames.map((vendorName, index) => (
+          {vendorNames.map((index) => (
             <li
               key={index}
               className="whitespace-pre-line text-sm text-gray-600"
             >
-              {generateMessage(vendorName)}
+              {generateMessage()}
             </li>
           ))}
         </ul>

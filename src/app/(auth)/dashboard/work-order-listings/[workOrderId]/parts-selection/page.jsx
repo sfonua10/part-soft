@@ -29,7 +29,7 @@ export default function PartsSelection() {
   const [selectedPart, setSelectedPart] = useState({})
   const [selectedVendorIds, setSelectedVendorIds] = useState([])
   const router = useRouter()
-  
+
   useEffect(() => {
     const workOrderData = JSON.parse(sessionStorage.getItem('workOrderDetails'))
     const vendors = JSON.parse(sessionStorage.getItem('vendorData')) || []
@@ -81,8 +81,11 @@ export default function PartsSelection() {
     if (result.success) {
       //   setIsPartsUpdated(true)
       //   // Update session storage or any other storage mechanism you're using
-      sessionStorage.setItem('workOrderDetails', JSON.stringify(result.data.workOrder));
-      sessionStorage.setItem('selectedPart', JSON.stringify(selectedPart));
+      sessionStorage.setItem(
+        'workOrderDetails',
+        JSON.stringify(result.data.workOrder),
+      )
+      sessionStorage.setItem('selectedPart', JSON.stringify(selectedPart))
       // sessionStorage.setItem('vendorData', JSON.stringify(vendorData))
       router.push(
         `/dashboard/work-order-listings/${dataFromPreviousPage.workOrderNumber}/parts-selection/review-message-and-send`,
@@ -110,57 +113,72 @@ export default function PartsSelection() {
             </RadioGroup.Label>
 
             <div className="mt-4 grid grid-cols-1 gap-y-6 sm:grid-cols-3 sm:gap-x-4">
-              {parts.map((part) => (
-                <RadioGroup.Option
-                  key={part._id}
-                  value={part._id}
-                  className={({ checked, active }) =>
-                    classNames(
-                      active
-                        ? 'border-blue-600 ring-2 ring-blue-600'
-                        : 'border-gray-300',
-                      'relative flex cursor-pointer rounded-lg border bg-white p-4 shadow-sm focus:outline-none',
-                    )
-                  }
-                >
-                  {({ checked, active }) => (
-                    <>
-                      <span className="flex flex-1">
-                        <span className="flex flex-col">
-                          <RadioGroup.Label
-                            as="span"
-                            className="block text-sm font-medium text-gray-900"
-                          >
-                            {part.partName}
-                          </RadioGroup.Label>
-                          <RadioGroup.Description
-                            as="span"
-                            className="mt-1 flex items-center text-sm text-gray-500"
-                          >
-                            Part Number: {part.partNumber}
-                          </RadioGroup.Description>
-                          {/* Additional part details can be added here */}
+              {parts.map((part) => {
+                console.log('notificationsSent', part.notificationsSent) // Logging outside className computation
+                const notificationSent = part.notificationsSent !== null
+
+                return (
+                  <RadioGroup.Option
+                    key={part._id}
+                    value={part._id}
+                    disabled={notificationSent} // Disabling the option if notificationSent has a value
+                    className={({ checked, active }) =>
+                      classNames(
+                        notificationSent
+                          ? 'border-green-300 bg-green-50 ring-2 ring-green-600'
+                          : '', // Apply green background if notification has been sent
+                        !notificationSent && active
+                          ? 'border-blue-600 ring-2 ring-blue-600'
+                          : 'border-gray-300',
+                        notificationSent
+                          ? 'cursor-not-allowed'
+                          : 'cursor-pointer', // Use cursor-not-allowed if notificationSent is true
+                        'relative flex rounded-lg border bg-white p-4 shadow-sm focus:outline-none',
+                      )
+                    }
+                  >
+                    {({ checked, active }) => (
+                      <>
+                        <span className="flex flex-1">
+                          <span className="flex flex-col">
+                            <RadioGroup.Label
+                              as="span"
+                              className="block text-sm font-medium text-gray-900"
+                            >
+                              {part.partName}
+                            </RadioGroup.Label>
+                            <RadioGroup.Description
+                              as="span"
+                              className="mt-1 flex items-center text-sm text-gray-500"
+                            >
+                              Part Number: {part.partNumber}
+                            </RadioGroup.Description>
+                            {/* Additional part details can be added here */}
+                          </span>
                         </span>
-                      </span>
-                      <CheckCircleIcon
-                        className={classNames(
-                          !checked ? 'invisible' : '',
-                          'h-5 w-5 text-blue-600',
-                        )}
-                        aria-hidden="true"
-                      />
-                      <span
-                        className={classNames(
-                          active ? 'border' : 'border-2',
-                          checked ? 'border-blue-600' : 'border-transparent',
-                          'pointer-events-none absolute -inset-px rounded-lg',
-                        )}
-                        aria-hidden="true"
-                      />
-                    </>
-                  )}
-                </RadioGroup.Option>
-              ))}
+                        <CheckCircleIcon
+                          className={classNames(
+                            notificationSent || checked ? '' : 'invisible',
+                            'h-5 w-5',
+                            notificationSent
+                              ? 'text-green-600'
+                              : 'text-blue-600',
+                          )}
+                          aria-hidden="true"
+                        />
+                        <span
+                          className={classNames(
+                            active ? 'border' : 'border-2',
+                            checked ? 'border-blue-600' : 'border-transparent',
+                            'pointer-events-none absolute -inset-px rounded-lg',
+                          )}
+                          aria-hidden="true"
+                        />
+                      </>
+                    )}
+                  </RadioGroup.Option>
+                )
+              })}
             </div>
           </RadioGroup>
 
