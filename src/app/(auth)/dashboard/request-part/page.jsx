@@ -2,7 +2,6 @@
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import VehicleInfo2 from '@/components/RequestPart/VehicleInfo2'
-// import { PlusCircleIcon } from '@heroicons/react/20/solid'
 import { PlusCircleIcon } from '@heroicons/react/24/outline'
 import PartRequestSection from '@/components/RequestPart/PartRequestSection'
 import SuccessModal from '@/components/RequestPart/SuccessModal'
@@ -80,12 +79,6 @@ export default function RequestPart() {
 
   const handleSubmit = async (event) => {
     event.preventDefault()
-
-    // // Validate work order number
-    // const workOrderNumberError = validateField(
-    //   'work-order-number',
-    //   workOrderNumber,
-    // )
 
     const formData = {
       workOrderNumber,

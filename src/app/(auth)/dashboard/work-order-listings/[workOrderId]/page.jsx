@@ -4,7 +4,6 @@ import useSWR from 'swr'
 import VehicleInfo from '@/components/RequestPart/VehicleInfo'
 import { useRouter } from 'next/navigation'
 import Summary from '@/components/Summary'
-// import BulletSteps from '@/components/WorkOrderListings/BulletSteps'
 import { updateWorkOrder } from '@/utils/helpers/apiHelper'
 
 const fetcher = (url) => fetch(url).then((res) => res.json())
@@ -50,14 +49,6 @@ const WorkOrderDetailsPage = ({ params }) => {
   }
 
   const handleUpdateWorkOrder = async () => {
-    // Only proceed if data has changed
-    // if (!hasDataChanged) {
-    //   router.push(
-    //     `/dashboard/work-order-listings/${workOrderNumber}/parts-selection`,
-    //   )
-    //   return
-    // }
-
     const workOrderDetails = {
       _id: workOrder._id,
       vehicle: vehicle,
@@ -103,7 +94,6 @@ const WorkOrderDetailsPage = ({ params }) => {
   return (
     <div className="bg-white">
       <div className="mx-auto max-w-2xl px-4 pb-24 pt-16 sm:px-6 lg:max-w-7xl lg:px-8">
-        {/* <BulletSteps /> */}
         <h1 className='text-2xl'>Work Order Details Page {workOrderNumber}</h1>
         <form
           onSubmit={handleFormSubmit}
