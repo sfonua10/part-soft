@@ -7,7 +7,6 @@ import { useRouter } from 'next/navigation'
 
 import VendorSelection from '@/components/WorkOrderListings/VendorSelection'
 import Summary from '@/components/Summary'
-import BulletSteps from '@/components/WorkOrderListings/BulletSteps'
 import Link from 'next/link'
 
 function classNames(...classes) {
@@ -25,13 +24,13 @@ const getButtonStyles = (condition) => {
 export default function PartsSelection() {
   const [dataFromPreviousPage, setDataFromPreviousPage] = useState({})
   const [vendorData, setVendorData] = useState([])
-  const parts = dataFromPreviousPage.parts || []
+  const parts = dataFromPreviousPage?.parts || []
   const [selectedPart, setSelectedPart] = useState({})
   const [selectedVendorIds, setSelectedVendorIds] = useState([])
   const router = useRouter()
 
   useEffect(() => {
-    const workOrderData = JSON.parse(sessionStorage.getItem('workOrderData'))
+    const workOrderData = JSON.parse(sessionStorage.getItem('workOrderDetails'))
     const vendors = JSON.parse(sessionStorage.getItem('vendorData')) || []
 
     setDataFromPreviousPage(workOrderData)
@@ -78,15 +77,14 @@ export default function PartsSelection() {
     }
 
     const result = await updateWorkOrder(updatedWorkOrderDetails)
-
     if (result.success) {
-      //   setIsPartsUpdated(true)
-      //   // Update session storage or any other storage mechanism you're using
-      // sessionStorage.setItem('workOrderData', JSON.stringify(result.workOrder));
-      // sessionStorage.setItem('vendorData', JSON.stringify(vendorData))
-
-      //   // Redirecting to a next page or you can perform another action
-      //   router.push(`/dashboard/work-order-listings/${workOrder._id}/next-page-or-action`)
+    
+      sessionStorage.setItem(
+        'workOrderDetails',
+        JSON.stringify(result.data.workOrder),
+      )
+      sessionStorage.setItem('selectedPart', JSON.stringify(selectedPart))
+  
       router.push(
         `/dashboard/work-order-listings/${dataFromPreviousPage.workOrderNumber}/parts-selection/review-message-and-send`,
       )
@@ -96,33 +94,42 @@ export default function PartsSelection() {
   }
 
   return (
-    <>
-      <BulletSteps />
-      <div className="gap-12 lg:grid lg:grid-cols-2">
-        <div>
-          <RadioGroup
-            value={selectedPart._id || null}
-            onChange={(value) => {
-              const selected = parts.find((part) => part._id === value)
-              setSelectedPart(selected)
-              setSelectedVendorIds([])
-            }}
-          >
-            <RadioGroup.Label className="text-base font-semibold leading-6 text-gray-900">
-              Select a part
-            </RadioGroup.Label>
+    <div className="gap-12 lg:grid lg:grid-cols-2">
+      <div>
+        <RadioGroup
+          value={selectedPart._id || null}
+          onChange={(value) => {
+            const selected = parts.find((part) => part._id === value)
+            setSelectedPart(selected)
+            setSelectedVendorIds([])
+          }}
+        >
+          <RadioGroup.Label className="text-base font-semibold leading-6 text-gray-900">
+            Select a part
+          </RadioGroup.Label>
 
-            <div className="mt-4 grid grid-cols-1 gap-y-6 sm:grid-cols-3 sm:gap-x-4">
-              {parts.map((part) => (
+          <div className="mt-4 grid grid-cols-1 gap-y-6 sm:grid-cols-3 sm:gap-x-4">
+            {parts.map((part) => {
+              console.log('notificationsSent', part.notificationsSent) // Logging outside className computation
+              const notificationSent = part.notificationsSent !== null
+
+              return (
                 <RadioGroup.Option
                   key={part._id}
                   value={part._id}
+                  disabled={notificationSent} // Disabling the option if notificationSent has a value
                   className={({ checked, active }) =>
                     classNames(
-                      active
+                      notificationSent
+                        ? 'border-green-300 bg-green-50 ring-2 ring-green-600'
+                        : '', // Apply green background if notification has been sent
+                      !notificationSent && active
                         ? 'border-blue-600 ring-2 ring-blue-600'
                         : 'border-gray-300',
-                      'relative flex cursor-pointer rounded-lg border bg-white p-4 shadow-sm focus:outline-none',
+                      notificationSent
+                        ? 'cursor-not-allowed'
+                        : 'cursor-pointer', // Use cursor-not-allowed if notificationSent is true
+                      'relative flex rounded-lg border bg-white p-4 shadow-sm focus:outline-none',
                     )
                   }
                 >
@@ -147,8 +154,9 @@ export default function PartsSelection() {
                       </span>
                       <CheckCircleIcon
                         className={classNames(
-                          !checked ? 'invisible' : '',
-                          'h-5 w-5 text-blue-600',
+                          notificationSent || checked ? '' : 'invisible',
+                          'h-5 w-5',
+                          notificationSent ? 'text-green-600' : 'text-blue-600',
                         )}
                         aria-hidden="true"
                       />
@@ -163,44 +171,44 @@ export default function PartsSelection() {
                     </>
                   )}
                 </RadioGroup.Option>
-              ))}
-            </div>
-          </RadioGroup>
-
-          <VendorSelection
-            vendorData={vendorData}
-            selectedVendorIds={selectedVendorIds}
-            onVendorChange={handleVendorChange}
-          />
-          <div className="mt-10 flex justify-between gap-4 border-gray-200 pt-6">
-            <Link
-              className={getButtonStyles(true)}
-              href={`/dashboard/work-order-listings/${dataFromPreviousPage.workOrderNumber}`}
-            >
-              Back
-            </Link>
-
-            <button
-              disabled={!selectedPart?._id || selectedVendorIds.length === 0}
-              className={getButtonStyles(
-                selectedPart?._id && selectedVendorIds.length > 0,
-              )}
-              onClick={handleUpdateParts}
-            >
-              Next
-            </button>
+              )
+            })}
           </div>
-        </div>
+        </RadioGroup>
 
-        <div>
-          <Summary
-            workOrderNumber={dataFromPreviousPage.workOrderNumber}
-            vendorData={vendorData}
-            vehicle={dataFromPreviousPage.vehicle || {}}
-            selectedPart={selectedPart}
-          />
+        <VendorSelection
+          vendorData={vendorData}
+          selectedVendorIds={selectedVendorIds}
+          onVendorChange={handleVendorChange}
+        />
+        <div className="mt-10 flex justify-between gap-4 border-gray-200 pt-6">
+          <Link
+            className={getButtonStyles(true)}
+            href={`/dashboard/work-order-listings/${dataFromPreviousPage.workOrderNumber}`}
+          >
+            Back
+          </Link>
+
+          <button
+            disabled={!selectedPart?._id || selectedVendorIds.length === 0}
+            className={getButtonStyles(
+              selectedPart?._id && selectedVendorIds.length > 0,
+            )}
+            onClick={handleUpdateParts}
+          >
+            Next
+          </button>
         </div>
       </div>
-    </>
+
+      <div>
+        <Summary
+          workOrderNumber={dataFromPreviousPage.workOrderNumber}
+          vendorData={vendorData}
+          vehicle={dataFromPreviousPage.vehicle || {}}
+          selectedPart={selectedPart}
+        />
+      </div>
+    </div>
   )
 }

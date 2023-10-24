@@ -1,4 +1,5 @@
 import twilio from 'twilio'
+import WorkOrder from '@/models/workOrder'
 
 export async function POST(request) {
   try {
@@ -8,55 +9,32 @@ export async function POST(request) {
     const authToken = process.env.TWILIO_AUTH_TOKEN
     const fromNumber = process.env.FROM_NUMBER
 
-    console.log('Environment variables:', {
-      accountSid: !!accountSid,
-      authToken: !!authToken,
-      fromNumber: fromNumber,
-    })
-
     if (!accountSid || !authToken || !fromNumber) {
       throw new Error('Missing required environment variables')
     }
 
     const client = twilio(accountSid, authToken)
-    const { workOrderNumber, vehicle, parts, vendors } = await request.json()
+    const { _id, workOrderNumber, vehicle, part, vendors } = await request.json()
 
     console.log('Received request data:', {
+      _id,
       workOrderNumber,
       vehicle,
-      partsLength: parts.length,
+      partName: part.partName,
       vendorsLength: vendors.length,
     })
 
-    let partDescriptions, responseExamples;
-if (parts.length === 1) {
-    partDescriptions = `Part Name: ${parts[0].partName}
-Part Number: ${parts[0].partNumber}
+    const partDescription = `
+Part Name: ${part.partName}
+Part Number: ${part.partNumber}
 -----------`;
-    responseExamples = `Yes 124.99`;
-} else {
-    partDescriptions = parts
-        .map((part, index) => `${String.fromCharCode(65 + index)}. 
-    Part Name: ${part.partName}
-    Part Number: ${part.partNumber}`)
-        .join('\n') + "\n-----------";
 
-    // Generate response example for multiple parts
-    responseExamples = parts
-        .map((part, index) => {
-            const letter = String.fromCharCode(65 + index);
-            // Here we'll alternate between Yes with a price and No without a price for the example.
-            const response = (index % 2 === 0) ? `Yes ${120 + index}` : 'No';
-            return `${letter} ${response}`;
-        })
-        .join(', ');
-}
-
+    const responseExample = `Yes 124.99`;
 
     const messageTemplate = (vendorName) => `
 Hi ${vendorName},
 
-We're requesting availability and pricing for parts related to:
+We're requesting availability and pricing for a part related to:
 
 Work Order: ${workOrderNumber}
 Make: ${vehicle.make}
@@ -64,30 +42,47 @@ Model: ${vehicle.model}
 Year: ${vehicle.year}
 VIN: ${vehicle.vin}
 
-${partDescriptions}
+${partDescription}
 
-
-Example Reply: "${responseExamples}".
+Example Reply: "${responseExample}".
 
 Thanks,
 Partsoft - Casey Johnson      
     `
 
     for (let vendor of vendors) {
-      if (!vendor.data.name || !vendor.data.phone) {
+      if (!vendor.name || !vendor.phone) {
         console.warn('Vendor missing name or phone:', vendor)
-        continue // skip this iteration and go to the next vendor
+        continue
       }
 
-      console.log('Preparing message for', vendor.data.name, 'at', vendor.data.phone)
-      const personalizedMessage = messageTemplate(vendor.data.name)
-      console.log('Sending message:', personalizedMessage)
+      const personalizedMessage = messageTemplate(vendor.name)
       await client.messages.create({
         body: personalizedMessage,
         from: fromNumber,
-        to: vendor.data.phone.trim(),
+        to: vendor.phone.trim(),
       })
     }
+
+    try {
+      await WorkOrder.updateOne(
+        { _id: _id, 'parts._id': part._id },
+        {
+          $set: { 'parts.$.notificationsSent': new Date() },
+        },
+      )
+    } catch (dbError) {
+      console.error(
+        'Error updating notificationsSent for part:',
+        part._id,
+        dbError.message,
+      )
+      return new Response(JSON.stringify({ message: dbError.message }), {
+        status: 500,
+      })
+    }
+    
+    console.log('Updated notificationsSent for the part.')
 
     console.log('Messages sent successfully.')
     return new Response(JSON.stringify({ message: 'Messages sent' }), {
