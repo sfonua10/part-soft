@@ -2,6 +2,7 @@
 import useSWR from 'swr'
 import VendorTable from './VendorTable'
 import ReviewTable from './Dashboard/ReviewTable'
+import PartsDisplay from './Dashboard/PartsDisplay'
 const fetcher = (url) => fetch(url).then((res) => res.json())
 
 export default function Dashboard() {
@@ -28,8 +29,9 @@ export default function Dashboard() {
 
   return (
     <div>
-      <ReviewTable data={workOrdersAwaitingReview} />
+      {/* <ReviewTable data={workOrdersAwaitingReview} /> */}
       {/* <VendorTable data={workOrdersData} /> */}
+      <PartsDisplay data={workOrdersData} />
     </div>
   )
 }
