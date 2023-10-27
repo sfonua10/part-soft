@@ -1,29 +1,29 @@
 import NextAuth from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
-// import Email from "next-auth/providers/email";
-// import { MongoDBAdapter } from "@auth/mongodb-adapter";
+import Email from "next-auth/providers/email";
+import { MongoDBAdapter } from "@auth/mongodb-adapter";
 import User from '@/models/user'
 import { connectToDB } from '@/utils/database'
-// import clientPromise from "@/utils/mongodb";
+import clientPromise from "@/utils/mongodb";
 import { createTransport } from 'nodemailer'
-import specificAllowedEmails from '@/utils/allowedEmails'
+import specificAllowedEmails from '@/utils/specificAllowedEmails'
 
 const handler = NextAuth({
   secret: process.env.NEXTAUTH_SECRET,
-  // adapter: MongoDBAdapter(clientPromise),
+  adapter: MongoDBAdapter(clientPromise),
   providers: [
-    // Email({
-    //   server: {
-    //     host: process.env.SMTP_HOST,
-    //     port: Number(process.env.SMTP_PORT),
-    //     auth: {
-    //       user: process.env.SMTP_USER,
-    //       pass: process.env.SMTP_PASSWORD,
-    //     },
-    //   },
-    //   from: process.env.EMAIL_FROM,
-    //   sendVerificationRequest: sendVerificationRequest
-    // }),
+    Email({
+      server: {
+        host: process.env.SMTP_HOST,
+        port: Number(process.env.SMTP_PORT),
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASSWORD,
+        },
+      },
+      from: process.env.EMAIL_FROM,
+      sendVerificationRequest: sendVerificationRequest
+    }),
     GoogleProvider({
       clientId: process.env.GOOGLE_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,

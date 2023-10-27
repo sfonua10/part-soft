@@ -71,7 +71,7 @@ const LoginForm = () => {
       </div>
       <h2 className="mt-20 text-lg font-semibold text-gray-900">Log in</h2>
       <form onSubmit={handleSubmit} className="mt-10 grid grid-cols-1 gap-y-8">
-        {/* <TextField
+        <TextField
           label="Enter your email"
           name="email"
           type="email"
@@ -80,7 +80,7 @@ const LoginForm = () => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           error={emailError}
-        /> */}
+        />
         {/* <div>
           <label
             htmlFor="role"
@@ -106,13 +106,13 @@ const LoginForm = () => {
         </div> */}
 
 
-        {/* <div>
+        <div>
           <Button type="submit" variant="solid" color="blue" className="w-full">
             <span>
               Sign in<span aria-hidden="true">&rarr;</span>
             </span>
           </Button>
-        </div> */}
+        </div>
         <div>
 
 

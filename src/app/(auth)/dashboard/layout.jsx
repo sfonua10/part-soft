@@ -27,7 +27,7 @@ function classNames(...classes) {
 
 export default function DashboardLayout({ children }) {
   const userNavigation = [
-    { name: 'Your profile', href: '#' },
+    { name: 'Your profile', href: '/dashboard/user-profile' },
     { name: 'Sign out', onClick: handleSignOut },
   ]
   const pathname = usePathname()
@@ -267,12 +267,13 @@ export default function DashboardLayout({ children }) {
                     ))}
                   </ul>
                 </li>
+                
                 <li className="-mx-6 mt-auto">
                   <a
-                    href="#"
+                    href="/dashboard/user-profile"
                     className="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-gray-900 hover:bg-gray-50"
                   >
-                    {session?.user?.image && (
+                    {session?.user?.image ? (
                       <Image
                         className="h-8 w-8 rounded-full bg-gray-50"
                         src={session?.user?.image}
@@ -280,12 +281,22 @@ export default function DashboardLayout({ children }) {
                         width={32}
                         height={32}
                       />
+                    ) : (
+                      <span className="inline-block h-8 w-8 overflow-hidden rounded-full bg-gray-100">
+                        <svg
+                          className="h-full w-full text-gray-300"
+                          fill="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                      </span>
                     )}
                     <span className="sr-only">Your profile</span>
                     {session?.user?.name ? (
                       <span aria-hidden="true">{session.user.name}</span>
                     ) : (
-                      'United Diesel'
+                      <span aria-hidden="true">{session?.user.email}</span>
                     )}
                   </a>
                 </li>
@@ -398,7 +409,7 @@ export default function DashboardLayout({ children }) {
                 <Menu as="div" className="relative">
                   <Menu.Button className="-m-1.5 flex items-center p-1.5">
                     <span className="sr-only">Open user menu</span>
-                    {session?.user?.image && (
+                    {session?.user?.image ? (
                       <Image
                         className="h-8 w-8 rounded-full bg-gray-50"
                         src={session?.user?.image}
@@ -406,13 +417,23 @@ export default function DashboardLayout({ children }) {
                         width={32}
                         height={32}
                       />
+                    ) : (
+                      <span className="inline-block h-8 w-8 overflow-hidden rounded-full bg-gray-100">
+                        <svg
+                          className="h-full w-full text-gray-300"
+                          fill="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                      </span>
                     )}
                     <span className="hidden lg:flex lg:items-center">
                       <span
                         className="ml-4 text-sm font-semibold leading-6 text-gray-900"
                         aria-hidden="true"
                       >
-                        {session?.user?.name}
+                        {session?.user?.name || session?.user?.email}
                       </span>
                       <ChevronDownIcon
                         className="ml-2 h-5 w-5 text-gray-400"

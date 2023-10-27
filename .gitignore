@@ -35,4 +35,4 @@ yarn-error.log*
 next-env.d.ts
 
 generateKey.js
-src/utils/allowedEmails.js
+src/utils/specificAllowedEmails.js
