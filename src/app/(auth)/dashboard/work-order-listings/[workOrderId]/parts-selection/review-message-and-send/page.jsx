@@ -37,7 +37,7 @@ export default function ReviewMessageAndSend() {
     setVendorData(vendors)
     setSelectedPart(sP)
   }, [])
-  
+  console.log('selectedPart', selectedPart)
   const handleConfirmation = async () => {
     // Loop through only the selected vendors
     for (let vendorId of selectedPart.selectedVendors) {

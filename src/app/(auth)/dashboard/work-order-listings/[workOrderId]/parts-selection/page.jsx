@@ -92,7 +92,7 @@ export default function PartsSelection() {
       console.error('Failed to update:', result.error)
     }
   }
-
+console.log('parts =====>', parts)
   return (
     <div className="gap-12 lg:grid lg:grid-cols-2">
       <div>

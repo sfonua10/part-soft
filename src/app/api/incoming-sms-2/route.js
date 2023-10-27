@@ -3,129 +3,129 @@ import WorkOrder from '@/models/workOrder';
 import Vendor from '@/models/vendor';
 
 function extractAvailabilityAndPrice(str) {
-  const regex = /([yY](es)?|[nN]o?)(\d+(\.\d{0,2})?)?/;
+  const regex = /([a-zA-Z])\s*([yY](es)?|[nN]o?)?(\d+(\.\d{0,2})?)?/;
   const match = str.match(regex);
-  
+
   if (match) {
-      const availability = match[1];
-      const price = parseFloat(match[2]);
-      return { availability, price };
+      const code = match[1];
+      const availability = match[2] || (match[4] ? 'yes' : null);
+      let price = parseFloat(match[4]);
+      if (isNaN(price)) {
+          price = null;  // setting to null if it's NaN
+      }
+      return { code, availability, price };
   }
-  
-  return { availability: str, price: null }; // default case
+
+  return { code: null, availability: null, price: null }; // default case
+}
+
+function getPartIndexFromCode(code) {
+    return code.toUpperCase().charCodeAt(0) - 'A'.charCodeAt(0);
 }
 
 export async function POST(request) {
-  const formData = new URLSearchParams(await request.text());
-  const senderNumber = formData.get('From');
-  const messageBody = formData.get('Body');
+    const formData = new URLSearchParams(await request.text());
+    const senderNumber = formData.get('From');
+    const messageBody = formData.get('Body');
 
-  console.log(`Received message from: ${senderNumber}, message: ${messageBody}`);
+    console.log(`Received message from: ${senderNumber}, message: ${messageBody}`);
 
-  const [responsePart, ...priceParts] = messageBody.trim().split(' ');
-  const { availability: extractedAvailability, price: extractedPrice } = extractAvailabilityAndPrice(responsePart);
+    const { code, availability: extractedAvailability, price: extractedPrice } = extractAvailabilityAndPrice(messageBody);
 
-  // We will assume the latest work order queried by this vendor is the one being responded to.
-  const workOrder = await WorkOrder.findOne({}).sort({_id: -1});
-  if (!workOrder) {
-      return replyWithError("Couldn't find a matching work order. Please check and try again.");
-  }
-  
-  const vendorInfo = await Vendor.findOne({ phone: senderNumber });
-  const vendorName = vendorInfo ? vendorInfo.name : 'Unknown Vendor';
+    const partIndex = getPartIndexFromCode(code);
+    const workOrder = await WorkOrder.findOne({}).sort({ _id: -1 });
 
-  let price;
-  if (extractedPrice) {
-    price = extractedPrice;
-  } else if (priceParts.length) {
-    const priceString = priceParts.join('').replace("$", "");
-    price = parseFloat(priceString);
-  } else {
-    price = null;
-  }
+    if (!workOrder || partIndex < 0 || partIndex >= workOrder.parts.length) {
+        return replyWithError("Couldn't find a matching part or work order based on your response. Please check and try again.");
+    }
 
-  if (isNaN(price) && price !== null) {
-    return replyWithError("Invalid price format. Please reply with the format 'YES/NO $Price'. You can include the dollar sign or omit it. Thank you!");
-  }
-  const part = workOrder.parts[0];
-  const partNumber = part.partNumber;
+    const part = workOrder.parts[partIndex];
 
-  let availability, orderStatus;
-  const cleanedAvailabilityResponse = extractedAvailability.trim().toUpperCase();
-  switch (cleanedAvailabilityResponse) {
-    case 'YES':
-    case 'Y':
-      availability = 'In Stock';
-      orderStatus = 'Confirmed';
-      break;
-    case 'NO':
-    case 'N':
-      availability = 'Out of Stock';
-      orderStatus = 'N/A';
-      break;
-    default:
-      return replyWithError("We didn't recognize your response. Please reply with the format 'YES/NO $Price'. Thank you!");
-  }
+    const vendorInfo = await Vendor.findOne({ phone: senderNumber });
+    const vendorName = vendorInfo ? vendorInfo.name : 'Unknown Vendor';
 
-  const vendorResponseData = {
-    vendorName: vendorName,
-    availability: availability,
-    orderStatus: orderStatus,
-    partAvailable: cleanedAvailabilityResponse.toLowerCase(),
-    price: price
-  };
+    let availability, orderStatus;
+    const cleanedAvailabilityResponse = (extractedAvailability || '').trim().toUpperCase();
 
-  const vendorResponseIndex = part.vendorResponses.findIndex(response => response.vendorName === vendorName);
+    switch (cleanedAvailabilityResponse) {
+        case 'YES':
+        case 'Y':
+            availability = 'In Stock';
+            orderStatus = 'Confirmed';
+            break;
+        case 'NO':
+        case 'N':
+            availability = 'Out of Stock';
+            orderStatus = 'N/A';
+            break;
+        default:
+            if (extractedPrice !== null) {
+                availability = 'In Stock';
+                orderStatus = 'Confirmed';
+            } else {
+                return replyWithError("We didn't recognize your response. Please reply with the format 'A/B/C... $Price' for available parts or 'A/B/C... N/NO' for unavailable parts. Thank you!");
+            }
+    }
 
-  let updatedWorkOrder;
+    const vendorResponseData = {
+        vendorName: vendorName,
+        availability: availability,
+        orderStatus: orderStatus,
+        partAvailable: cleanedAvailabilityResponse.toLowerCase(),
+        price: extractedPrice
+    };
 
-  if (vendorResponseIndex !== -1) {
-      // If the vendor response already exists, update it.
-      const updateKey = `parts.$.vendorResponses.${vendorResponseIndex}`;
-      updatedWorkOrder = await WorkOrder.findOneAndUpdate(
-          {
-              'parts.partNumber': partNumber
-          },
-          {
-              [`${updateKey}.availability`]: availability,
-              [`${updateKey}.orderStatus`]: orderStatus,
-              [`${updateKey}.partAvailable`]: cleanedAvailabilityResponse.toLowerCase(),
-              [`${updateKey}.price`]: price
-          },
-          { new: true }
-      );
-  } else {
-      // If the vendor response doesn't exist, add a new one.
-      updatedWorkOrder = await WorkOrder.findOneAndUpdate(
-          {
-              'parts.partNumber': partNumber
-          },
-          { $push: { 'parts.$.vendorResponses': vendorResponseData } },
-          { new: true }
-      );
-  }
+    const vendorResponseIndex = part.vendorResponses.findIndex(response => response.vendorName === vendorName);
 
-  let responseMessage;
-  if (updatedWorkOrder) {
-      responseMessage = `Successfully updated the part with availability: ${availability} and price: $${price}.`;
-  } else {
-      responseMessage = `Error updating the part. Please ensure you are responding to the correct request.`;
-  }
+    let updatedWorkOrder;
 
-  const twiml = new twilio.twiml.MessagingResponse();
-  twiml.message(responseMessage);
-  return new Response(twiml.toString(), {
-      headers: { 'Content-Type': 'text/xml' },
-      status: 200,
-  });
+    if (vendorResponseIndex !== -1) {
+        const updateKey = `parts.${partIndex}.vendorResponses.${vendorResponseIndex}`;
+        const updateData = {
+            [`${updateKey}.availability`]: availability,
+            [`${updateKey}.orderStatus`]: orderStatus,
+            [`${updateKey}.partAvailable`]: cleanedAvailabilityResponse.toLowerCase(),
+        };
+        if (extractedPrice !== null) {
+            updateData[`${updateKey}.price`] = extractedPrice;
+        }
+        updatedWorkOrder = await WorkOrder.findOneAndUpdate(
+            { _id: workOrder._id },
+            updateData,
+            { new: true }
+        );
+    } else {
+        const pushData = { [`parts.${partIndex}.vendorResponses`]: vendorResponseData };
+        if (extractedPrice === null) {
+            delete pushData[`parts.${partIndex}.vendorResponses`].price;
+        }
+        updatedWorkOrder = await WorkOrder.findOneAndUpdate(
+            { _id: workOrder._id },
+            { $push: pushData },
+            { new: true }
+        );
+    }
+
+    let responseMessage;
+    if (updatedWorkOrder) {
+        responseMessage = `Successfully updated the part with availability: ${availability} and price: $${extractedPrice}.`;
+    } else {
+        responseMessage = `Error updating the part. Please ensure you are responding to the correct request.`;
+    }
+
+    const twiml = new twilio.twiml.MessagingResponse();
+    twiml.message(responseMessage);
+    return new Response(twiml.toString(), {
+        headers: { 'Content-Type': 'text/xml' },
+        status: 200,
+    });
 }
 
-// Helper function to reply with an error
 function replyWithError(message) {
-  const twiml = new twilio.twiml.MessagingResponse();
-  twiml.message(message);
-  return new Response(twiml.toString(), {
-    headers: { 'Content-Type': 'text/xml' },
-    status: 200,
-  });
+    const twiml = new twilio.twiml.MessagingResponse();
+    twiml.message(message);
+    return new Response(twiml.toString(), {
+        headers: { 'Content-Type': 'text/xml' },
+        status: 200,
+    });
 }

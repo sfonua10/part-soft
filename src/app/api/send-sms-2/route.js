@@ -1,5 +1,6 @@
 import twilio from 'twilio'
 import WorkOrder from '@/models/workOrder'
+import { generateUniqueCode } from '@/utils/generateUniqueCode'
 
 export async function POST(request) {
   try {
@@ -14,7 +15,8 @@ export async function POST(request) {
     }
 
     const client = twilio(accountSid, authToken)
-    const { _id, workOrderNumber, vehicle, part, vendors } = await request.json()
+    const { _id, workOrderNumber, vehicle, part, vendors } =
+      await request.json()
 
     console.log('Received request data:', {
       _id,
@@ -24,14 +26,7 @@ export async function POST(request) {
       vendorsLength: vendors.length,
     })
 
-    const partDescription = `
-Part Name: ${part.partName}
-Part Number: ${part.partNumber}
------------`;
-
-    const responseExample = `Yes 124.99`;
-
-    const messageTemplate = (vendorName) => `
+    const messageTemplate = (vendorName, uniqueCode) => `
 Hi ${vendorName},
 
 We're requesting availability and pricing for a part related to:
@@ -42,38 +37,61 @@ Model: ${vehicle.model}
 Year: ${vehicle.year}
 VIN: ${vehicle.vin}
 
-${partDescription}
+Part Name: ${part.partName}
+Part Number: ${part.partNumber}
+Code: ${uniqueCode}
 
-Example Reply: "${responseExample}".
+To reply:
+- If available: Use the format "${uniqueCode} <space> Price", for example: "${uniqueCode} 124.99".
+- If not available: Reply with "${uniqueCode} no" or "${uniqueCode} n".
 
 Thanks,
-Partsoft - Casey Johnson      
-    `
+Partsoft - Kacey Johnson      
+    `;
+    
+
+    function prepareVendorResponse(vendorName) {
+      return {
+        vendorName: vendorName,
+        availability: 'Pending',
+        orderStatus: 'N/A',
+        price: null,
+        delivery: null,
+        partAvailable: 'Pending',
+      }
+    }
+
+    let vendorResponsesToUpdate = []
 
     for (let vendor of vendors) {
       if (!vendor.name || !vendor.phone) {
         console.warn('Vendor missing name or phone:', vendor)
         continue
       }
-
-      const personalizedMessage = messageTemplate(vendor.name)
+      const uniqueCode = generateUniqueCode();
+      const personalizedMessage = messageTemplate(vendor.name, uniqueCode)
       await client.messages.create({
         body: personalizedMessage,
         from: fromNumber,
         to: vendor.phone.trim(),
       })
+
+      vendorResponsesToUpdate.push(prepareVendorResponse(vendor.name))
     }
 
     try {
-      await WorkOrder.updateOne(
-        { _id: _id, 'parts._id': part._id },
-        {
-          $set: { 'parts.$.notificationsSent': new Date() },
-        },
-      )
+      for (const response of vendorResponsesToUpdate) {
+        await WorkOrder.updateOne(
+          { _id: _id, 'parts._id': part._id },
+          {
+            $push: { 'parts.$.vendorResponses': response },
+            $set: { 'parts.$.notificationsSent': new Date() },
+          },
+        )
+      }
     } catch (dbError) {
       console.error(
-        'Error updating notificationsSent for part:',
+        'Error updating notificationsSent and vendorResponses for part:',
         part._id,
         dbError.message,
       )
@@ -81,8 +99,8 @@ Partsoft - Casey Johnson
         status: 500,
       })
     }
-    
-    console.log('Updated notificationsSent for the part.')
+
+    console.log('Updated notificationsSent and vendorResponses for the part.')
 
     console.log('Messages sent successfully.')
     return new Response(JSON.stringify({ message: 'Messages sent' }), {
