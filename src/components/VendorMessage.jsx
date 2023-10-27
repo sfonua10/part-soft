@@ -1,22 +1,28 @@
 import React from 'react'
 
-const VendorMessage = ({ workOrderNumber, vehicle, selectedPart, vendorData }) => {
-
+const VendorMessage = ({
+  workOrderNumber,
+  vehicle,
+  selectedPart,
+  vendorData,
+}) => {
   const vendorNames = selectedPart?.selectedVendors?.map((vendorId) => {
     const vendor = vendorData.find((v) => v._id === vendorId)
     return vendor?.name || 'N/A'
   })
 
   const generateMessage = () => {
+    const vendorsList = vendorNames?.join(', ')
+
     const partDescriptions = `
   Part Name: ${selectedPart.partName}
   Part Number: ${selectedPart.partNumber}
   -----------`
 
-    const responseExamples = `Yes 124.99` // since it's just one part
+    const responseExamples = `Yes 124.99`
 
     return `
-  Hi [Vendor],
+  Hi ${vendorsList},
   
   We're requesting availability and pricing for the following part related to:
   
@@ -43,19 +49,9 @@ const VendorMessage = ({ workOrderNumber, vehicle, selectedPart, vendorData }) =
       <h2 id="message-heading" className="text-lg font-medium text-gray-900">
         Vendor Messages
       </h2>
-
-      {vendorNames && vendorNames.length > 0 && (
-        <ul className="mt-2 space-y-2">
-          {vendorNames.map((index) => (
-            <li
-              key={index}
-              className="whitespace-pre-line text-sm text-gray-600"
-            >
-              {generateMessage()}
-            </li>
-          ))}
-        </ul>
-      )}
+      <div className="whitespace-pre-line text-sm text-gray-600">
+        {generateMessage()}
+      </div>
     </section>
   )
 }
