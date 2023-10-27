@@ -19,10 +19,6 @@ function extractAvailabilityAndPrice(str) {
   return { code: null, availability: null, price: null }; // default case
 }
 
-function getPartIndexFromCode(code) {
-    return code.toUpperCase().charCodeAt(0) - 'A'.charCodeAt(0);
-}
-
 export async function POST(request) {
     const formData = new URLSearchParams(await request.text());
     const senderNumber = formData.get('From');
@@ -32,14 +28,14 @@ export async function POST(request) {
 
     const { code, availability: extractedAvailability, price: extractedPrice } = extractAvailabilityAndPrice(messageBody);
 
-    const partIndex = getPartIndexFromCode(code);
-    const workOrder = await WorkOrder.findOne({}).sort({ _id: -1 });
-
-    if (!workOrder || partIndex < 0 || partIndex >= workOrder.parts.length) {
-        return replyWithError("Couldn't find a matching part or work order based on your response. Please check and try again.");
+    // Instead of fetching the last work order and inferring part based on code, 
+    // we'll now find the work order and part based on the received code.
+    const workOrder = await WorkOrder.findOne({ "parts.vendorResponses.code": code });
+    if (!workOrder) {
+        return replyWithError("Couldn't find a matching work order based on your response. Please check and try again.");
     }
 
-    const part = workOrder.parts[partIndex];
+    const part = workOrder.parts.find(p => p.vendorResponses.some(vr => vr.code === code));
 
     const vendorInfo = await Vendor.findOne({ phone: senderNumber });
     const vendorName = vendorInfo ? vendorInfo.name : 'Unknown Vendor';
@@ -72,15 +68,16 @@ export async function POST(request) {
         availability: availability,
         orderStatus: orderStatus,
         partAvailable: cleanedAvailabilityResponse.toLowerCase(),
-        price: extractedPrice
+        price: extractedPrice,
+        code: code
     };
 
-    const vendorResponseIndex = part.vendorResponses.findIndex(response => response.vendorName === vendorName);
+    const vendorResponseIndex = part.vendorResponses.findIndex(response => response.vendorName === vendorName && response.code === code);
 
     let updatedWorkOrder;
 
     if (vendorResponseIndex !== -1) {
-        const updateKey = `parts.${partIndex}.vendorResponses.${vendorResponseIndex}`;
+        const updateKey = `parts.$[partElement].vendorResponses.${vendorResponseIndex}`;
         const updateData = {
             [`${updateKey}.availability`]: availability,
             [`${updateKey}.orderStatus`]: orderStatus,
@@ -92,17 +89,17 @@ export async function POST(request) {
         updatedWorkOrder = await WorkOrder.findOneAndUpdate(
             { _id: workOrder._id },
             updateData,
-            { new: true }
+            { arrayFilters: [{ 'partElement._id': part._id }], new: true }
         );
     } else {
-        const pushData = { [`parts.${partIndex}.vendorResponses`]: vendorResponseData };
+        const pushData = { [`parts.$[partElement].vendorResponses`]: vendorResponseData };
         if (extractedPrice === null) {
-            delete pushData[`parts.${partIndex}.vendorResponses`].price;
+            delete pushData[`parts.$[partElement].vendorResponses`].price;
         }
         updatedWorkOrder = await WorkOrder.findOneAndUpdate(
             { _id: workOrder._id },
             { $push: pushData },
-            { new: true }
+            { arrayFilters: [{ 'partElement._id': part._id }], new: true }
         );
     }
 

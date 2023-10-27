@@ -1,12 +1,20 @@
-const allowedChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+import { UniqueCodeState } from '@/models/workOrder'
 
-let currentIndex = 0;
+const allowedChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
-export function generateUniqueCode() {
-    if (currentIndex >= allowedChars.length) {
-        currentIndex = 0;  // reset the index if it exceeds the length
-    }
-    const code = allowedChars.charAt(currentIndex);
-    currentIndex++;
-    return code;
+export async function generateUniqueCode() {
+  let state = await UniqueCodeState.findOne({})
+  if (!state) {
+    state = new UniqueCodeState()
+    await state.save()
+  }
+
+  if (state.currentIndex >= allowedChars.length) {
+    state.currentIndex = 0
+  }
+
+  const code = allowedChars.charAt(state.currentIndex)
+  state.currentIndex++
+  await state.save()
+  return code
 }

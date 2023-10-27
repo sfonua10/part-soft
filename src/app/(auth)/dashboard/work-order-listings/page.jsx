@@ -1,6 +1,5 @@
 'use client'
 import useSWR from 'swr'
-import { XCircleIcon } from '@heroicons/react/20/solid'
 import Link from 'next/link'
 
 const fetcher = (url) => fetch(url).then((res) => res.json())
@@ -25,27 +24,11 @@ export default function PartsRequestQueue() {
     const allPartsNotified = order.parts.every(
       (part) => part.notificationsSent !== null,
     )
-
     if (allPartsNotified) return 'bg-green-50'
 
-    // 3. Check if some parts have notificationsSent
-    const somePartsNotified = order.parts.some(
-      (part) => part.notificationsSent !== null,
-    )
-
-    if (somePartsNotified) return 'bg-yellow-50'
-
-    // 4. Check if all parts have notificationsSent set to null
-    const allPartsNotNotified = order.parts.every(
-      (part) => part.notificationsSent === null,
-    )
-
-    if (allPartsNotNotified) return 'bg-red-50'
-
-    // Default: No background color
-    return ''
+    // 3. If not all parts are notified, then use yellow background
+    return 'bg-yellow-50'
   }
-  console.log(sortedData)
   return (
     <div className="px-4 sm:px-6 lg:px-8">
       <div className="sm:flex sm:items-center">
@@ -65,9 +48,7 @@ export default function PartsRequestQueue() {
         <div className="flex space-x-4">
           {[
             ['All parts notified', 'bg-green-50', 'border-green-300'],
-            ['Some parts notified', 'bg-yellow-50', 'border-yellow-300'],
-            ['No parts notified', 'bg-red-50', 'border-red-300'],
-            ['Vehicle details missing', 'bg-red-50', 'border-red-300', true],
+            ['Some or no parts notified', 'bg-yellow-50', 'border-yellow-300'],
           ].map(([notification, bgColor, borderColor, showIcon], index) => {
             const id = notification.toLowerCase().replace(/\s+/g, '-')
             return (
@@ -90,13 +71,7 @@ export default function PartsRequestQueue() {
                       ></span>
                     </>
                   )}
-                  {/* If showIcon is true, render the XCircleIcon */}
-                  {showIcon && (
-                    <XCircleIcon
-                      className="h-4 w-4 text-red-500"
-                      aria-hidden="true"
-                    />
-                  )}
+
                 </div>
                 <label
                   htmlFor={id}
@@ -185,10 +160,6 @@ export default function PartsRequestQueue() {
                         {isVehicleInfoMissing(order.vehicle) && (
                           <div className="mt-2">
                             <div className="flex items-center text-red-500">
-                              <XCircleIcon
-                                className="mr-2 h-5 w-5"
-                                aria-hidden="true"
-                              />
                               Missing required vehicle information
                             </div>
                           </div>

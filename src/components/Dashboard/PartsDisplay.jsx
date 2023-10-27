@@ -80,10 +80,23 @@ export default function PartsDisplay({ data }) {
                 <span className="mr-2 inline-block rounded-t border border-b-0 bg-gray-100 px-3 text-xs">
                   WO: {workOrder.workOrderNumber}
                 </span>
-                <span className="mr-2 inline-block rounded-t border border-b-0 bg-gray-100 px-3 text-xs">
-                  {workOrder.vehicle.year} {workOrder.vehicle.make}{' '}
-                  {workOrder.vehicle.model} {workOrder.vehicle.vin}
-                </span>
+                { 
+            workOrder.vehicle.year === 'N/A' && 
+            workOrder.vehicle.make === 'N/A' && 
+            workOrder.vehicle.model === 'N/A' && 
+            workOrder.vehicle.vin === 'N/A' ? (
+              <span className="inline-block rounded-t border border-b-0 bg-gray-100 px-3 text-xs">
+                Vehicle data not available
+              </span>
+            ) : (
+              <span className="mr-2 inline-block rounded-t border border-b-0 bg-gray-100 px-3 text-xs">
+                {workOrder.vehicle.year !== 'N/A' ? workOrder.vehicle.year : 'N/A'}{' '}
+                {workOrder.vehicle.make !== 'N/A' ? workOrder.vehicle.make : 'N/A'}{' '}
+                {workOrder.vehicle.model !== 'N/A' ? workOrder.vehicle.model : 'N/A'}{' '}
+                {workOrder.vehicle.vin !== 'N/A' ? workOrder.vehicle.vin : 'N/A'}
+              </span>
+            )
+          }
               </div>
               <div className="flex">
                 <span className="mr-2 inline-block rounded-t border border-b-0 bg-gray-100 px-3 text-xs">
