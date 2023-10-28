@@ -1,10 +1,10 @@
 import NextAuth from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
-import Email from "next-auth/providers/email";
-import { MongoDBAdapter } from "@auth/mongodb-adapter";
+import Email from 'next-auth/providers/email'
+import { MongoDBAdapter } from '@auth/mongodb-adapter'
 import User from '@/models/user'
 import { connectToDB } from '@/utils/database'
-import clientPromise from "@/utils/mongodb";
+import clientPromise from '@/utils/mongodb'
 import { createTransport } from 'nodemailer'
 import specificAllowedEmails from '@/utils/specificAllowedEmails'
 
@@ -22,7 +22,7 @@ const handler = NextAuth({
         },
       },
       from: process.env.EMAIL_FROM,
-      sendVerificationRequest: sendVerificationRequest
+      sendVerificationRequest: sendVerificationRequest,
     }),
     GoogleProvider({
       clientId: process.env.GOOGLE_ID,
@@ -47,7 +47,7 @@ const handler = NextAuth({
 
       return session
     },
-    async signIn({ account, profile, user, credentials, error }) {
+    async signIn({ account, profile, user, error }) {
       try {
         await connectToDB()
 
@@ -56,27 +56,30 @@ const handler = NextAuth({
           return false
         }
 
-        // Restrict access based on the email domain
-        if (account.provider === 'google') {
-          if (!specificAllowedEmails.includes(profile.email)) {
-            console.error('Email not allowed for sign-in')
-            return false
-          }
-        }
-        // Declare variables to store user details
-        let email, name, picture
+        // Set default values
+        let email = ''
+        let name = ''
+        let picture = ''
 
         // Check if the provider is google
         if (account.provider === 'google') {
           email = profile.email
           name = profile.name
           picture = profile.picture
-        }
-        // Check if the provider is email
-        else if (account.provider === 'email') {
+        } else if (!profile && user) {
+          // Fall back to the user object when profile is undefined
           email = user.email
-          name = ''
-          picture = ''
+          name = user.name || ''
+          picture = user.image || ''
+        }
+
+        // Restrict access based on the email domain
+        if (
+          !specificAllowedEmails.includes(email) &&
+          !email.endsWith('@uniteddieselservice.net')
+        ) {
+          console.error('Email not allowed for sign-in')
+          return false
         }
 
         // Check if the user email exists in the database
