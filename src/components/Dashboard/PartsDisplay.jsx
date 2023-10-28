@@ -165,7 +165,7 @@ export default function PartsDisplay({ data }) {
                         <tr className="border-t border-gray-200">
                           <td
                             colSpan={5}
-                            className="whitespace-nowrap bg-yellow-50 px-3 py-4 text-sm text-gray-500"
+                            className="whitespace-nowrap bg-blue-50 px-3 py-4 text-sm text-gray-500"
                           >
                             Parts Manager needs to review
                           </td>
