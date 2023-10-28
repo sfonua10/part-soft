@@ -47,10 +47,9 @@ To reply:
 
 Thanks,
 Partsoft - Kacey Johnson      
-    `;
-    
+    `
 
-    function prepareVendorResponse(vendorName) {
+    function prepareVendorResponse(vendorName, uniqueCode) {
       return {
         vendorName: vendorName,
         availability: 'Pending',
@@ -58,6 +57,7 @@ Partsoft - Kacey Johnson
         price: null,
         delivery: null,
         partAvailable: 'Pending',
+        code: uniqueCode,
       }
     }
 
@@ -68,7 +68,10 @@ Partsoft - Kacey Johnson
         console.warn('Vendor missing name or phone:', vendor)
         continue
       }
-      const uniqueCode = generateUniqueCode();
+      // This part has the potential to be slow if there are many vendors since it waits for DB
+      // operations in a loop. Depending on your application needs and the number of vendors,
+      // this may or may not be an issue.
+      const uniqueCode = await generateUniqueCode()
       const personalizedMessage = messageTemplate(vendor.name, uniqueCode)
       await client.messages.create({
         body: personalizedMessage,
@@ -76,9 +79,10 @@ Partsoft - Kacey Johnson
         to: vendor.phone.trim(),
       })
 
-      vendorResponsesToUpdate.push(prepareVendorResponse(vendor.name))
+      vendorResponsesToUpdate.push(
+        prepareVendorResponse(vendor.name, uniqueCode),
+      )
     }
-
     try {
       for (const response of vendorResponsesToUpdate) {
         await WorkOrder.updateOne(

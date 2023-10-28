@@ -1,4 +1,15 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
+
+// UniqueCodeState Schema
+const uniqueCodeStateSchema = new mongoose.Schema({
+  currentIndex: {
+    type: Number,
+    default: 0,
+  },
+});
+
+const UniqueCodeState = 
+  mongoose.models.UniqueCodeState || mongoose.model('UniqueCodeState', uniqueCodeStateSchema);
 
 // Vendor Response Schema
 const vendorResponseSchema = new mongoose.Schema({
@@ -27,7 +38,11 @@ const vendorResponseSchema = new mongoose.Schema({
     enum: ['yes', 'no', 'N/A'],
     required: true,
   },
-})
+  code: {
+    type: String,
+    maxlength: 1 
+  }
+});
 
 // Part Schema
 const partSchema = new mongoose.Schema({
@@ -50,7 +65,7 @@ const partSchema = new mongoose.Schema({
     default: null,
   },
   vendorResponses: [vendorResponseSchema],
-})
+});
 
 // Vehicle Schema
 const vehicleSchema = new mongoose.Schema({
@@ -58,7 +73,7 @@ const vehicleSchema = new mongoose.Schema({
   model: String,
   year: String,
   vin: String,
-})
+});
 
 // Work Order Schema
 const workOrderSchema = new mongoose.Schema({
@@ -93,9 +108,10 @@ const workOrderSchema = new mongoose.Schema({
     default: null,
   },
   parts: [partSchema],
-})
+});
 
 const WorkOrder =
-  mongoose.models.WorkOrder || mongoose.model('WorkOrder', workOrderSchema)
+  mongoose.models.WorkOrder || mongoose.model('WorkOrder', workOrderSchema);
 
-export default WorkOrder
+export default WorkOrder;
+export { UniqueCodeState };

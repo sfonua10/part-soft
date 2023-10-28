@@ -10,6 +10,10 @@ const UserSchema = new Schema({
     unique: [true, 'Email already exists!'],
     required: [true, 'Email is required!'],
   },
+  profileImage: {
+    type: String,
+    default: null,  // or set to a default image URL if you have one
+  },
   companyName: {
     type: String,
     // required: [true, 'Company Name is required!'],

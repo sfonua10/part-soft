@@ -54,8 +54,7 @@ const LoginForm = () => {
     setEmailError('')
 
     try {
-      await signIn('email', { email }) // Updated to use 'email' provider and only pass email
-      alert('Magic link sent to your email.')
+      await signIn('email', { email })
     } catch (error) {
       setEmailError('Failed to send magic link.')
       console.error('Error logging in:', error)
@@ -71,7 +70,7 @@ const LoginForm = () => {
       </div>
       <h2 className="mt-20 text-lg font-semibold text-gray-900">Log in</h2>
       <form onSubmit={handleSubmit} className="mt-10 grid grid-cols-1 gap-y-8">
-        {/* <TextField
+        <TextField
           label="Enter your email"
           name="email"
           type="email"
@@ -80,7 +79,7 @@ const LoginForm = () => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           error={emailError}
-        /> */}
+        />
         {/* <div>
           <label
             htmlFor="role"
@@ -106,13 +105,13 @@ const LoginForm = () => {
         </div> */}
 
 
-        {/* <div>
+        <div>
           <Button type="submit" variant="solid" color="blue" className="w-full">
             <span>
               Sign in<span aria-hidden="true">&rarr;</span>
             </span>
           </Button>
-        </div> */}
+        </div>
         <div>
 
 
@@ -131,6 +130,8 @@ const LoginForm = () => {
             </div>
           </div> */}
           
+        </div>
+      </form>
           <div className="mt-6 grid grid-cols-2 gap-4">
             <a
               // href="#"
@@ -167,8 +168,6 @@ const LoginForm = () => {
               <span className="text-sm font-semibold leading-6">Google</span>
             </a>
           </div>
-        </div>
-      </form>
     </>
   )
 }
