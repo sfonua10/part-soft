@@ -119,8 +119,7 @@ export default function DashboardLayout({ children }) {
   function handleSignOut() {
     signOut({ callbackUrl: '/' })
   }
-console.log('sidebarOpen', sidebarOpen)
-console.log('session', session)
+
   return (
     <>
       <div>

@@ -49,8 +49,6 @@ const handler = NextAuth({
       return session
     },
     async signIn({ account, profile, user, error }) {
-      console.log('profile ====>', profile)
-      console.log('user ====>', user)
       try {
         await connectToDB()
 
