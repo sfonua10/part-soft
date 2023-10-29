@@ -2,7 +2,7 @@ import User from '@/models/user'
 
 export async function PUT(req) {
   try {
-    const { _id, name, role, profileImage, email } = await req.json()  // <-- added email here
+    const { _id, name, role, image, email } = await req.json()  // <-- added email here
 
     let updateQuery = {}
 
@@ -14,8 +14,8 @@ export async function PUT(req) {
       updateQuery['role'] = role
     }
 
-    if (profileImage !== undefined) {
-      updateQuery['profileImage'] = profileImage
+    if (image !== undefined) {
+      updateQuery['image'] = image
     }
 
     if (email !== undefined) {  // <-- added email update logic here

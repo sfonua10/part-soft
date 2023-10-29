@@ -1,11 +1,11 @@
 export function getBackgroundColorForAvailability(availability) {
   switch (availability) {
     case 'In Stock':
-      return 'bg-green-50'
+      return 'bg-green-200'
     case 'Out of Stock':
-      return 'bg-red-50'
+      return 'bg-red-200'
     case 'Pending':
-      return 'bg-yellow-50'
+      return 'bg-yellow-200'
     default:
       return '' // or some default color
   }

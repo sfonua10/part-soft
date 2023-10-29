@@ -17,7 +17,7 @@ const getSendButtonStyles = (condition) => {
   }`
 }
 export default function ReviewMessageAndSend() {
-  const router = useRouter();
+  const router = useRouter()
   const [dataFromPreviousPage, setDataFromPreviousPage] = useState({})
   const [vendorData, setVendorData] = useState([])
   const [selectedPart, setSelectedPart] = useState({})
@@ -56,13 +56,13 @@ export default function ReviewMessageAndSend() {
             _id: dataFromPreviousPage._id,
             workOrderNumber: dataFromPreviousPage.workOrderNumber,
             vehicle: dataFromPreviousPage.vehicle,
-            parts: selectedPart, 
-            vendors: [vendor], 
+            parts: selectedPart,
+            vendors: [vendor],
           }
           try {
             await sendCommunication(method, messageData, 'Your message here')
             // Handle any post-send logic if necessary
-            router.push('/dashboard');
+            router.push('/dashboard')
           } catch (error) {
             console.error(`Failed to send ${method} to ${vendor.name}`, error)
           }
@@ -83,12 +83,7 @@ export default function ReviewMessageAndSend() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 pb-24 pt-16 sm:px-6 lg:max-w-7xl lg:px-8">
-      <Link
-        href={`/dashboard/work-order-listings/${dataFromPreviousPage.workOrderNumber}/parts-selection`}
-      >
-        <ChevronLeftIcon className="h-6 text-gray-400" />
-      </Link>
-      <div className="gap-12 lg:grid lg:grid-cols-12">
+      <div className="mt-4 gap-12 lg:grid lg:grid-cols-12">
         {/* Left Side - Summary */}
         <div className="lg:col-span-7">
           <Summary
@@ -97,6 +92,11 @@ export default function ReviewMessageAndSend() {
             vehicle={dataFromPreviousPage.vehicle || {}}
             selectedPart={selectedPart}
           />
+          <Link
+            href={`/dashboard/work-order-listings/${dataFromPreviousPage.workOrderNumber}/parts-selection`}
+          >
+            <ChevronLeftIcon className="h-6 text-gray-400" />
+          </Link>
         </div>
 
         {/* Right Side - Vendor Messages & Communication Preferences */}

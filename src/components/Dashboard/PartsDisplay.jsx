@@ -8,11 +8,13 @@ import {
   transformData,
   getBackgroundColorForAvailability,
 } from '@/utils/dashboard/partdisplay'
+import { useSidebar } from '@/app/(auth)/dashboard/sidebar-provider'
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 export default function PartsDisplay({ data }) {
+  const { toggleOpen } = useSidebar();
   const transformedData = transformData(data)
   const sortedData = [...transformedData].sort((a, b) => {
     const dateA = new Date(a.dateSubmitted)
@@ -52,13 +54,14 @@ export default function PartsDisplay({ data }) {
     <div className="px-4 sm:px-6 lg:px-8">
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto">
-          <h1 className="text-base font-semibold leading-6 text-gray-900">
+          <h1 className="text-2xl font-semibold leading-6 text-gray-900">
             Work Order and Parts
           </h1>
           {/* <p className="mt-2 text-sm text-gray-700">
             A list of all the users in your account including their name, title,
             email and role.
           </p> */}
+          {/* <button onClick={() => toggleOpen()}>Close Side</button> */}
         </div>
         <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
           <button
@@ -75,9 +78,9 @@ export default function PartsDisplay({ data }) {
         {sortedData?.map((workOrder, workOrderIdx) => (
           <div key={workOrder.workOrderNumber} className="mb-8">
             {/* Tabs */}
-            <div className="flex justify-between">
+            <div className={`flex justify-between ${areAllCollapsed ? 'border-b-2' : 'border-b-1'}`}>
               <div className="flex">
-                <span className="mr-2 inline-block rounded-t border border-b-0 bg-gray-100 px-3 text-xs">
+                <span className="mr-2 inline-block rounded-t border border-b-0 bg-gray-100 text-gray-950 px-3 text-xs">
                   WO: {workOrder.workOrderNumber}
                 </span>
                 { 
@@ -85,11 +88,11 @@ export default function PartsDisplay({ data }) {
             workOrder.vehicle.make === 'N/A' && 
             workOrder.vehicle.model === 'N/A' && 
             workOrder.vehicle.vin === 'N/A' ? (
-              <span className="inline-block rounded-t border border-b-0 bg-gray-100 px-3 text-xs">
+              <span className="inline-block rounded-t border border-b-0 bg-gray-100 px-3 text-xs text-gray-950">
                 Vehicle data not available
               </span>
             ) : (
-              <span className="mr-2 inline-block rounded-t border border-b-0 bg-gray-100 px-3 text-xs">
+              <span className="mr-2 inline-block rounded-t border border-b-0 bg-gray-100 px-3 text-xs text-gray-950">
                 {workOrder.vehicle.year !== 'N/A' ? workOrder.vehicle.year : 'N/A'}{' '}
                 {workOrder.vehicle.make !== 'N/A' ? workOrder.vehicle.make : 'N/A'}{' '}
                 {workOrder.vehicle.model !== 'N/A' ? workOrder.vehicle.model : 'N/A'}{' '}
@@ -184,16 +187,16 @@ export default function PartsDisplay({ data }) {
                               ), // Set background color here
                             )}
                           >
-                            <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-normal text-gray-500 sm:pl-3">
+                            <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-normal text-gray-900 sm:pl-3">
                               {vendor.vendorName}
                             </td>
-                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900">
                               {vendor.availability}
                             </td>
-                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900">
                               {vendor.orderStatus}
                             </td>
-                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900">
                               {vendor.price}
                             </td>
                             {/* <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3">

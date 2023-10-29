@@ -8,19 +8,9 @@ import { useRouter } from 'next/navigation'
 import VendorSelection from '@/components/WorkOrderListings/VendorSelection'
 import Summary from '@/components/Summary'
 import Link from 'next/link'
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
+import { getIconStyles, getButtonStyles, classNames } from '@/utils/buttonStyles'
 
-function classNames(...classes) {
-  return classes.filter(Boolean).join(' ')
-}
-const baseButtonStyles =
-  'w-full rounded-md border border-transparent px-4 py-2 text-sm font-medium shadow-sm hover:bg--[#2563eb] focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:ring-offset-2 focus:ring-offset-gray-50 sm:order-last sm:w-auto'
-const getButtonStyles = (condition) => {
-  return `${baseButtonStyles} ${
-    condition
-      ? 'bg-[#2563eb] text-white'
-      : 'cursor-not-allowed bg-[#2563eb] opacity-50'
-  }`
-}
 export default function PartsSelection() {
   const [dataFromPreviousPage, setDataFromPreviousPage] = useState({})
   const [vendorData, setVendorData] = useState([])
@@ -121,10 +111,10 @@ console.log('parts =====>', parts)
                   className={({ checked, active }) =>
                     classNames(
                       notificationSent
-                        ? 'border-green-300 bg-green-50 ring-2 ring-green-600'
+                        ? 'border-green-300 ring-2 ring-green-600 bg-green-200'
                         : '', // Apply green background if notification has been sent
                       !notificationSent && active
-                        ? 'border-blue-600 ring-2 ring-blue-600'
+                        ? 'border-blue-600 ring-2 ring-blue-600 bg-blue-100'
                         : 'border-gray-300',
                       notificationSent
                         ? 'cursor-not-allowed'
@@ -182,13 +172,17 @@ console.log('parts =====>', parts)
           onVendorChange={handleVendorChange}
         />
         <div className="mt-10 flex justify-between gap-4 border-gray-200 pt-6">
-          <Link
+          {/* <Link
             className={getButtonStyles(true)}
             href={`/dashboard/work-order-listings/${dataFromPreviousPage.workOrderNumber}`}
           >
             Back
-          </Link>
-
+          </Link> */}
+      <Link
+            href={`/dashboard/work-order-listings/${dataFromPreviousPage.workOrderNumber}`}
+            >
+        <ChevronLeftIcon className="h-6 text-gray-400" />
+      </Link>
           <button
             disabled={!selectedPart?._id || selectedVendorIds.length === 0}
             className={getButtonStyles(
@@ -196,7 +190,7 @@ console.log('parts =====>', parts)
             )}
             onClick={handleUpdateParts}
           >
-            Next
+              <ChevronRightIcon className={getIconStyles(selectedPart?._id && selectedVendorIds.length > 0)} />
           </button>
         </div>
       </div>

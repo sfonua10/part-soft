@@ -38,6 +38,7 @@ const handler = NextAuth({
           session.user.id = sessionUser._id.toString()
           session.user.role = sessionUser.role
           session.user.name = sessionUser.name
+          session.user.image = sessionUser.image
         } else {
           console.error('No user found in database')
         }
@@ -48,6 +49,8 @@ const handler = NextAuth({
       return session
     },
     async signIn({ account, profile, user, error }) {
+      console.log('profile ====>', profile)
+      console.log('user ====>', user)
       try {
         await connectToDB()
 

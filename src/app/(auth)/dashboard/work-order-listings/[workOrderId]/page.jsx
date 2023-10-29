@@ -5,6 +5,8 @@ import VehicleInfo from '@/components/RequestPart/VehicleInfo'
 import { useRouter } from 'next/navigation'
 import Summary from '@/components/Summary'
 import { updateWorkOrder } from '@/utils/helpers/apiHelper'
+import { ChevronRightIcon } from '@heroicons/react/24/outline'
+import { getButtonStyles, getIconStyles } from '@/utils/buttonStyles'
 
 const fetcher = (url) => fetch(url).then((res) => res.json())
 
@@ -76,17 +78,6 @@ const WorkOrderDetailsPage = ({ params }) => {
   if (error) return <div>Error loading work order</div>
   if (!workOrder) return <div>Loading...</div>
 
-  const baseButtonStyles =
-    'w-full rounded-md border border-transparent px-4 py-2 text-sm font-medium shadow-sm hover:bg--[#2563eb] focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:ring-offset-2 focus:ring-offset-gray-50 sm:order-last sm:w-auto'
-
-  const getButtonStyles = (condition) => {
-    return `${baseButtonStyles} ${
-      condition
-        ? 'bg-[#2563eb] text-white'
-        : 'cursor-not-allowed bg-[#2563eb] opacity-50'
-    }`
-  }
-
   const isFormFilled = () => {
     return vehicle.make && vehicle.model && vehicle.year && vehicle.vin
   }
@@ -114,7 +105,7 @@ const WorkOrderDetailsPage = ({ params }) => {
                 className={getButtonStyles(isFormFilled())}
                 onClick={handleFormSubmit}
               >
-                Next
+              <ChevronRightIcon className={getIconStyles(isFormFilled())} />
               </button>
             </div>
           </section>

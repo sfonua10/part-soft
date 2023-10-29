@@ -58,7 +58,7 @@ export default function UserProfile() {
     //     const data = await response.json()
 
     //     if (data.success && data.url) {
-    //       handleFieldChange('profileImage', data.url)
+    //       handleFieldChange('image', data.url)
     //     } else {
     //       console.error('Failed to upload image:', data.message)
     //     }
@@ -114,7 +114,7 @@ export default function UserProfile() {
                 {/* <img
                   src={
                     previewImage ||
-                    user.profileImage ||
+                    user.image ||
                     'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
                   }
                   alt=""
@@ -159,7 +159,7 @@ export default function UserProfile() {
               {/* <div className="col-span-full flex items-center gap-x-8">
                 <img
                   src={
-                    user.profileImage ||
+                    user.image ||
                     'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
                   }
                   alt=""
