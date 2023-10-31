@@ -1,5 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react'
+import { useSession } from 'next-auth/react'
 import useSWR from 'swr'
 import VehicleInfo from '@/components/RequestPart/VehicleInfo'
 import { useRouter } from 'next/navigation'
@@ -12,17 +13,24 @@ const fetcher = (url) => fetch(url).then((res) => res.json())
 
 const WorkOrderDetailsPage = ({ params }) => {
   const router = useRouter()
-  const workOrderNumber = params.workOrderId
-  const { data: workOrder, error } = useSWR(
-    workOrderNumber
-      ? `/api/get-workorders?workOrderId=${workOrderNumber}`
-      : null,
-    fetcher,
-    { revalidateOnFocus: false },
-  )
-  const { data: vendorData } = useSWR('/api/vendor-info', fetcher, {
+  const { data: session } = useSession()
+  const userId = session?.user?.id
+  const workOrderNumber = params.workOrderId;
+
+  const workOrderApiUrl = userId && workOrderNumber
+  ? `/api/get-workorders?workOrderId=${workOrderNumber}&userId=${userId}`
+  : null;
+
+
+  const vendorApiUrl = userId ? `/api/vendor-info?userId=${userId}` : null;
+
+  const { data: workOrder, error: workOrderError } = useSWR(workOrderApiUrl, fetcher, {
     revalidateOnFocus: false,
-  })
+  });
+
+  const { data: vendorData, error: vendorError } = useSWR(vendorApiUrl, fetcher, {
+    revalidateOnFocus: false,
+  });
 
   // Maintain a state for the vehicle information and work order number
   const [vehicle, setVehicle] = useState({
@@ -75,7 +83,7 @@ const WorkOrderDetailsPage = ({ params }) => {
     handleUpdateWorkOrder()
   }
 
-  if (error) return <div>Error loading work order</div>
+  if (workOrderError) return <div>Error loading work order</div>
   if (!workOrder) return <div>Loading...</div>
 
   const isFormFilled = () => {

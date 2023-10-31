@@ -31,22 +31,22 @@ const handler = NextAuth({
   ],
   callbacks: {
     async session({ session, user }) {
-      // store the user id from MongoDB to session
       if (session?.user?.email) {
-        const sessionUser = await User.findOne({ email: session.user.email })
+        const sessionUser = await User.findOne({ email: session.user.email });
         if (sessionUser) {
-          session.user.id = sessionUser._id.toString()
-          session.user.role = sessionUser.role
-          session.user.name = sessionUser.name
-          session.user.image = sessionUser.image
+          session.user.id = sessionUser._id.toString();
+          session.user.role = sessionUser.role;
+          session.user.name = sessionUser.name;
+          session.user.image = sessionUser.image;
+          session.user.organizationId =  sessionUser.organizationId || null;
         } else {
-          console.error('No user found in database')
+          console.error('No user found in database');
         }
       } else {
-        console.error('No email found in session user')
+        console.error('No email found in session user');
       }
-
-      return session
+    
+      return session;
     },
     async signIn({ account, profile, user, error }) {
       try {
@@ -61,7 +61,7 @@ const handler = NextAuth({
         let email = ''
         let name = ''
         let picture = ''
-
+        let organizationId = ''
         // Check if the provider is google
         if (account.provider === 'google') {
           email = profile.email
@@ -88,12 +88,18 @@ const handler = NextAuth({
           const userExists = await User.findOne({ email })
           // If user does not exist, create a new user in MongoDB
           if (!userExists) {
-            await User.create({
+            const newUser = {
               email,
               username: name?.replace(' ', '').toLowerCase(),
               image: picture,
               name: name,
-            })
+            }
+
+            if (organizationId) {
+              newUser.organizationId = organizationId
+            }
+
+            await User.create(newUser)
           }
         } else {
           console.error('No email found')

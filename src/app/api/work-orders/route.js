@@ -1,13 +1,20 @@
 import { connectToDB } from '@/utils/database'
 import WorkOrder from '@/models/workOrder'
+import mongoose from 'mongoose';
 
 export async function POST(req) {
-  const { workOrderNumber, vehicle, parts, mechanicName } = await req.json()
-
+  const { organizationId, workOrderNumber, vehicle, parts, mechanicName } = await req.json()
+  if (!mongoose.Types.ObjectId.isValid(organizationId)) {
+    return new Response('Invalid organizationId provided', {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
   try {
     await connectToDB()
 
     const newWorkOrder = new WorkOrder({
+      organizationId,
       workOrderNumber,
       vehicle,
       parts,

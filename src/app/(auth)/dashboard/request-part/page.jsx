@@ -81,6 +81,7 @@ export default function RequestPart() {
     event.preventDefault()
 
     const formData = {
+      organizationId: session?.user?.organizationId,
       workOrderNumber,
       vehicle,
       parts: parts.map((part) => ({

@@ -12,6 +12,7 @@ export default function VendorForm({ data }) {
     setSelectedVendor({})
     setOpen(true)
   }
+  
   useEffect(() => {
     if (data) {
       setSelectedPeople(data)
