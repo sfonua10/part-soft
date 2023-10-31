@@ -2,21 +2,29 @@
 import {
   ArrowDownCircleIcon,
   ArrowUpCircleIcon,
+  CheckCircleIcon,
 } from '@heroicons/react/24/outline'
 import { useState, Fragment } from 'react'
 import {
-  transformData,
   getBackgroundColorForAvailability,
+  formatDate,
 } from '@/utils/dashboard/partdisplay'
 import { useSidebar } from '@/app/(auth)/dashboard/sidebar-provider'
+import { updateWorkOrder } from '@/utils/helpers/apiHelper'
+import useSWR, { mutate } from 'swr'
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
-export default function PartsDisplay({ data }) {
-  const { toggleOpen } = useSidebar();
-  const transformedData = transformData(data)
-  const sortedData = [...transformedData].sort((a, b) => {
+export default function PartsDisplay({ data, endpointUrl }) {
+  const { toggleOpen } = useSidebar()
+  const [visibleParts, setVisibleParts] = useState({})
+  // Initialize an array of booleans with the same length as transformedData
+  const [collapseStates, setCollapseStates] = useState(
+    new Array(data.length).fill(false),
+  )
+
+  const sortedData = [...data].sort((a, b) => {
     const dateA = new Date(a.dateSubmitted)
     const dateB = new Date(b.dateSubmitted)
 
@@ -28,11 +36,6 @@ export default function PartsDisplay({ data }) {
     return dateB - dateA // sorts in descending order by date
   })
 
-  // Initialize an array of booleans with the same length as transformedData
-  const [collapseStates, setCollapseStates] = useState(
-    new Array(transformedData.length).fill(false),
-  )
-
   function toggleCollapseState(index) {
     const newStates = [...collapseStates]
     newStates[index] = !newStates[index]
@@ -43,13 +46,49 @@ export default function PartsDisplay({ data }) {
     const areAllCollapsed = collapseStates.every((state) => state)
 
     if (areAllCollapsed) {
-      setCollapseStates(new Array(transformedData.length).fill(false))
+      setCollapseStates(new Array(data.length).fill(false))
     } else {
-      setCollapseStates(new Array(transformedData.length).fill(true))
+      setCollapseStates(new Array(data.length).fill(true))
     }
+  }
+  const toggleVisibility = (partId) => {
+    setVisibleParts((prev) => ({ ...prev, [partId]: !prev[partId] }))
   }
 
   const areAllCollapsed = collapseStates.every((state) => state)
+
+  const updatePartStatusById = async (workOrder, partId) => {
+    try {
+      const updatedParts = workOrder.parts.map((part) =>
+        part._id === partId ? { ...part, completed: true } : part,
+      )
+
+      const updatedWorkOrder = { ...workOrder, parts: updatedParts }
+      const response = await updateWorkOrder(updatedWorkOrder)
+
+      if (response.success) {
+        console.log('Work order updated successfully:', response.data)
+
+        // Find the index of the updated work order in the original data array
+        const workOrderIndex = data.findIndex(
+          (w) => w.workOrderNumber === workOrder.workOrderNumber,
+        )
+
+        // If the work order is found, update it locally
+        if (workOrderIndex !== -1) {
+          const newData = [...data]
+          newData[workOrderIndex] = updatedWorkOrder
+
+          // Manually update the local data without re-fetching from the server
+          mutate(endpointUrl, newData, false)
+        }
+      } else {
+        console.error('Failed to update work order:', response.error)
+      }
+    } catch (error) {
+      console.error('Error updating part status:', error)
+    }
+  }
   return (
     <div className="px-4 sm:px-6 lg:px-8">
       <div className="sm:flex sm:items-center">
@@ -78,33 +117,45 @@ export default function PartsDisplay({ data }) {
         {sortedData?.map((workOrder, workOrderIdx) => (
           <div key={workOrder.workOrderNumber} className="mb-8">
             {/* Tabs */}
-            <div className={`flex justify-between ${areAllCollapsed ? 'border-b-2' : 'border-b-1'}`}>
+            <div
+              className={`flex justify-between ${
+                areAllCollapsed ? 'border-b-2' : 'border-b-1'
+              }`}
+            >
               <div className="flex">
-                <span className="mr-2 inline-block rounded-t border border-b-0 bg-gray-100 text-gray-950 px-3 text-xs">
+                <span className="mr-2 inline-block rounded-t border border-b-0 bg-gray-100 px-3 text-xs text-gray-950">
                   WO: {workOrder.workOrderNumber}
                 </span>
-                { 
-            workOrder.vehicle.year === 'N/A' && 
-            workOrder.vehicle.make === 'N/A' && 
-            workOrder.vehicle.model === 'N/A' && 
-            workOrder.vehicle.vin === 'N/A' ? (
-              <span className="inline-block rounded-t border border-b-0 bg-gray-100 px-3 text-xs text-gray-950">
-                Vehicle data not available
-              </span>
-            ) : (
-              <span className="mr-2 inline-block rounded-t border border-b-0 bg-gray-100 px-3 text-xs text-gray-950">
-                {workOrder.vehicle.year !== 'N/A' ? workOrder.vehicle.year : 'N/A'}{' '}
-                {workOrder.vehicle.make !== 'N/A' ? workOrder.vehicle.make : 'N/A'}{' '}
-                {workOrder.vehicle.model !== 'N/A' ? workOrder.vehicle.model : 'N/A'}{' '}
-                {workOrder.vehicle.vin !== 'N/A' ? workOrder.vehicle.vin : 'N/A'}
-              </span>
-            )
-          }
+                {workOrder.vehicle.year === '' &&
+                workOrder.vehicle.make === '' &&
+                workOrder.vehicle.model === '' &&
+                workOrder.vehicle.vin === '' ? (
+                  <span className="inline-block rounded-t border border-b-0 bg-gray-100 px-3 text-xs text-gray-950">
+                    Vehicle data not available
+                  </span>
+                ) : (
+                  <span className="mr-2 inline-block rounded-t border border-b-0 bg-gray-100 px-3 text-xs text-gray-950">
+                    {workOrder.vehicle.year !== ''
+                      ? workOrder.vehicle.year
+                      : 'N/A'}{' '}
+                    {workOrder.vehicle.make !== ''
+                      ? workOrder.vehicle.make
+                      : 'N/A'}{' '}
+                    {workOrder.vehicle.model !== ''
+                      ? workOrder.vehicle.model
+                      : 'N/A'}{' '}
+                    {workOrder.vehicle.vin !== ''
+                      ? workOrder.vehicle.vin
+                      : 'N/A'}
+                  </span>
+                )}
               </div>
               <div className="flex">
                 <span className="mr-2 inline-block rounded-t border border-b-0 bg-gray-100 px-3 text-xs">
                   Created:{' '}
-                  {workOrder.dateSubmitted ? workOrder.dateSubmitted : 'N/A'}
+                  {workOrder.dateSubmitted
+                    ? formatDate(workOrder.dateSubmitted)
+                    : 'N/A'}
                 </span>
                 <span className="inline-flex items-center justify-center rounded-t border border-b-0 bg-gray-100 px-3 text-xs">
                   <button
@@ -155,64 +206,82 @@ export default function PartsDisplay({ data }) {
                   {workOrder.parts.map((part) => (
                     <Fragment key={part.name}>
                       {/* Part header */}
-                      <tr className="border-t border-gray-200 bg-gray-50">
+                      <tr className="group border-t border-gray-200 bg-gray-50 hover:bg-gray-100">
                         <th
                           colSpan={5}
                           scope="colgroup"
                           className="py-2 pl-4 pr-3 text-left text-xs font-semibold text-gray-900 sm:pl-3"
                         >
-                          {part.name}
+                          <div className="flex w-full items-center justify-between">
+                            <span>
+                              {part.partName} - {part.partNumber}
+                            </span>
+                            {part.completed ? (
+                              <div className="flex items-center space-x-1 text-green-500">
+                                <span className="flex items-center gap-1 rounded border border-green-500 bg-green-50 px-2 py-1 text-xs font-semibold text-green-900">
+                                  Completed
+                                  <CheckCircleIcon className="h-5 w-5" />
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => toggleVisibility(part._id)}
+                                  className="rounded bg-white px-2 py-1 text-xs font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                                >
+                                  {visibleParts[part._id] ? 'Hide' : 'Show'}
+                                </button>
+                              </div>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  updatePartStatusById(workOrder, part._id)
+                                }
+                                className="rounded bg-white px-2 py-1 text-xs font-semibold text-gray-900 opacity-0 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 group-hover:opacity-100"
+                              >
+                                Complete
+                              </button>
+                            )}
+                          </div>
                         </th>
                       </tr>
-                      {part.vendors.length === 0 ? (
-                        <tr className="border-t border-gray-200">
-                          <td
-                            colSpan={5}
-                            className="whitespace-nowrap bg-blue-50 px-3 py-4 text-sm text-gray-500"
-                          >
-                            Parts Manager needs to review
-                          </td>
-                        </tr>
-                      ) : (
-                        part.vendors.map((vendor, vendorIdx) => (
-                          <tr
+
+                      {/* Vendor responses */}
+                      {!part.completed || visibleParts[part._id] ? (
+                        part.vendorResponses.length === 0 ? (
+                          <tr className="border-t border-gray-200">
+                            <td
+                              colSpan={5}
+                              className="whitespace-nowrap bg-blue-50 px-3 py-4 text-sm text-gray-500"
+                            >
+                              Parts Manager needs to review
+                            </td>
+                          </tr>
+                        ) : (
+                          part.vendorResponses.map((vendor, vendorIdx) => (
+                            <tr
                             key={vendor.vendorName}
                             className={classNames(
-                              vendorIdx === 0
-                                ? 'border-gray-300'
-                                : 'border-gray-200',
+                              vendorIdx === 0 ? 'border-gray-300' : 'border-gray-200',
                               'border-t',
-                              getBackgroundColorForAvailability(
-                                vendor.availability,
-                              ), // Set background color here
+                              getBackgroundColorForAvailability(vendor.availability),
                             )}
                           >
-                            <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-normal text-gray-900 sm:pl-3">
+                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                               {vendor.vendorName}
                             </td>
-                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900">
+                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                               {vendor.availability}
                             </td>
-                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900">
+                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                               {vendor.orderStatus}
                             </td>
-                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900">
+                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                               {vendor.price}
                             </td>
-                            {/* <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3">
-                              <a
-                                href="#"
-                                className="text-blue-600 hover:text-blue-900"
-                              >
-                                Edit
-                                <span className="sr-only">
-                                  , {vendor.vendorName}
-                                </span>
-                              </a>
-                            </td> */}
                           </tr>
-                        ))
-                      )}
+                          ))
+                        )
+                      ) : null}
                     </Fragment>
                   ))}
                 </tbody>

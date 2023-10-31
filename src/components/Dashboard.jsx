@@ -41,7 +41,7 @@ export default function Dashboard() {
       {/* <ReviewTable data={workOrdersAwaitingReview} /> */}
       {/* <VendorTable data={workOrdersData} /> */}
       {/* <OrganizationSelectModal /> */}
-      <PartsDisplay data={workOrdersData} />
+      <PartsDisplay data={workOrdersData} endpointUrl={endpointUrl} />
     </div>
   )
 }

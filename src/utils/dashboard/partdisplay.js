@@ -11,7 +11,7 @@ export function getBackgroundColorForAvailability(availability) {
   }
 }
 
-function formatDate(isoDateString) {
+export function formatDate(isoDateString) {
   const date = new Date(isoDateString)
   const month = String(date.getMonth() + 1).padStart(2, '0') // Months are 0-indexed in JavaScript
   const day = String(date.getDate()).padStart(2, '0')
@@ -27,6 +27,7 @@ export function transformData(dataArray) {
         : null
     const dateSubmitted = rawDate ? formatDate(rawDate) : 'N/A'
     return {
+      _id: item._id,
       workOrderNumber: item.workOrderNumber,
       dateSubmitted: dateSubmitted,
       mechanicName: item.mechanicName || 'N/A',  // Including mechanicName in case you need it
@@ -38,6 +39,7 @@ export function transformData(dataArray) {
       },
       parts: item.parts.map((part) => {
         return {
+          id: part._id,
           name: `${part.partName} - ${part.partNumber}`,
           vendors: part.vendorResponses.map((vendor) => {
             let priceValue = vendor.price
