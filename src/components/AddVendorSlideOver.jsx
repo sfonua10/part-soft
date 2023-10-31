@@ -28,7 +28,6 @@ export default function AddVendorSliderOver({ open, setOpen, vendor }) {
     specialization: vendor?.specialization || '',
   })
   const { data: session } = useSession()
-console.log('my vendor session', session)
   const isObjectEmpty = (obj) => Object.keys(obj).length === 0
 
   const mode = !isObjectEmpty(vendor) ? 'edit' : 'new'
