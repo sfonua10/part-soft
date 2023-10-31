@@ -77,6 +77,11 @@ const vehicleSchema = new mongoose.Schema({
 
 // Work Order Schema
 const workOrderSchema = new mongoose.Schema({
+  organizationId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Organization',
+    required: [true, 'Organization ID is required'],
+  },
   workOrderNumber: {
     type: String,
     required: true,

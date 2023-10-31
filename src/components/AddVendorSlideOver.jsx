@@ -1,5 +1,6 @@
 'use client'
 import { Fragment, useState, useEffect } from 'react'
+import { useSession } from 'next-auth/react'
 import { mutate } from 'swr'
 import { Dialog, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
@@ -26,7 +27,8 @@ export default function AddVendorSliderOver({ open, setOpen, vendor }) {
     primaryContact: vendor?.primaryContact || '',
     specialization: vendor?.specialization || '',
   })
-
+  const { data: session } = useSession()
+console.log('my vendor session', session)
   const isObjectEmpty = (obj) => Object.keys(obj).length === 0
 
   const mode = !isObjectEmpty(vendor) ? 'edit' : 'new'
@@ -88,7 +90,8 @@ export default function AddVendorSliderOver({ open, setOpen, vendor }) {
     e.preventDefault();
   
     const vendorData = {
-      _id: vendor ? vendor._id : undefined, // Add this line
+      _id: vendor ? vendor._id : undefined,
+      organizationId: session?.user?.organizationId,
       name: e.target['vendor-name'].value,
       phone: e.target.phone.value,
       email: e.target.email.value,
@@ -122,13 +125,19 @@ export default function AddVendorSliderOver({ open, setOpen, vendor }) {
   
         const updatedVendor = await response.json();
   
-        mutate('/api/vendor-info', async data => {
+        mutate('/api/vendor-info', data => {
+          if (!Array.isArray(data)) {
+            console.error('Expected data to be an array, but got:', data);
+            return data; // or return [] to ensure the rest of your app can handle it
+          }
+        
           if (mode === 'edit') {
             return data.map(item => item._id === updatedVendor._id ? updatedVendor : item);
           } else {
             return [...data, updatedVendor];
           }
         }, false);
+        
   
         setOpen(false);
         setShow(true);

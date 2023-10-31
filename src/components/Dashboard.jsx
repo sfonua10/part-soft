@@ -1,17 +1,26 @@
 'use client'
+import { useSession } from 'next-auth/react'
 import useSWR from 'swr'
 import VendorTable from './VendorTable'
 import ReviewTable from './Dashboard/ReviewTable'
 import PartsDisplay from './Dashboard/PartsDisplay'
+// import OrganizationSelectModal from './Dashboard/OrganizationSelectModal'
+
 const fetcher = (url) => fetch(url).then((res) => res.json())
 
 export default function Dashboard() {
+  const { data: session } = useSession()
+  const userId = session?.user?.id
+  
+  // Define the endpoint URL with the userId as a query parameter
+  const endpointUrl = userId ? `/api/get-workorders?userId=${userId}` : null
+
   // Fetching work orders data
   const {
     data: workOrdersData,
     error,
     isLoading,
-  } = useSWR('/api/get-workorders', fetcher, {
+  } = useSWR(endpointUrl, fetcher, {
     refreshInterval: 10000,
   })
   
@@ -23,14 +32,15 @@ export default function Dashboard() {
     return <div>No work orders available.</div>
   }
 
-  const workOrdersAwaitingReview = workOrdersData.filter(
-    (order) => order.status === 'Awaiting Parts Manager Review',
-  )
+  // const workOrdersAwaitingReview = workOrdersData.filter(
+  //   (order) => order.status === 'Awaiting Parts Manager Review',
+  // )
 
   return (
     <div>
       {/* <ReviewTable data={workOrdersAwaitingReview} /> */}
       {/* <VendorTable data={workOrdersData} /> */}
+      {/* <OrganizationSelectModal /> */}
       <PartsDisplay data={workOrdersData} />
     </div>
   )

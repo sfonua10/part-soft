@@ -1,40 +1,45 @@
-// import Vendor from "@/models/vendor";
-
-// export async function GET(request) {
-//     try {
-//       //Get the activeOnly query parameter from the request
-//       const url = new URL(request?.url);
-//       const activeOnly = url.searchParams.get('activeOnly');
-
-//       let query = {};
-
-//       if (activeOnly === 'true') {
-//         query.isActive = true;
-//       }
-
-//       const vendors = await Vendor.find(query);
-      
-//       return new Response(JSON.stringify(vendors), { status: 200 });
-//     } catch (error) {
-//       console.error("Error fetching vendors:", error.message);
-//       return new Response(JSON.stringify({ message: error.message }), {
-//         status: 500,
-//       });
-//     }
-//   }
-  
 import Vendor from "@/models/vendor";
+import User from "@/models/user";
 
-export async function GET() {
+export async function GET(request) {
     try {
-        // Since you're not using activeOnly, you can query all vendors directly
-        const vendors = await Vendor.find();
-      
-        return new Response(JSON.stringify(vendors), { status: 200 });
+        const url = new URL(request.url);
+        const userId = url.searchParams.get('userId');
+
+        if (!userId) {
+            return new Response(JSON.stringify({ message: 'User ID is required' }), {
+                status: 400,
+                headers: { 'Content-Type': 'application/json' },
+            });
+        }
+
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return new Response(JSON.stringify({ message: 'User not found' }), {
+                status: 404,
+                headers: { 'Content-Type': 'application/json' },
+            });
+        }
+
+        if (!user.organizationId) {
+            return new Response(JSON.stringify({ message: 'User is not associated with any organization' }), {
+                status: 400,
+                headers: { 'Content-Type': 'application/json' },
+            });
+        }
+
+        const vendors = await Vendor.find({ organizationId: user.organizationId });
+
+        return new Response(JSON.stringify(vendors), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' },
+        });
     } catch (error) {
         console.error("Error fetching vendors:", error.message);
-        return new Response(JSON.stringify({ message: error.message }), {
+        return new Response(JSON.stringify({ message: 'Internal Server Error' }), {
             status: 500,
+            headers: { 'Content-Type': 'application/json' },
         });
     }
 }

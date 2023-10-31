@@ -14,7 +14,7 @@ const LoginForm = () => {
   const [role, setRole] = useState('')
   const { data: session, loading } = useSession()
   const router = useRouter()
-
+  
   useEffect(() => {
     checkJWTValidity()
   }, [])
@@ -23,7 +23,11 @@ const LoginForm = () => {
     if (loading) return
     if (session) {
       // The user is authenticated
-      router.push('/dashboard')
+      if (session.user.organizationId === null) {
+        router.push('/onboarding')
+      } else {
+        router.push('/dashboard')
+      }
     }
   }, [loading, session])
 

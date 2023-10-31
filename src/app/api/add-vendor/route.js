@@ -1,5 +1,6 @@
 import { connectToDB } from '@/utils/database'
 import Vendor from '@/models/vendor'
+import mongoose from 'mongoose';
 
 const formatToE164 = (phone) => {
   const numbersOnly = phone.replace(/\D/g, ''); // Removes all non-numeric characters
@@ -8,7 +9,14 @@ const formatToE164 = (phone) => {
 
 export async function POST(req) {
   // Destructure all the needed fields from the request
-  const { name, phone, email, primaryContact, specialization } = await req.json()
+  const { organizationId, name, phone, email, primaryContact, specialization } = await req.json()
+  if (!mongoose.Types.ObjectId.isValid(organizationId)) {
+    return new Response('Invalid organizationId provided', {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
   if (name === "ErrorTest") {
     throw new Error("This is a test error!")
   }
@@ -17,6 +25,7 @@ export async function POST(req) {
     // Format the phone number to E.164 if it doesn't start with a '+'
     const formattedPhone = formatToE164(phone);
     const newVendor = new Vendor({
+      organizationId,
       name,
       phone: formattedPhone,
       email,

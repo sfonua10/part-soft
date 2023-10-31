@@ -1,4 +1,5 @@
 'use client'
+import { useSession } from 'next-auth/react'
 import useSWR from 'swr'
 import Link from 'next/link'
 
@@ -9,7 +10,12 @@ function isVehicleInfoMissing(vehicle) {
 }
 
 export default function PartsRequestQueue() {
-  const { data: workOrders, error } = useSWR('/api/get-workorders', fetcher)
+  const { data: session } = useSession()
+  const userId = session?.user?.id
+  
+  const endpointUrl = userId ? `/api/get-workorders?userId=${userId}` : null
+
+  const { data: workOrders, error } = useSWR(endpointUrl, fetcher)
 
   if (error) return <div>Error loading work orders</div>
   if (!workOrders) return <div>Loading...</div>

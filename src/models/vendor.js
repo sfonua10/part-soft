@@ -1,6 +1,11 @@
 import mongoose from 'mongoose';
 
 const VendorSchema = new mongoose.Schema({
+  organizationId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Organization',
+    required: [true, 'Organization ID is required'],
+  },
   name: {
     type: String,
     required: true,

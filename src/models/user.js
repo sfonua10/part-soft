@@ -1,6 +1,12 @@
-import { Schema, model, models } from 'mongoose';
+import { Schema, model, models } from 'mongoose'
+const mongoose = require('mongoose')
 
 const UserSchema = new Schema({
+  organizationId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Organization',
+    default: null,
+  },
   name: {
     type: String,
     default: null,
@@ -12,7 +18,7 @@ const UserSchema = new Schema({
   },
   image: {
     type: String,
-    default: null,  // or set to a default image URL if you have one
+    default: null, // or set to a default image URL if you have one
   },
   companyName: {
     type: String,
@@ -24,11 +30,11 @@ const UserSchema = new Schema({
   },
   role: {
     type: String,
-    default: 'mechanic'
-  }
+    default: 'mechanic',
+  },
   // ... (other fields)
-});
+})
 
-const User = models.User || model("User", UserSchema);
+const User = models.User || model('User', UserSchema)
 
-export default User;
+export default User
