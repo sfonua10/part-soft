@@ -21,7 +21,7 @@ export default function Dashboard() {
     error,
     isLoading,
   } = useSWR(endpointUrl, fetcher, {
-    refreshInterval: 10000,
+    refreshInterval: 30000,
   })
   
   if (error) {
