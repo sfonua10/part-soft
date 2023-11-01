@@ -64,6 +64,10 @@ const partSchema = new mongoose.Schema({
     type: Date, // Stores the date when the notifications were sent
     default: null,
   },
+  completed: {
+    type: Boolean,
+    default: false,
+  },
   vendorResponses: [vendorResponseSchema],
 });
 
