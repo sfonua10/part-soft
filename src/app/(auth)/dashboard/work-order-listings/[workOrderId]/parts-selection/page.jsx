@@ -82,7 +82,7 @@ export default function PartsSelection() {
       console.error('Failed to update:', result.error)
     }
   }
-console.log('parts =====>', parts)
+
   return (
     <div className="gap-12 lg:grid lg:grid-cols-2">
       <div>
@@ -100,7 +100,6 @@ console.log('parts =====>', parts)
 
           <div className="mt-4 grid grid-cols-1 gap-y-6 sm:grid-cols-3 sm:gap-x-4">
             {parts.map((part) => {
-              console.log('notificationsSent', part.notificationsSent) // Logging outside className computation
               const notificationSent = part.notificationsSent !== null
 
               return (
