@@ -51,6 +51,7 @@ export function transformData(dataArray) {
               priceValue = 'N/A'
             }
             return {
+              id: vendor._id,
               vendorName: vendor.vendorName,
               availability: vendor.availability || 'N/A',
               orderStatus: vendor.orderStatus || 'N/A',

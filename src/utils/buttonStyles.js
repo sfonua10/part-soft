@@ -12,7 +12,3 @@ export const getButtonStyles = (condition) => {
 export const getIconStyles = (condition) => {
   return condition ? 'h-6 text-gray-700' : 'h-6 text-gray-400'
 }
-
-export function classNames(...classes) {
-  return classes.filter(Boolean).join(' ')
-}

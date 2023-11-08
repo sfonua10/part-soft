@@ -2,8 +2,7 @@
 import { useSession } from 'next-auth/react'
 import useSWR from 'swr'
 import Link from 'next/link'
-
-const fetcher = (url) => fetch(url).then((res) => res.json())
+import { fetcher } from '@/utils/fetcher'
 
 function isVehicleInfoMissing(vehicle) {
   return !vehicle.make || !vehicle.model || !vehicle.year || !vehicle.vin

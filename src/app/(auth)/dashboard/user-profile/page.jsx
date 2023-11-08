@@ -2,6 +2,7 @@
 import useSWR from 'swr'
 import { useSession } from 'next-auth/react'
 import { useState } from 'react'
+import { fetcher } from '@/utils/fetcher'
 
 export default function UserProfile() {
   const [editedUser, setEditedUser] = useState({})
@@ -9,7 +10,6 @@ export default function UserProfile() {
   const [previewImage, setPreviewImage] = useState(null)
   const [uploading, setUploading] = useState(false)
 
-  const fetcher = (url) => fetch(url).then((res) => res.json())
   const { data: session } = useSession()
 
   const userId = session?.user?.id

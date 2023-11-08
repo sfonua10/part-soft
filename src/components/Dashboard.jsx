@@ -5,8 +5,7 @@ import VendorTable from './VendorTable'
 import ReviewTable from './Dashboard/ReviewTable'
 import PartsDisplay from './Dashboard/PartsDisplay'
 // import OrganizationSelectModal from './Dashboard/OrganizationSelectModal'
-
-const fetcher = (url) => fetch(url).then((res) => res.json())
+import { fetcher } from '@/utils/fetcher'
 
 export default function Dashboard() {
   const { data: session } = useSession()

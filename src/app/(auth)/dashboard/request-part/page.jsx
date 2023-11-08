@@ -1,10 +1,11 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
-import VehicleInfo2 from '@/components/RequestPart/VehicleInfo2'
+import AdditionalVehicleInfo from '@/components/RequestPart/AdditionalVehicleInfo'
 import { PlusCircleIcon } from '@heroicons/react/24/outline'
 import PartRequestSection from '@/components/RequestPart/PartRequestSection'
 import SuccessModal from '@/components/RequestPart/SuccessModal'
+import Summary from '@/components/Summary'
 
 export default function RequestPart() {
   const [vehicle, setVehicle] = useState({
@@ -32,6 +33,7 @@ export default function RequestPart() {
     e.preventDefault()
     setParts([...parts, {}])
   }
+
   const handleVehicleInputChange = (e) => {
     const { name, value } = e.target
     const error = validateField(name, value)
@@ -45,6 +47,7 @@ export default function RequestPart() {
       [name]: error,
     }))
   }
+
   const validateField = (fieldName, value) => {
     let error
     if (fieldName === 'work-order-number' && value.trim() === '') {
@@ -71,6 +74,7 @@ export default function RequestPart() {
       },
     }))
   }
+
   const handleRemovePart = (index) => {
     const newParts = parts.slice()
     newParts.splice(index, 1)
@@ -143,7 +147,7 @@ export default function RequestPart() {
             <h2 id="cart-heading" className="sr-only">
               Items in your shopping cart
             </h2>
-            <VehicleInfo2
+            <AdditionalVehicleInfo
               vehicle={vehicle}
               handleVehicleInputChange={handleVehicleInputChange}
               errors={errors}
@@ -176,85 +180,13 @@ export default function RequestPart() {
           </section>
 
           {/* Order summary */}
-          <section
-            aria-labelledby="summary-heading"
-            className="mt-16 rounded-lg bg-gray-50 px-4 py-6 sm:p-6 lg:col-span-5 lg:mt-0 lg:p-8"
-          >
-            <h2
-              id="summary-heading"
-              className="text-lg font-medium text-gray-900"
-            >
-              Parts summary
-            </h2>
-            <div className="mt-4">
-              <h3 className="text-sm font-medium text-gray-900">
-                Work Order #
-              </h3>
-              <p className="text-sm text-gray-600">
-                {workOrderNumber || 'Not provided'}
-              </p>
-            </div>
-
-            {/* Additional Vehicle Info */}
-            {showAdditionalInfo && (
-              <div className="mt-4">
-                <h3 className="text-sm font-medium text-gray-900">
-                  Vehicle Information
-                </h3>
-                <dl className="mt-2 space-y-2">
-                  {['vin', 'make', 'model', 'year'].map((field, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between"
-                    >
-                      <dt className="text-sm text-gray-600">
-                        {field.toUpperCase()}
-                      </dt>
-                      <dd className="text-sm font-medium text-gray-900">
-                        {vehicle[field] || 'N/A'}
-                      </dd>
-                    </div>
-                  ))}
-                </dl>
-              </div>
-            )}
-
-            {parts.map((part, index) => (
-              <div key={index} className="mt-4">
-                <h3 className="text-sm font-medium text-gray-900">
-                  Part #{index + 1}
-                </h3>
-                <dl className="mt-2 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <dt className="text-sm text-gray-600">Part Name</dt>
-                    <dd className="text-sm font-medium text-gray-900">
-                      {part['part-name'] || 'N/A'}
-                    </dd>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <dt className="text-sm text-gray-600">Part Num.</dt>
-                    <dd className="text-sm font-medium text-gray-900">
-                      {part['part-number'] || 'N/A'}
-                    </dd>
-                  </div>
-                </dl>
-              </div>
-            ))}
-
-            <div className="mt-6">
-              <button
-                type="submit"
-                disabled={isQueueButtonDisabled}
-                className={`w-full rounded-md border border-transparent px-4 py-3 text-base font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                  isQueueButtonDisabled
-                    ? 'cursor-not-allowed bg-gray-300 text-gray-500'
-                    : 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 focus:ring-offset-gray-50'
-                }`}
-              >
-                Queue
-              </button>
-            </div>
-          </section>
+          <Summary
+            workOrderNumber={workOrderNumber}
+            vehicle={vehicle}
+            parts={parts}
+            showAdditionalInfo={showAdditionalInfo}
+            isQueueButtonDisabled={isQueueButtonDisabled}
+          />
         </form>
       </div>
     </div>

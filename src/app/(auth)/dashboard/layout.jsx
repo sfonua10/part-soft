@@ -3,27 +3,17 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useSession, signOut } from 'next-auth/react'
-import { Fragment, useState, useEffect } from 'react'
+import { Fragment, useState } from 'react'
 import { Dialog, Transition, Menu } from '@headlessui/react'
 import {
   Bars3Icon,
-  HomeIcon,
-  UsersIcon,
-  EnvelopeIcon,
   XMarkIcon,
-  ListBulletIcon,
-  MagnifyingGlassIcon,
-  BellIcon,
 } from '@heroicons/react/24/outline'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import { SidebarContext } from './sidebar-provider'
-// import VendorTable from './VendorTable'
-import UnitedDieselLogo from '@/images/logos/united-diesel-logo.png'
 import { Logo } from '@/components/Logo'
-
-function classNames(...classes) {
-  return classes.filter(Boolean).join(' ')
-}
+import { useNavigation } from '@/hooks/useNavigation'
+import { classNames } from '@/utils/classNames'
 
 export default function DashboardLayout({ children }) {
   const userNavigation = [
@@ -34,87 +24,7 @@ export default function DashboardLayout({ children }) {
   const { data: session } = useSession()
 
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [navigation, setNavigation] = useState([])
-
-  useEffect(() => {
-    if (session?.user?.role === 'admin') {
-      setNavigation([
-        {
-          name: 'Dashboard',
-          href: '/dashboard',
-          icon: HomeIcon,
-          current: true,
-        },
-        // {
-        //   name: 'Dashboard2',
-        //   href: '/dashboard2',
-        //   icon: HomeIcon,
-        //   current: true,
-        // },
-        {
-          name: 'Work Order Listings',
-          href: '/dashboard/work-order-listings',
-          icon: ListBulletIcon,
-          current: false,
-        },
-        {
-          name: 'Request Part',
-          href: '/dashboard/request-part',
-          icon: EnvelopeIcon,
-          current: false,
-        },
-        {
-          name: 'Manage Vendors',
-          href: '/dashboard/manage-vendors',
-          icon: UsersIcon,
-          current: false,
-        },
-      ])
-    } else {
-      setNavigation([
-        {
-          name: 'Dashboard',
-          href: '/dashboard',
-          icon: HomeIcon,
-          current: true,
-        },
-        {
-          name: 'Request Part',
-          href: '/dashboard/request-part',
-          icon: EnvelopeIcon,
-        },
-      ])
-    }
-  }, [session])
-
-  useEffect(() => {
-    setNavigation((prev) =>
-      prev.map((item) => {
-        const isExactMatch = pathname === item.href
-        const isSubpathOfAnother =
-          item.href !== '/dashboard' && pathname.startsWith(item.href + '/')
-        return {
-          ...item,
-          current: isExactMatch || isSubpathOfAnother,
-        }
-      }),
-    )
-  }, [pathname])
-
-  const handleNavClick = (href) => {
-    setSidebarOpen(false)
-    setNavigation((prev) =>
-      prev.map((item) => {
-        const isExactMatch = href === item.href
-        const isSubpathOfAnother =
-          item.href !== '/dashboard' && href.startsWith(item.href + '/')
-        return {
-          ...item,
-          current: isExactMatch || isSubpathOfAnother,
-        }
-      }),
-    )
-  }
+  const navigation = useNavigation(session, pathname);
 
   function handleSignOut() {
     signOut({ callbackUrl: '/' })
@@ -194,7 +104,7 @@ export default function DashboardLayout({ children }) {
                             {navigation.map((item) => (
                               <li key={item.name}>
                                 <Link
-                                  onClick={() => handleNavClick(item.name)}
+                                  onClick={() => setSidebarOpen(false)}
                                   href={item.href}
                                   className={classNames(
                                     item.current
@@ -243,7 +153,7 @@ export default function DashboardLayout({ children }) {
                     {navigation.map((item) => (
                       <li key={item.name}>
                         <Link
-                          onClick={() => handleNavClick(item.name)}
+                          onClick={() => setSidebarOpen(false)}
                           href={item.href}
                           className={classNames(
                             item.current
@@ -306,7 +216,6 @@ export default function DashboardLayout({ children }) {
         </div>
 
         <div className="lg:pl-72">
-          {/* <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8"> */}
           <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
             <button
               type="button"
@@ -324,6 +233,7 @@ export default function DashboardLayout({ children }) {
             />
 
             <div className="flex flex-1 justify-end gap-x-4 self-stretch lg:gap-x-6">
+              {/* TODO: integrate search to filter out workorder or parts*/}
               {/* {pathname === '/dashboard' && (
                 <form className="relative flex flex-1" action="#" method="GET">
                   <label htmlFor="search-field" className="sr-only">
