@@ -8,9 +8,7 @@ const ManageVendors = () => {
   const { data: session } = useSession();
   const userId = session?.user?.id;
 
-  const { data, error } = useSWR(userId ? `/api/vendor-info?userId=${userId}` : null, fetcher, {
-    revalidateOnMount: true,
-  });
+  const { data, error } = useSWR(userId ? `/api/vendor-info?userId=${userId}` : null, fetcher);
 
   if (error) return <div>Failed to load vendors</div>;
   if (!data) return <div>Loading...</div>;

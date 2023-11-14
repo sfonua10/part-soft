@@ -1,25 +1,31 @@
 'use client'
 import { Fragment, useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
-import { mutate } from 'swr'
 import { Dialog, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import Notification from './Notification'
 
-export default function AddVendorSliderOver({ open, setOpen, vendor, onAddVendor, onUpdateVendor }) {
+export default function AddVendorSliderOver({
+  open,
+  setOpen,
+  vendor,
+  onAddVendor,
+  onUpdateVendor,
+}) {
+  const { data: session } = useSession()
   const [errors, setErrors] = useState({})
-  const [name, setName] = useState(vendor?.name || '')
-  const [phone, setPhone] = useState(vendor?.phone || '')
-  const [email, setEmail] = useState(vendor?.email || '')
-  const [primaryContact, setPrimaryContact] = useState(
-    vendor?.primaryContact || '',
-  )
-  const [specialization, setSpecialization] = useState(
-    vendor?.specialization || '',
-  )
+  const [formState, setFormState] = useState({
+    name: vendor?.name || '',
+    phone: vendor?.phone || '',
+    email: vendor?.email || '',
+    primaryContact: vendor?.primaryContact || '',
+    specialization: vendor?.specialization || '',
+  })
+
   const [show, setShow] = useState(false)
   const [message, setMessage] = useState('')
   const [type, setType] = useState('success')
+
   const [initialState, setInitialState] = useState({
     name: vendor?.name || '',
     phone: vendor?.phone || '',
@@ -27,10 +33,10 @@ export default function AddVendorSliderOver({ open, setOpen, vendor, onAddVendor
     primaryContact: vendor?.primaryContact || '',
     specialization: vendor?.specialization || '',
   })
-  const { data: session } = useSession()
   const isObjectEmpty = (obj) => Object.keys(obj).length === 0
 
   const mode = !isObjectEmpty(vendor) ? 'edit' : 'new'
+
   useEffect(() => {
     const newState = {
       name: vendor?.name || '',
@@ -40,29 +46,30 @@ export default function AddVendorSliderOver({ open, setOpen, vendor, onAddVendor
       specialization: vendor?.specialization || '',
     }
 
-    setName(newState.name)
-    setPhone(newState.phone)
-    setEmail(newState.email)
-    setPrimaryContact(newState.primaryContact)
-    setSpecialization(newState.specialization)
+    setFormState(newState)
     setInitialState(newState)
   }, [vendor])
 
   useEffect(() => {
     if (vendor) {
-      setName(vendor.name || '')
-      setPhone(vendor.phone || '')
-      setEmail(vendor.email || '')
-      setPrimaryContact(vendor.primaryContact || '')
-      setSpecialization(vendor.specialization || '')
+      setFormState({
+        name: vendor.name || '',
+        phone: vendor.phone || '',
+        email: vendor.email || '',
+        primaryContact: vendor.primaryContact || '',
+        specialization: vendor.specialization || '',
+      })
     } else {
-      setName('')
-      setPhone('')
-      setEmail('')
-      setPrimaryContact('')
-      setSpecialization('')
+      setFormState({
+        name: '',
+        phone: '',
+        email: '',
+        primaryContact: '',
+        specialization: '',
+      })
     }
   }, [vendor])
+
   const validateForm = (data) => {
     const tempErrors = {}
 
@@ -79,36 +86,30 @@ export default function AddVendorSliderOver({ open, setOpen, vendor, onAddVendor
     if (!data.email.trim() || !/^\S+@\S+\.\S+$/.test(data.email))
       tempErrors.email = 'Enter a valid email address.'
 
-    // Add more validations as needed...
-
     setErrors(tempErrors)
-    return Object.keys(tempErrors).length === 0 
+    return Object.keys(tempErrors).length === 0
   }
 
   const handleVendorSubmit = async (e) => {
-    e.preventDefault();
-  
+    e.preventDefault()
+
     const vendorData = {
       _id: vendor ? vendor._id : undefined,
       organizationId: session?.user?.organizationId,
-      name: e.target['vendor-name'].value,
-      phone: e.target.phone.value,
-      email: e.target.email.value,
-      primaryContact: e.target['primary-contact-name'].value,
-      specialization: e.target['specialization'].value
-    };
-  
+      ...formState,
+    }
+
     if (validateForm(vendorData)) {
-      let url, method;
-  
+      let url, method
+
       if (mode === 'edit' && vendor && vendor._id) {
-        url = `/api/edit-vendor`;
-        method = 'PUT';
+        url = `/api/edit-vendor`
+        method = 'PUT'
       } else {
-        url = '/api/add-vendor';
-        method = 'POST';
+        url = '/api/add-vendor'
+        method = 'POST'
       }
-  
+
       try {
         const response = await fetch(url, {
           method: method,
@@ -116,79 +117,59 @@ export default function AddVendorSliderOver({ open, setOpen, vendor, onAddVendor
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(vendorData),
-        });
-  
-        const responseData = await response.json();
-  
+        })
+
+        const responseData = await response.json()
+
         if (response.ok) {
           if (mode === 'new') {
             // Call the function passed from VendorForm to add the new vendor to the state
-            onAddVendor(responseData);
+            onAddVendor(responseData)
           } else {
-            onUpdateVendor(responseData); // Update the vendor list in VendorForm
+            onUpdateVendor(responseData) // Update the vendor list in VendorForm
             // For editing, you might need to handle state update differently
             // For instance, updating the existing vendor's data in the list
           }
-  
-          setOpen(false);
-          setShow(true);
-          setMessage(mode === 'edit' ? 'Successfully updated the vendor.' : 'Successfully added the vendor.');
-          setType('success');
-          setTimeout(() => setShow(false), 3000); 
+
+          setOpen(false)
+          setShow(true)
+          setMessage(
+            mode === 'edit'
+              ? 'Successfully updated the vendor.'
+              : 'Successfully added the vendor.',
+          )
+          setType('success')
+          setTimeout(() => setShow(false), 3000)
         } else {
           // Handle the error in the UI, like showing an error message
-          setShow(true);
-          setMessage('There was a problem with the vendor operation. Please try again.');
-          setType('error');
-          setTimeout(() => setShow(false), 5000);
-          console.error('Server responded with an error:', responseData.message);
+          setShow(true)
+          setMessage(
+            'There was a problem with the vendor operation. Please try again.',
+          )
+          setType('error')
+          setTimeout(() => setShow(false), 5000)
+          console.error('Server responded with an error:', responseData.message)
         }
       } catch (error) {
         // Handle the error in the UI, like showing an error message
-        setShow(true);
-        setMessage('There was a problem with the network. Please try again.');
-        setType('error');
-        setTimeout(() => setShow(false), 5000);
-        console.error('There was a problem with the fetch operation:', error);
+        setShow(true)
+        setMessage('There was a problem with the network. Please try again.')
+        setType('error')
+        setTimeout(() => setShow(false), 5000)
+        console.error('There was a problem with the fetch operation:', error)
       }
     }
-  };
-  
-  
-  
+  }
   const handleInputChange = (e) => {
     const { name, value } = e.target
-
-    switch (name) {
-      case 'vendor-name':
-        setName(value)
-        break
-      case 'phone':
-        setPhone(value)
-        break
-      case 'email':
-        setEmail(value)
-        break
-      case 'primary-contact-name':
-        setPrimaryContact(value)
-        break
-      case 'specialization':
-        setSpecialization(value)
-        break
-      // ... handle other fields
-      default:
-        break
-    }
+    setFormState((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }))
   }
 
   const formIsUnchanged = () => {
-    return (
-      name === initialState.name &&
-      phone === initialState.phone &&
-      email === initialState.email &&
-      primaryContact === initialState.primaryContact &&
-      specialization === initialState.specialization
-    )
+    return JSON.stringify(formState) === JSON.stringify(initialState)
   }
   return (
     <>
@@ -255,7 +236,7 @@ export default function AddVendorSliderOver({ open, setOpen, vendor, onAddVendor
                             <div className="mt-4 grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-4">
                               <div className="sm:col-span-2">
                                 <label
-                                  htmlFor="vendor-name"
+                                  htmlFor="name"
                                   className="block text-sm font-medium text-gray-700"
                                 >
                                   Vendor Name
@@ -263,10 +244,10 @@ export default function AddVendorSliderOver({ open, setOpen, vendor, onAddVendor
                                 <div className="mt-1">
                                   <input
                                     type="text"
-                                    value={name || ''}
+                                    value={formState.name || ''}
                                     onChange={handleInputChange}
-                                    id="vendor-name"
-                                    name="vendor-name"
+                                    id="name"
+                                    name="name"
                                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#2563eb] focus:ring-[#2563eb] sm:text-sm"
                                   />
                                   {errors.name && (
@@ -279,7 +260,7 @@ export default function AddVendorSliderOver({ open, setOpen, vendor, onAddVendor
 
                               <div className="sm:col-span-2">
                                 <label
-                                  htmlFor="primary-contact-name"
+                                  htmlFor="primaryContact"
                                   className="block text-sm font-medium text-gray-700"
                                 >
                                   Primary Contact Name
@@ -287,10 +268,10 @@ export default function AddVendorSliderOver({ open, setOpen, vendor, onAddVendor
                                 <div className="mt-1">
                                   <input
                                     type="text"
-                                    value={primaryContact || ''}
+                                    value={formState.primaryContact || ''}
                                     onChange={handleInputChange}
-                                    id="primary-contact-name"
-                                    name="primary-contact-name"
+                                    id="primaryContact"
+                                    name="primaryContact"
                                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#2563eb] focus:ring-[#2563eb] sm:text-sm"
                                   />
                                 </div>
@@ -306,12 +287,12 @@ export default function AddVendorSliderOver({ open, setOpen, vendor, onAddVendor
                                 <div className="mt-1">
                                   <input
                                     type="tel"
-                                    value={phone || ''}
+                                    value={formState.phone || ''}
                                     onChange={handleInputChange}
                                     name="phone"
                                     id="phone"
                                     autoComplete="tel"
-                                    placeholder="1 (555) 123-4567"
+                                    placeholder="+1 (555) 123-4567"
                                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#2563eb] focus:ring-[#2563eb] sm:text-sm"
                                   />
                                   {errors.phone && (
@@ -332,7 +313,7 @@ export default function AddVendorSliderOver({ open, setOpen, vendor, onAddVendor
                                 <div className="mt-1">
                                   <input
                                     type="email"
-                                    value={email || ''}
+                                    value={formState.email || ''}
                                     onChange={handleInputChange}
                                     name="email"
                                     id="email"
@@ -355,7 +336,7 @@ export default function AddVendorSliderOver({ open, setOpen, vendor, onAddVendor
                                     name="specialization"
                                     id="specialization"
                                     onChange={handleInputChange}
-                                    value={specialization || ''}
+                                    value={formState.specialization || ''}
                                     rows="3"
                                     placeholder="Brake parts, engine components..."
                                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#2563eb] focus:ring-[#2563eb] sm:text-sm"
@@ -366,11 +347,11 @@ export default function AddVendorSliderOver({ open, setOpen, vendor, onAddVendor
                                 <button
                                   type="submit"
                                   disabled={formIsUnchanged()}
-                                  className={`mt-4 rounded-md px-4 py-2 text-white focus:border--[#2563eb] focus:outline-none focus:ring focus:ring-[#2563eb] 
+                                  className={`focus:border--[#2563eb] mt-4 rounded-md px-4 py-2 text-white focus:outline-none focus:ring focus:ring-[#2563eb] 
                                   ${
                                     formIsUnchanged()
                                       ? 'cursor-not-allowed bg-gray-500'
-                                      : 'bg-[#2563eb] hover:bg--[#2563eb]'
+                                      : 'hover:bg--[#2563eb] bg-[#2563eb]'
                                   }`}
                                 >
                                   {mode === 'edit' ? 'Update' : 'Add'}

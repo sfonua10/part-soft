@@ -15,10 +15,9 @@ export default function OrganizationSelectModal() {
   const organizations = [
     { _id: '620c1d4116a9b146ec3b595a', name: 'United Diesel Service' },
     { _id: '620c1d4116a9b146ec3b595b', name: 'Test' },
-    // Add more organizations as needed
+    
   ]
   useEffect(() => {
-    // Assuming you want to pre-select the first option
     setSelectedOrganization(organizations[0]._id)
   }, [])
 
