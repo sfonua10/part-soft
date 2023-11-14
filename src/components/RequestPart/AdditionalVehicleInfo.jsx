@@ -2,7 +2,8 @@ import {
   ArrowDownCircleIcon,
   ArrowUpCircleIcon,
 } from '@heroicons/react/24/outline'
-const VehicleInfo2 = ({
+
+const AdditionalVehicleInfo = ({
   vehicle,
   handleVehicleInputChange,
   errors,
@@ -162,4 +163,4 @@ const VehicleInfo2 = ({
     </section>
   )
 }
-export default VehicleInfo2
+export default AdditionalVehicleInfo

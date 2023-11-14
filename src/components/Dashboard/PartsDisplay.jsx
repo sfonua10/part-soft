@@ -12,10 +12,8 @@ import {
 import { useSidebar } from '@/app/(auth)/dashboard/sidebar-provider'
 import { updateWorkOrder } from '@/utils/helpers/apiHelper'
 import useSWR, { mutate } from 'swr'
+import { classNames } from '@/utils/classNames'
 
-function classNames(...classes) {
-  return classes.filter(Boolean).join(' ')
-}
 export default function PartsDisplay({ data, endpointUrl }) {
   const { toggleOpen } = useSidebar()
   const [visibleParts, setVisibleParts] = useState({})
@@ -41,6 +39,7 @@ export default function PartsDisplay({ data, endpointUrl }) {
     newStates[index] = !newStates[index]
     setCollapseStates(newStates)
   }
+
   function collapseAll() {
     // Check if all work orders are collapsed
     const areAllCollapsed = collapseStates.every((state) => state)
@@ -89,6 +88,7 @@ export default function PartsDisplay({ data, endpointUrl }) {
       console.error('Error updating part status:', error)
     }
   }
+
   return (
     <div className="px-4 sm:px-6 lg:px-8">
       <div className="sm:flex sm:items-center">
@@ -204,7 +204,7 @@ export default function PartsDisplay({ data, endpointUrl }) {
                 </thead>
                 <tbody className="bg-white">
                   {workOrder.parts.map((part) => (
-                    <Fragment key={part.name}>
+                    <Fragment key={part._id}>
                       {/* Part header */}
                       <tr className="group border-t border-gray-200 bg-gray-50 hover:bg-gray-100">
                         <th

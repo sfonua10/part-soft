@@ -6,7 +6,7 @@ import { Dialog, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import Notification from './Notification'
 
-export default function AddVendorSliderOver({ open, setOpen, vendor }) {
+export default function AddVendorSliderOver({ open, setOpen, vendor, onAddVendor, onUpdateVendor }) {
   const [errors, setErrors] = useState({})
   const [name, setName] = useState(vendor?.name || '')
   const [phone, setPhone] = useState(vendor?.phone || '')
@@ -118,41 +118,42 @@ export default function AddVendorSliderOver({ open, setOpen, vendor }) {
           body: JSON.stringify(vendorData),
         });
   
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
+        const responseData = await response.json();
   
-        const updatedVendor = await response.json();
-  
-        mutate('/api/vendor-info', data => {
-          if (!Array.isArray(data)) {
-            console.error('Expected data to be an array, but got:', data);
-            return data; // or return [] to ensure the rest of your app can handle it
-          }
-        
-          if (mode === 'edit') {
-            return data.map(item => item._id === updatedVendor._id ? updatedVendor : item);
+        if (response.ok) {
+          if (mode === 'new') {
+            // Call the function passed from VendorForm to add the new vendor to the state
+            onAddVendor(responseData);
           } else {
-            return [...data, updatedVendor];
+            onUpdateVendor(responseData); // Update the vendor list in VendorForm
+            // For editing, you might need to handle state update differently
+            // For instance, updating the existing vendor's data in the list
           }
-        }, false);
-        
   
-        setOpen(false);
-        setShow(true);
-        setMessage(mode === 'edit' ? 'Successfully updated the vendor.' : 'Successfully added the vendor.');
-        setType('success');
-        setTimeout(() => setShow(false), 3000); 
+          setOpen(false);
+          setShow(true);
+          setMessage(mode === 'edit' ? 'Successfully updated the vendor.' : 'Successfully added the vendor.');
+          setType('success');
+          setTimeout(() => setShow(false), 3000); 
+        } else {
+          // Handle the error in the UI, like showing an error message
+          setShow(true);
+          setMessage('There was a problem with the vendor operation. Please try again.');
+          setType('error');
+          setTimeout(() => setShow(false), 5000);
+          console.error('Server responded with an error:', responseData.message);
+        }
       } catch (error) {
+        // Handle the error in the UI, like showing an error message
         setShow(true);
-        setOpen(false);
-        setMessage('There was a problem with the vendor operation. Please try again.');
+        setMessage('There was a problem with the network. Please try again.');
         setType('error');
         setTimeout(() => setShow(false), 5000);
         console.error('There was a problem with the fetch operation:', error);
       }
     }
   };
+  
   
   
   const handleInputChange = (e) => {

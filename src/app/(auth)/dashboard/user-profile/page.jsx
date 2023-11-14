@@ -2,6 +2,7 @@
 import useSWR from 'swr'
 import { useSession } from 'next-auth/react'
 import { useState } from 'react'
+import { fetcher } from '@/utils/fetcher'
 
 export default function UserProfile() {
   const [editedUser, setEditedUser] = useState({})
@@ -9,7 +10,6 @@ export default function UserProfile() {
   const [previewImage, setPreviewImage] = useState(null)
   const [uploading, setUploading] = useState(false)
 
-  const fetcher = (url) => fetch(url).then((res) => res.json())
   const { data: session } = useSession()
 
   const userId = session?.user?.id
@@ -199,27 +199,26 @@ export default function UserProfile() {
               </div>
 
               <div className="col-span-full">
-  <label
-    htmlFor="email"
-    className="block text-sm font-medium leading-6 text-gray-900"
-  >
-    Email address
-  </label>
-  <div className="mt-2">
-    <input
-      readOnly
-      id="email"
-      name="email"
-      type="email"
-      autoComplete="email"
-      placeholder="you@example.com"
-      value={editedUser.email || user.email || ''}
-      onChange={(e) => handleFieldChange('email', e.target.value)}
-      className="block w-full rounded-md bg-gray-100 border-0 py-1.5 text-gray-500 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
-    />
-  </div>
-</div>
-
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  Email address
+                </label>
+                <div className="mt-2">
+                  <input
+                    readOnly
+                    id="email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    placeholder="you@example.com"
+                    value={editedUser.email || user.email || ''}
+                    onChange={(e) => handleFieldChange('email', e.target.value)}
+                    className="block w-full rounded-md border-0 bg-gray-100 py-1.5 text-gray-500 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
+                  />
+                </div>
+              </div>
             </div>
 
             <div className="mt-8 flex">

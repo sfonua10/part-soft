@@ -30,7 +30,7 @@ const handler = NextAuth({
     }),
   ],
   callbacks: {
-    async session({ session, user }) {
+    async session({ session }) {
       if (session?.user?.email) {
         const sessionUser = await User.findOne({ email: session.user.email });
         if (sessionUser) {

@@ -17,7 +17,6 @@ const PartRequestSection = ({
           {index !== 0 && (
             <button
               onClick={() => handleRemovePart(index)}
-              // className="opacity-0 group-hover:opacity-100 transition-opacity duration-300"
             >
               <XCircleIcon className="h-6 text-red-600" />
             </button>

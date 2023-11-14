@@ -4,12 +4,13 @@ import mongoose from 'mongoose';
 
 export async function POST(req) {
   const { organizationId, workOrderNumber, vehicle, parts, mechanicName } = await req.json()
-  if (!mongoose.Types.ObjectId.isValid(organizationId)) {
+  if (organizationId && !mongoose.Types.ObjectId.isValid(organizationId)) {
     return new Response('Invalid organizationId provided', {
       status: 400,
       headers: { 'Content-Type': 'application/json' },
     });
   }
+  
   try {
     await connectToDB()
 

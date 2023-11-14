@@ -7,7 +7,7 @@ export function getBackgroundColorForAvailability(availability) {
     case 'Pending':
       return 'bg-yellow-200'
     default:
-      return '' // or some default color
+      return ''
   }
 }
 
@@ -31,7 +31,7 @@ export function transformData(dataArray) {
       workOrderNumber: item.workOrderNumber,
       dateSubmitted: dateSubmitted,
       mechanicName: item.mechanicName || 'N/A',  // Including mechanicName in case you need it
-      vehicle: {  // Vehicle data added here
+      vehicle: { 
         make: item.vehicle.make || 'N/A',
         model: item.vehicle.model || 'N/A',
         year: item.vehicle.year || 'N/A',
@@ -51,6 +51,7 @@ export function transformData(dataArray) {
               priceValue = 'N/A'
             }
             return {
+              id: vendor._id,
               vendorName: vendor.vendorName,
               availability: vendor.availability || 'N/A',
               orderStatus: vendor.orderStatus || 'N/A',

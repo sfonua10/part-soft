@@ -9,7 +9,8 @@ import VendorSelection from '@/components/WorkOrderListings/VendorSelection'
 import Summary from '@/components/Summary'
 import Link from 'next/link'
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
-import { getIconStyles, getButtonStyles, classNames } from '@/utils/buttonStyles'
+import { getIconStyles, getButtonStyles } from '@/utils/buttonStyles'
+import { classNames } from '@/utils/classNames'
 
 export default function PartsSelection() {
   const [dataFromPreviousPage, setDataFromPreviousPage] = useState({})

@@ -8,29 +8,32 @@ import Summary from '@/components/Summary'
 import { updateWorkOrder } from '@/utils/helpers/apiHelper'
 import { ChevronRightIcon } from '@heroicons/react/24/outline'
 import { getButtonStyles, getIconStyles } from '@/utils/buttonStyles'
-
-const fetcher = (url) => fetch(url).then((res) => res.json())
+import { fetcher } from '@/utils/fetcher'
 
 const WorkOrderDetailsPage = ({ params }) => {
   const router = useRouter()
   const { data: session } = useSession()
   const userId = session?.user?.id
-  const workOrderNumber = params.workOrderId;
+  const workOrderNumber = params.workOrderId
 
-  const workOrderApiUrl = userId && workOrderNumber
-  ? `/api/get-workorders?workOrderId=${workOrderNumber}&userId=${userId}`
-  : null;
+  const workOrderApiUrl =
+    userId && workOrderNumber
+      ? `/api/get-workorders?workOrderId=${workOrderNumber}&userId=${userId}`
+      : null
 
+  const vendorApiUrl = userId ? `/api/vendor-info?userId=${userId}` : null
 
-  const vendorApiUrl = userId ? `/api/vendor-info?userId=${userId}` : null;
+  const { data: workOrder, error: workOrderError } = useSWR(
+    workOrderApiUrl,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+    },
+  )
 
-  const { data: workOrder, error: workOrderError } = useSWR(workOrderApiUrl, fetcher, {
+  const { data: vendorData } = useSWR(vendorApiUrl, fetcher, {
     revalidateOnFocus: false,
-  });
-
-  const { data: vendorData, error: vendorError } = useSWR(vendorApiUrl, fetcher, {
-    revalidateOnFocus: false,
-  });
+  })
 
   // Maintain a state for the vehicle information and work order number
   const [vehicle, setVehicle] = useState({
@@ -40,7 +43,6 @@ const WorkOrderDetailsPage = ({ params }) => {
     vin: '',
   })
   const [workOrderNum, setWorkOrderNum] = useState('')
-  const [hasDataChanged, setHasDataChanged] = useState(false)
 
   useEffect(() => {
     if (workOrder) {
@@ -55,10 +57,11 @@ const WorkOrderDetailsPage = ({ params }) => {
       ...prev,
       [name]: value,
     }))
-    setHasDataChanged(true)
   }
 
-  const handleUpdateWorkOrder = async () => {
+  const handleFormSubmit = async (e) => {
+    e.preventDefault()
+    
     const workOrderDetails = {
       _id: workOrder._id,
       vehicle: vehicle,
@@ -68,7 +71,10 @@ const WorkOrderDetailsPage = ({ params }) => {
     const result = await updateWorkOrder(workOrderDetails)
 
     if (result.success) {
-      sessionStorage.setItem('workOrderDetails', JSON.stringify({ ...workOrder, vehicle: vehicle }))
+      sessionStorage.setItem(
+        'workOrderDetails',
+        JSON.stringify({ ...workOrder, vehicle: vehicle }),
+      )
       sessionStorage.setItem('vendorData', JSON.stringify(vendorData))
       router.push(
         `/dashboard/work-order-listings/${workOrderNumber}/parts-selection`,
@@ -76,11 +82,6 @@ const WorkOrderDetailsPage = ({ params }) => {
     } else {
       console.error('Failed to update:', result.error)
     }
-  }
-
-  const handleFormSubmit = async (e) => {
-    e.preventDefault()
-    handleUpdateWorkOrder()
   }
 
   if (workOrderError) return <div>Error loading work order</div>
@@ -93,7 +94,7 @@ const WorkOrderDetailsPage = ({ params }) => {
   return (
     <div className="bg-white">
       <div className="mx-auto max-w-2xl px-4 pb-24 pt-16 sm:px-6 lg:max-w-7xl lg:px-8">
-        <h1 className='text-2xl'>Work Order Details Page {workOrderNumber}</h1>
+        <h1 className="text-2xl">Work Order Details Page {workOrderNumber}</h1>
         <form
           onSubmit={handleFormSubmit}
           className="mt-12 lg:grid lg:grid-cols-12 lg:items-start lg:gap-x-12 xl:gap-x-16"
@@ -113,7 +114,7 @@ const WorkOrderDetailsPage = ({ params }) => {
                 className={getButtonStyles(isFormFilled())}
                 onClick={handleFormSubmit}
               >
-              <ChevronRightIcon className={getIconStyles(isFormFilled())} />
+                <ChevronRightIcon className={getIconStyles(isFormFilled())} />
               </button>
             </div>
           </section>
