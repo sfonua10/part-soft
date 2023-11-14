@@ -38,10 +38,8 @@ export default function RequestPart() {
     const { name, value } = e.target
     const error = validateField(name, value)
 
-    // Update the vehicle state with the new value
     setVehicle((prev) => ({ ...prev, [name]: value }))
 
-    // Update the errors state for vehicle fields
     setErrors((prevErrors) => ({
       ...prevErrors,
       [name]: error,
@@ -60,12 +58,10 @@ export default function RequestPart() {
     const { name, value } = e.target
     const error = validateField(name, value)
 
-    // Update the parts state with the new value
     const newParts = [...parts]
     newParts[index][name] = value
     setParts(newParts)
 
-    // Update the errors state
     setErrors((prevErrors) => ({
       ...prevErrors,
       [index]: {
@@ -104,7 +100,6 @@ export default function RequestPart() {
         body: JSON.stringify(formData),
       })
 
-      // Handle the response
       const data = await response.json()
       if (!response.ok) {
         console.error('Server Error:', data.error)
@@ -112,7 +107,6 @@ export default function RequestPart() {
         return
       }
 
-      // Reset specific fields
       setWorkOrderNumber('')
       setParts([
         {
@@ -125,7 +119,6 @@ export default function RequestPart() {
       console.error('Error:', error)
     }
   }
-
   return (
     <div className="bg-white">
       <div className="mx-auto max-w-2xl px-4 pb-24 pt-16 sm:px-6 lg:max-w-7xl lg:px-8">

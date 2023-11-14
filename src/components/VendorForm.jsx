@@ -12,6 +12,18 @@ export default function VendorForm({ data }) {
     setSelectedVendor({})
     setOpen(true)
   }
+
+  const handleAddVendor = (newVendor) => {
+    setSelectedPeople(currentVendors => [...currentVendors, newVendor])
+  }
+
+  const handleUpdateVendor = (updatedVendor) => {
+    setSelectedPeople(currentVendors => 
+      currentVendors.map(vendor => 
+        vendor._id === updatedVendor._id ? updatedVendor : vendor
+      )
+    );
+  };
   
   useEffect(() => {
     if (data) {
@@ -33,6 +45,12 @@ export default function VendorForm({ data }) {
 
       if (response.ok) {
         console.log('Successfully deleted vendor:', responseData)
+        // Update the selectedPeople state to remove the deleted vendor
+        setSelectedPeople((currentVendors) =>
+          currentVendors.filter(
+            (vendor) => vendor.email !== vendorToDelete.email,
+          ),
+        )
         // Use mutate to re-fetch the data after successfully deleting a vendor
         mutate('/api/vendor-info')
       } else {
@@ -183,6 +201,8 @@ export default function VendorForm({ data }) {
         open={open}
         setOpen={setOpen}
         vendor={selectedVendor}
+        onAddVendor={handleAddVendor}
+        onUpdateVendor={handleUpdateVendor}
       />
     </>
   )

@@ -11,7 +11,7 @@ function isVehicleInfoMissing(vehicle) {
 export default function PartsRequestQueue() {
   const { data: session } = useSession()
   const userId = session?.user?.id
-  
+
   const endpointUrl = userId ? `/api/get-workorders?userId=${userId}` : null
 
   const { data: workOrders, error } = useSWR(endpointUrl, fetcher)
@@ -76,7 +76,6 @@ export default function PartsRequestQueue() {
                       ></span>
                     </>
                   )}
-
                 </div>
                 <label
                   htmlFor={id}
@@ -163,10 +162,8 @@ export default function PartsRequestQueue() {
                         {order.vehicle.make} {order.vehicle.model}
                         {order.vehicle.year} {order.vehicle.vin}
                         {isVehicleInfoMissing(order.vehicle) && (
-                          <div className="mt-2">
-                            <div className="flex items-center text-red-500">
-                              Missing required vehicle information
-                            </div>
+                          <div className="flex items-center text-red-500">
+                            Missing required vehicle information
                           </div>
                         )}
                       </td>

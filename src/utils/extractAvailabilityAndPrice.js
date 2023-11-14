@@ -12,5 +12,5 @@ function extractAvailabilityAndPrice(str) {
         return { code, availability, price };
     }
   
-    return { code: null, availability: null, price: null }; // default case
+    return { code: null, availability: null, price: null };
 }

@@ -3,6 +3,7 @@ import { useRouter } from 'next/navigation'
 import { Fragment, useState, useEffect } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { useSession } from 'next-auth/react'
+import { signIn } from 'next-auth/react'
 
 export default function OrganizationSelectModal() {
   const [open, setOpen] = useState(true)
@@ -42,6 +43,8 @@ export default function OrganizationSelectModal() {
       if (!response.ok) {
         throw new Error('Failed to update organization.')
       }
+
+      await signIn('email', { email: session.user.email, redirect: false });
 
       // Handle the success scenario here. e.g., show a success message, redirect, etc.
       setOpen(false)
