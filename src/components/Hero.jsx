@@ -29,7 +29,7 @@ export function Hero() {
       </h1>
       <p className="mx-auto mt-6 max-w-2xl text-lg tracking-tight text-slate-700">
         Finding the right truck parts can be cumbersome. PartSoft streamlines
-        the process, ensuring shops get what they need quickly and accurately.,
+        the process, ensuring shops get what they need quickly and accurately.
       </p>
       <div className="mt-10 flex justify-center gap-x-6">
         <Button href="/register">Try it now</Button>

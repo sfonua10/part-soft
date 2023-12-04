@@ -116,21 +116,21 @@ export default function ReviewMessageAndSend() {
               <legend className="sr-only">Select communication methods</legend>
               <div className="space-y-5">
                 {[
-                  // {
-                  //   id: 'email',
-                  //   label: 'Email',
-                  //   desc: 'Send notifications via Email.',
-                  // },
+                  {
+                    id: 'email',
+                    label: 'Email',
+                    desc: 'Send notifications via Email.',
+                  },
                   {
                     id: 'sms',
                     label: 'SMS',
                     desc: 'Send notifications via SMS.',
                   },
-                  // {
-                  //   id: 'voiceCall',
-                  //   label: 'Voice Call',
-                  //   desc: 'Automate voice calls to inform.',
-                  // },
+                  {
+                    id: 'voiceCall',
+                    label: 'Voice Call',
+                    desc: 'Automate voice calls to inform.',
+                  },
                 ].map((method) => (
                   <div key={method.id} className="relative flex items-start">
                     <div className="flex h-6 items-center">

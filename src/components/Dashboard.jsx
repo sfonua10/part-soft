@@ -20,7 +20,7 @@ export default function Dashboard() {
     error,
     isLoading,
   } = useSWR(endpointUrl, fetcher, {
-    refreshInterval: 30000,
+    refreshInterval: 1000000,
   })
   
   if (error) {
