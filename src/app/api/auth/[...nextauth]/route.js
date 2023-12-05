@@ -21,7 +21,7 @@ const handler = NextAuth({
           pass: process.env.SMTP_PASSWORD,
         },
       },
-      from: process.env.EMAIL_FROM,
+      from: process.env.EMAIL_FROM || 'saiafonua@gmail.com',
       sendVerificationRequest: sendVerificationRequest,
     }),
     GoogleProvider({
