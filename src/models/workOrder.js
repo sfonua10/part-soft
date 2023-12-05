@@ -23,7 +23,7 @@ const vendorResponseSchema = new mongoose.Schema({
   orderStatus: {
     type: String,
     enum: ['Pending', 'N/A', 'Confirmed', 'Cancelled'],
-    required: true,
+    // required: true,
   },
   price: {
     type: Number,
@@ -36,7 +36,7 @@ const vendorResponseSchema = new mongoose.Schema({
   partAvailable: {
     type: String,
     enum: ['yes', 'no', 'N/A', 'Pending'],
-    required: true,
+    // required: true,
   },
   code: {
     type: String,

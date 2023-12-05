@@ -16,6 +16,7 @@
     "@heroicons/react": "^2.0.18",
     "@tailwindcss/forms": "^0.5.6",
     "autoprefixer": "^10.4.12",
+    "aws-sdk": "^2.1511.0",
     "axios": "^1.5.1",
     "bcrypt": "^5.1.1",
     "clsx": "^1.2.1",
