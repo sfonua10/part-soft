@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const sendCommunication = async (method, vendorData, message) => {
+export const sendCommunication = async (method, vendorData, organizationName, message) => {
     let endpoint;
     let payload;
 
@@ -11,6 +11,7 @@ export const sendCommunication = async (method, vendorData, message) => {
                 _id: vendorData._id,
                 workOrderNumber: vendorData.workOrderNumber,
                 vehicle: vendorData.vehicle,
+                organizationName: organizationName,
                 part: {
                     _id: vendorData.parts._id,
                     partName: vendorData.parts.partName,

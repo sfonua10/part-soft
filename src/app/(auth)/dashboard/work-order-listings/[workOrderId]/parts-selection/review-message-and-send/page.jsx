@@ -6,6 +6,7 @@ import SendConfirmationModal from '@/components/WorkOrderListings/SendConfirmati
 import { ChevronLeftIcon } from '@heroicons/react/24/outline'
 import { sendCommunication } from '@/utils/communicationMethods'
 import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 
 import Link from 'next/link'
 const baseSendButtonStyles =
@@ -18,6 +19,7 @@ const getSendButtonStyles = (condition) => {
 }
 export default function ReviewMessageAndSend() {
   const router = useRouter()
+  const { data: session } = useSession()
   const [dataFromPreviousPage, setDataFromPreviousPage] = useState({})
   const [vendorData, setVendorData] = useState([])
   const [selectedPart, setSelectedPart] = useState({})
@@ -27,6 +29,7 @@ export default function ReviewMessageAndSend() {
     voiceCall: false,
   })
   const [modalOpen, setModalOpen] = useState(false)
+  const organizationName = session?.user?.organizationName;
 
   useEffect(() => {
     const workOrderData = JSON.parse(sessionStorage.getItem('workOrderDetails'))
@@ -60,7 +63,7 @@ export default function ReviewMessageAndSend() {
             vendors: [vendor],
           }
           try {
-            await sendCommunication(method, messageData, 'Your message here')
+            await sendCommunication(method, messageData, organizationName, 'Your message here')
             // Handle any post-send logic if necessary
             router.push('/dashboard')
           } catch (error) {
@@ -80,7 +83,6 @@ export default function ReviewMessageAndSend() {
   const isAnyMethodSelected = Object.values(communicationMethods).some(
     (value) => value,
   )
-
   return (
     <div className="mx-auto max-w-2xl px-4 pb-24 pt-16 sm:px-6 lg:max-w-7xl lg:px-8">
       <div className="mt-4 gap-12 lg:grid lg:grid-cols-12">
@@ -106,6 +108,7 @@ export default function ReviewMessageAndSend() {
             vendorData={vendorData}
             vehicle={dataFromPreviousPage.vehicle || {}}
             selectedPart={selectedPart}
+            organizationName={organizationName}
           />
 
           <div className="mt-6 rounded-md bg-gray-50 p-4">
@@ -126,11 +129,11 @@ export default function ReviewMessageAndSend() {
                     label: 'SMS',
                     desc: 'Send notifications via SMS.',
                   },
-                  {
-                    id: 'voiceCall',
-                    label: 'Voice Call',
-                    desc: 'Automate voice calls to inform.',
-                  },
+                  // {
+                  //   id: 'voiceCall',
+                  //   label: 'Voice Call',
+                  //   desc: 'Automate voice calls to inform.',
+                  // },
                 ].map((method) => (
                   <div key={method.id} className="relative flex items-start">
                     <div className="flex h-6 items-center">

@@ -5,6 +5,7 @@ const VendorMessage = ({
   vehicle,
   selectedPart,
   vendorData,
+  organizationName
 }) => {
   const vendorNames = selectedPart?.selectedVendors?.map((vendorId) => {
     const vendor = vendorData.find((v) => v._id === vendorId)
@@ -17,27 +18,25 @@ const VendorMessage = ({
     const partDescriptions = `
   Part Name: ${selectedPart.partName}
   Part Number: ${selectedPart.partNumber}
-  -----------`
-
-    const responseExamples = `Yes 124.99`
-
+  `
     return `
   Hi ${vendorsList},
   
-  We're requesting availability and pricing for the following part related to:
+  We're requesting availability and pricing for a part related to:
   
   Work Order: ${workOrderNumber}
   Make: ${vehicle.make}
   Model: ${vehicle.model}
   Year: ${vehicle.year}
   VIN: ${vehicle.vin}
-  
   ${partDescriptions}
-  
-  Example Reply: "${responseExamples}".
-  
+  Please click the link below to submit your response:
+  [URL link will be inserted here]
+
   Thanks,
-  Partsoft - Kacey Johnson
+
+  Kacey Johnson
+  ${organizationName}
   `
   }
 

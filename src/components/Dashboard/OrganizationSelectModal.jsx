@@ -15,7 +15,6 @@ export default function OrganizationSelectModal() {
   const organizations = [
     { _id: '620c1d4116a9b146ec3b595a', name: 'United Diesel Service' },
     { _id: '620c1d4116a9b146ec3b595b', name: 'Test' },
-    
   ]
   useEffect(() => {
     setSelectedOrganization(organizations[0]._id)
@@ -25,6 +24,10 @@ export default function OrganizationSelectModal() {
     if (!selectedOrganization) return
     setIsLoading(true)
     setError(null)
+
+  // Find the organization name
+  const organization = organizations.find(org => org._id === selectedOrganization);
+  const organizationName = organization ? organization.name : '';
 
     try {
       const response = await fetch('/api/update-organization', {
@@ -36,6 +39,7 @@ export default function OrganizationSelectModal() {
         body: JSON.stringify({
           userId: session.user.id,
           organizationId: selectedOrganization,
+          organizationName: organizationName
         }),
       })
 
