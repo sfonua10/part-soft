@@ -81,7 +81,7 @@ export async function POST(request) {
       const personalizedEmailContent = emailMessageTemplate(vendor)
 
       const emailParams = {
-        Source: process.env.EMAIL_FROM,
+        Source: process.env.EMAIL_FROM || 'saiafonua@gmail.com',
         Destination: {
           ToAddresses: [vendor.email],
         },
