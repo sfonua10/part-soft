@@ -1,3 +1,4 @@
+//REMOVE in February 2024 if not needed
 import { UniqueCodeState } from '@/models/workOrder'
 
 const allowedChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'

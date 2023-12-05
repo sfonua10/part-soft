@@ -3,9 +3,9 @@ import User from '@/models/user'
 
 export async function PATCH(req) {
   try {
-    const { userId, organizationId } = await req.json()
+    const { userId, organizationId, organizationName } = await req.json()
     
-    if (!userId || !organizationId) {
+    if (!userId || !organizationId || !organizationName) {
       return new Response(JSON.stringify({ error: 'Missing required fields' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' },
@@ -17,7 +17,7 @@ export async function PATCH(req) {
     // Update user's organizationId
     const updatedUser = await User.findByIdAndUpdate(
       userId,
-      { organizationId },
+      { organizationId, organizationName },
       { new: true }
     )
 

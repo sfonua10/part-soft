@@ -7,6 +7,10 @@ const UserSchema = new Schema({
     ref: 'Organization',
     default: null,
   },
+  organizationName: {
+    type: String,
+    default: null, // or set to a default value if you have one
+  },
   name: {
     type: String,
     default: null,

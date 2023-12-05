@@ -1,15 +1,15 @@
 const mongoose = require('mongoose');
 
 // UniqueCodeState Schema
-const uniqueCodeStateSchema = new mongoose.Schema({
-  currentIndex: {
-    type: Number,
-    default: 0,
-  },
-});
+// const uniqueCodeStateSchema = new mongoose.Schema({
+//   currentIndex: {
+//     type: Number,
+//     default: 0,
+//   },
+// });
 
-const UniqueCodeState = 
-  mongoose.models.UniqueCodeState || mongoose.model('UniqueCodeState', uniqueCodeStateSchema);
+// const UniqueCodeState = 
+//   mongoose.models.UniqueCodeState || mongoose.model('UniqueCodeState', uniqueCodeStateSchema);
 
 // Vendor Response Schema
 const vendorResponseSchema = new mongoose.Schema({
@@ -35,7 +35,7 @@ const vendorResponseSchema = new mongoose.Schema({
   },
   partAvailable: {
     type: String,
-    enum: ['yes', 'no', 'N/A'],
+    enum: ['yes', 'no', 'N/A', 'Pending'],
     required: true,
   },
   code: {
@@ -86,6 +86,10 @@ const workOrderSchema = new mongoose.Schema({
     ref: 'Organization',
     required: [true, 'Organization ID is required'],
   },
+  organizationName: {
+    type: String,
+    // required: [true, 'Organization Name is required'],
+  },
   workOrderNumber: {
     type: String,
     required: true,
@@ -123,4 +127,4 @@ const WorkOrder =
   mongoose.models.WorkOrder || mongoose.model('WorkOrder', workOrderSchema);
 
 export default WorkOrder;
-export { UniqueCodeState };
+// export { UniqueCodeState };

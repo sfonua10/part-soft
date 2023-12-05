@@ -39,6 +39,7 @@ const handler = NextAuth({
           session.user.name = sessionUser.name;
           session.user.image = sessionUser.image;
           session.user.organizationId =  sessionUser.organizationId || null;
+          session.user.organizationName = sessionUser.organizationName;
         } else {
           console.error('No user found in database');
         }
@@ -97,6 +98,7 @@ const handler = NextAuth({
 
             if (organizationId) {
               newUser.organizationId = organizationId
+              newUser.organizationName = organizationName
             }
 
             await User.create(newUser)

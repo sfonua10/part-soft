@@ -1,6 +1,6 @@
 import twilio from 'twilio'
 import WorkOrder from '@/models/workOrder'
-import { generateUniqueCode } from '@/utils/generateUniqueCode'
+// import { generateUniqueCode } from '@/utils/generateUniqueCode'
 
 export async function POST(request) {
   try {
@@ -9,24 +9,34 @@ export async function POST(request) {
     const accountSid = process.env.TWILIO_ACCOUNT_SID
     const authToken = process.env.TWILIO_AUTH_TOKEN
     const fromNumber = process.env.FROM_NUMBER
+    const formUrl =
+      'https://867f-2601-681-5902-7c0-8509-74cb-4d14-45e.ngrok-free.app/form'
 
     if (!accountSid || !authToken || !fromNumber) {
       throw new Error('Missing required environment variables')
     }
 
     const client = twilio(accountSid, authToken)
-    const { _id, workOrderNumber, vehicle, part, vendors } =
+    const { _id, workOrderNumber, vehicle, organizationName, part, vendors } =
       await request.json()
+    const { _id: partId, partName, partNumber } = part;
 
     console.log('Received request data:', {
       _id,
       workOrderNumber,
       vehicle,
+      organizationName,
       partName: part.partName,
       vendorsLength: vendors.length,
     })
 
-    const messageTemplate = (vendorName, uniqueCode) => `
+    const messageTemplate = (vendorName) => {
+      const encodedPartName = encodeURIComponent(partName)
+      const encodedPartNumber = encodeURIComponent(partNumber)
+      const encodedOrganizationName = encodeURIComponent(organizationName)
+      const encodedVendorName = encodeURIComponent(vendorName)
+      
+      return `
 Hi ${vendorName},
 
 We're requesting availability and pricing for a part related to:
@@ -39,25 +49,25 @@ VIN: ${vehicle.vin}
 
 Part Name: ${part.partName}
 Part Number: ${part.partNumber}
-Code: ${uniqueCode}
 
-To reply:
-- If available: Use the format "${uniqueCode} <space> Price", for example: "${uniqueCode} 124.99".
-- If not available: Reply with "${uniqueCode} no" or "${uniqueCode} n".
+Please click the link below to submit your response:
+${formUrl}?vendorName=${encodedVendorName}&organizationName=${encodedOrganizationName}&partName=${encodedPartName}&partNumber=${encodedPartNumber}&partId=${partId}&workOrderNumber=${workOrderNumber}
 
 Thanks,
-Partsoft - Kacey Johnson      
-    `
 
-    function prepareVendorResponse(vendorName, uniqueCode) {
+Kacey Johnson
+${organizationName}
+  `
+    }
+
+    function prepareVendorResponse(vendorName) {
       return {
         vendorName: vendorName,
         availability: 'Pending',
         orderStatus: 'N/A',
         price: null,
         delivery: null,
-        partAvailable: 'Pending',
-        code: uniqueCode,
+        partAvailable: 'N/A'
       }
     }
 
@@ -71,8 +81,8 @@ Partsoft - Kacey Johnson
       // This part has the potential to be slow if there are many vendors since it waits for DB
       // operations in a loop. Depending on your application needs and the number of vendors,
       // this may or may not be an issue.
-      const uniqueCode = await generateUniqueCode()
-      const personalizedMessage = messageTemplate(vendor.name, uniqueCode)
+
+      const personalizedMessage = messageTemplate(vendor.name)
       await client.messages.create({
         body: personalizedMessage,
         from: fromNumber,
@@ -80,7 +90,7 @@ Partsoft - Kacey Johnson
       })
 
       vendorResponsesToUpdate.push(
-        prepareVendorResponse(vendor.name, uniqueCode),
+        prepareVendorResponse(vendor.name),
       )
     }
     try {
