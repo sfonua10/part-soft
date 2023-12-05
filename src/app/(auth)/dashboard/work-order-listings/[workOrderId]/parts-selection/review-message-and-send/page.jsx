@@ -63,7 +63,7 @@ export default function ReviewMessageAndSend() {
             vendors: [vendor],
           }
           try {
-            await sendCommunication(method, messageData, organizationName, 'Your message here')
+            await sendCommunication(method, messageData, organizationName)
             // Handle any post-send logic if necessary
             router.push('/dashboard')
           } catch (error) {
@@ -80,9 +80,11 @@ export default function ReviewMessageAndSend() {
       [method]: !prevState[method],
     }))
   }
+
   const isAnyMethodSelected = Object.values(communicationMethods).some(
     (value) => value,
   )
+  
   return (
     <div className="mx-auto max-w-2xl px-4 pb-24 pt-16 sm:px-6 lg:max-w-7xl lg:px-8">
       <div className="mt-4 gap-12 lg:grid lg:grid-cols-12">

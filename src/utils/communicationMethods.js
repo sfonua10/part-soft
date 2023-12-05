@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const sendCommunication = async (method, vendorData, organizationName, message) => {
+export const sendCommunication = async (method, vendorData, organizationName) => {
     let endpoint;
     let payload;
 
@@ -22,8 +22,8 @@ export const sendCommunication = async (method, vendorData, organizationName, me
             break;
         
         case 'email':
-            endpoint = "/api/sendEmail";
-            payload = { vendorData, message };
+            endpoint = "/api/send-email";
+            payload = { vendorData, organizationName };
             break;
         // Add other cases as needed
         default:

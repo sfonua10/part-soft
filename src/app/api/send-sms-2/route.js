@@ -10,7 +10,7 @@ export async function POST(request) {
     const authToken = process.env.TWILIO_AUTH_TOKEN
     const fromNumber = process.env.FROM_NUMBER
     const formUrl =
-      'https://867f-2601-681-5902-7c0-8509-74cb-4d14-45e.ngrok-free.app/form'
+      'https://part-soft.vercel.app/form'
 
     if (!accountSid || !authToken || !fromNumber) {
       throw new Error('Missing required environment variables')
