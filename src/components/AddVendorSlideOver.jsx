@@ -102,11 +102,10 @@ export default function AddVendorSliderOver({
     if (validateForm(vendorData)) {
       let url, method
 
+      url = `/api/vendors`
       if (mode === 'edit' && vendor && vendor._id) {
-        url = `/api/edit-vendor`
         method = 'PUT'
       } else {
-        url = '/api/add-vendor'
         method = 'POST'
       }
 

@@ -18,10 +18,10 @@ const WorkOrderDetailsPage = ({ params }) => {
 
   const workOrderApiUrl =
     userId && workOrderNumber
-      ? `/api/get-workorders?workOrderId=${workOrderNumber}&userId=${userId}`
+      ? `/api/work-orders?workOrderId=${workOrderNumber}&userId=${userId}`
       : null
 
-  const vendorApiUrl = userId ? `/api/vendor-info?userId=${userId}` : null
+  const vendorApiUrl = userId ? `/api/vendors?userId=${userId}` : null
 
   const { data: workOrder, error: workOrderError } = useSWR(
     workOrderApiUrl,

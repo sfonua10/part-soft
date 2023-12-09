@@ -12,7 +12,7 @@ export default function Dashboard() {
   const userId = session?.user?.id
   
   // Define the endpoint URL with the userId as a query parameter
-  const endpointUrl = userId ? `/api/get-workorders?userId=${userId}` : null
+  const endpointUrl = userId ? `/api/work-orders?userId=${userId}` : null
 
   // Fetching work orders data
   const {
@@ -20,7 +20,7 @@ export default function Dashboard() {
     error,
     isLoading,
   } = useSWR(endpointUrl, fetcher, {
-    refreshInterval: 1000000,
+    refreshInterval: 10000000,
   })
   
   if (error) {
