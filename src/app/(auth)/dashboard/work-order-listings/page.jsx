@@ -12,7 +12,7 @@ export default function PartsRequestQueue() {
   const { data: session } = useSession()
   const userId = session?.user?.id
 
-  const endpointUrl = userId ? `/api/get-workorders?userId=${userId}` : null
+  const endpointUrl = userId ? `/api/work-orders?userId=${userId}` : null
 
   const { data: workOrders, error } = useSWR(endpointUrl, fetcher)
 

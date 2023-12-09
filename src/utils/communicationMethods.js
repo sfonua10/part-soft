@@ -6,7 +6,7 @@ export const sendCommunication = async (method, vendorData, organizationName) =>
 
     switch(method) {
         case 'sms':
-            endpoint = "/api/send-sms-2";
+            endpoint = "/api/send-sms";
             payload = {
                 _id: vendorData._id,
                 workOrderNumber: vendorData.workOrderNumber,

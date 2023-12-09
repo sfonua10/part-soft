@@ -58,7 +58,7 @@ export default function VendorTable({ data }) {
 
   const deleteAllWorkOrders = async () => {
     try {
-      const response = await fetch('/api/delete-all-workorders', {
+      const response = await fetch('/api/work-orders', {
         method: 'DELETE',
         header: {
           'Content-Type': 'application/json',

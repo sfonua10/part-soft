@@ -2,7 +2,7 @@
 
 export const updateWorkOrder = async (workOrderDetails) => {
   try {
-    const response = await fetch('/api/update-workorder', {
+    const response = await fetch('/api/work-orders', {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

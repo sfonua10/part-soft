@@ -33,7 +33,7 @@ export default function VendorForm({ data }) {
 
   const deleteVendor = async (vendorToDelete) => {
     try {
-      const response = await fetch('/api/delete-vendor', {
+      const response = await fetch('/api/vendors', {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -52,7 +52,7 @@ export default function VendorForm({ data }) {
           ),
         )
         // Use mutate to re-fetch the data after successfully deleting a vendor
-        mutate('/api/vendor-info')
+        mutate('/api/vendors')
       } else {
         console.error('Error deleting vendor:', responseData.message)
         // Handle the error in the UI, like showing an error message.
