@@ -21,15 +21,6 @@ export async function POST(request) {
       await request.json()
     const { _id: partId, partName, partNumber } = part;
 
-    console.log('Received request data:', {
-      _id,
-      workOrderNumber,
-      vehicle,
-      organizationName,
-      partName: part.partName,
-      vendorsLength: vendors.length,
-    })
-
     const messageTemplate = (vendorName) => {
       const encodedPartName = encodeURIComponent(partName)
       const encodedPartNumber = encodeURIComponent(partNumber)
@@ -113,8 +104,6 @@ ${organizationName}
         status: 500,
       })
     }
-
-    console.log('Updated notificationsSent and vendorResponses for the part.')
 
     console.log('Messages sent successfully.')
     return new Response(JSON.stringify({ message: 'Messages sent' }), {

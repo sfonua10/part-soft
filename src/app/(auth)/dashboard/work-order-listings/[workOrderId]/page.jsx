@@ -88,8 +88,8 @@ const WorkOrderDetailsPage = ({ params }) => {
   if (!workOrder) return <div>Loading...</div>
 
   const isFormFilled = () => {
-    return vehicle.make && vehicle.model && vehicle.year && vehicle.vin
-  }
+    return vehicle?.make && vehicle?.model && vehicle?.year && vehicle?.vin;
+  }  
 
   return (
     <div className="bg-white">
