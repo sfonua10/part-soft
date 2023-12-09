@@ -1,9 +1,8 @@
-import WorkOrder from '@/models/workOrder'
-import User from '@/models/user'
+import WorkOrder from '@/models/workOrder';
+import User from '@/models/user';
 
 export async function GET(request) {
   try {
-    // Get the user ID and work order ID from query parameters
     const url = new URL(request.url);
     const userId = url.searchParams.get('userId');
     const workOrderId = url.searchParams.get('workOrderId');
@@ -15,7 +14,7 @@ export async function GET(request) {
       });
     }
 
-    // Fetch the user's details from the database
+    // Fetch the user's details to get the organizationId
     const user = await User.findById(userId);
     if (!user) {
       return new Response(JSON.stringify({ message: 'User not found' }), {
@@ -23,13 +22,12 @@ export async function GET(request) {
         headers: { 'Content-Type': 'application/json' },
       });
     }
-    const organizationId = user.organizationId;
 
-    // If a specific workOrderId is provided, fetch that work order
     if (workOrderId) {
+      // Fetch the specific work order within the user's organization
       const workOrder = await WorkOrder.findOne({
         workOrderNumber: workOrderId,
-        organizationId: organizationId,  // Ensuring the work order belongs to the user's organization
+        organizationId: user.organizationId,
       });
 
       if (!workOrder) {
@@ -43,13 +41,9 @@ export async function GET(request) {
         status: 200,
         headers: { 'Content-Type': 'application/json' },
       });
-    }
-    // If no specific workOrderId is provided, fetch all work orders associated with the user's organization
-    else {
-      const workOrders = await WorkOrder.find({
-        organizationId: organizationId,  // Filtering by organization ID
-      });
-
+    } else {
+      // Fetch all work orders within the user's organization
+      const workOrders = await WorkOrder.find({ organizationId: user.organizationId });
       return new Response(JSON.stringify(workOrders), {
         status: 200,
         headers: { 'Content-Type': 'application/json' },

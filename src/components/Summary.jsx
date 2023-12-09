@@ -2,7 +2,7 @@ import React from 'react'
 
 const Summary = ({
   workOrderNumber,
-  vehicle,
+  vehicle = {},
   selectedPart = {},
   vendorData,
   parts,
@@ -41,7 +41,7 @@ const Summary = ({
                   {capitalizeFirstLetter(field)}
                 </dt>
                 <dd className="text-sm font-medium text-gray-900">
-                  {vehicle[field] || 'N/A'}
+                  {vehicle?.[field] || 'N/A'}
                 </dd>
               </div>
             ))}
