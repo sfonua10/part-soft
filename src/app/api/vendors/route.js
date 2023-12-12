@@ -3,6 +3,8 @@ import User from '@/models/user'
 import mongoose from 'mongoose'
 import { formatToE164 } from '@/utils/formatToE164'
 import { connectToDB } from '@/utils/database'
+// Ensure that the 'organizationId' field in the Vendor model is indexed
+Vendor.schema.index({ organizationId: 1 });
 
 export async function GET(request) {
   try {
@@ -16,8 +18,11 @@ export async function GET(request) {
       })
     }
 
-    const user = await User.findById(userId)
-
+    const user = await User.findById(userId).catch(err => {
+      console.error('Error fetching user:', err.message);
+      throw new Error('User fetch failed');
+    });
+    
     if (!user) {
       return new Response(JSON.stringify({ message: 'User not found' }), {
         status: 404,
@@ -37,7 +42,8 @@ export async function GET(request) {
       )
     }
 
-    const vendors = await Vendor.find({ organizationId: user.organizationId })
+    // Limit the fields returned for each vendor
+    const vendors = await Vendor.find({ organizationId: user.organizationId }).select('field1 field2')
 
     return new Response(JSON.stringify(vendors), {
       status: 200,
@@ -151,8 +157,12 @@ export async function DELETE(request) {
   const { _id } = await request.json()
 
   try {
-    const objectId = new mongoose.Types.ObjectId(_id)
-    const result = await Vendor.deleteOne({ _id: objectId })
+    const objectId = new mongoose.Types.ObjectId(_id);
+    const result = await Vendor.deleteOne({ _id: objectId }).catch(err => {
+      console.error('Error deleting vendor:', err.message);
+      throw new Error('Vendor deletion failed');
+    });
+    
 
     if (result.deletedCount > 0) {
       return new Response(

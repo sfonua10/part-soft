@@ -4,6 +4,7 @@ let isConnected = false; // track the connection
 
 export const connectToDB = async () => {
   mongoose.set('strictQuery', true);
+  mongoose.set('bufferCommands', false);
 
   if(isConnected) {
     console.log('MongoDB is already connected');
