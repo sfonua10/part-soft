@@ -6,6 +6,7 @@ const UserSchema = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Organization',
     default: null,
+    index: true
   },
   organizationName: {
     type: String,
@@ -14,6 +15,7 @@ const UserSchema = new Schema({
   name: {
     type: String,
     default: null,
+    index: true
   },
   email: {
     type: String,
@@ -35,6 +37,7 @@ const UserSchema = new Schema({
   role: {
     type: String,
     default: 'mechanic',
+    index: true
   },
   // ... (other fields)
 })

@@ -49,10 +49,12 @@ const partSchema = new mongoose.Schema({
   partName: {
     type: String,
     required: true,
+    index: true
   },
   partNumber: {
     type: String,
     required: true,
+    index: true
   },
   selectedVendors: [
     {
@@ -85,6 +87,7 @@ const workOrderSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Organization',
     required: [true, 'Organization ID is required'],
+    index: true
   },
   organizationName: {
     type: String,
@@ -93,6 +96,7 @@ const workOrderSchema = new mongoose.Schema({
   workOrderNumber: {
     type: String,
     required: true,
+    index: true
   },
   status: {
     type: String,
