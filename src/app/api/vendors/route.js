@@ -43,8 +43,9 @@ export async function GET(request) {
     }
 
     // Limit the fields returned for each vendor
-    const vendors = await Vendor.find({ organizationId: user.organizationId }).select('field1 field2')
-
+    const vendors = await Vendor.find({ organizationId: user.organizationId })
+    .select('_id name phone email primaryContact specialization');
+  
     return new Response(JSON.stringify(vendors), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },

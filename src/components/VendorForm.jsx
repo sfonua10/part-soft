@@ -140,7 +140,7 @@ export default function VendorForm({ data }) {
                   <tbody className="divide-y divide-gray-200 bg-white">
                     {selectedPeople?.map((vendor) => (
                       <tr
-                        key={vendor?.email}
+                        key={vendor?._id}
                         className={
                           selectedPeople?.includes(vendor)
                             ? 'bg-gray-50'
