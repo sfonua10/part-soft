@@ -26,7 +26,7 @@ export const connectToDB = async () => {
       dbName: "partsoft",
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      serverSelectionTimeoutMS: 15000, // Extend the server selection timeout
+      serverSelectionTimeoutMS: 30000, // Extend the server selection timeout
       socketTimeoutMS: 45000, // Extend the socket timeout
     });
 
