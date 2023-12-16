@@ -29,6 +29,11 @@ const handler = NextAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
   ],
+  session: {
+    strategy: "database",
+    maxAge: 24 * 60 * 60, // 24 hours in seconds
+    updateAge: 24 * 60 * 60, // Update the session in the database every 24 hours
+  },
   callbacks: {
     async session({ session }) {
       if (session?.user?.email) {
