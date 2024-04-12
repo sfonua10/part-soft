@@ -81,13 +81,13 @@ const handler = NextAuth({
         }
 
         // Restrict access based on the email domain
-        if (
-          !specificAllowedEmails.includes(email) &&
-          !email.endsWith('@uniteddieselservice.net')
-        ) {
-          console.error('Email not allowed for sign-in')
-          return false
-        }
+        // if (
+        //   !specificAllowedEmails.includes(email) &&
+        //   !email.endsWith('@uniteddieselservice.net')
+        // ) {
+        //   console.error('Email not allowed for sign-in')
+        //   return false
+        // }
 
         // Check if the user email exists in the database
         if (email) {
