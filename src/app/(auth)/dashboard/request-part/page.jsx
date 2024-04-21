@@ -6,6 +6,8 @@ import { PlusCircleIcon } from '@heroicons/react/24/outline'
 import PartRequestSection from '@/components/RequestPart/PartRequestSection'
 import SuccessModal from '@/components/RequestPart/SuccessModal'
 import Summary from '@/components/Summary'
+import { useMutation } from 'convex/react'
+import { api } from '../../../../../convex/_generated/api'
 
 export default function RequestPart() {
   const [vehicle, setVehicle] = useState({
@@ -77,9 +79,19 @@ export default function RequestPart() {
     setParts(newParts)
   }
 
+  const createWorkorder = useMutation(api.workorders.createWorkorder)
+
   const handleSubmit = async (event) => {
     event.preventDefault()
-
+    await createWorkorder({
+      orgId: session?.user?.organizationId,
+      workOrderNumber,
+      parts: parts.map((part) => ({
+        partName: part['part-name'],
+        partNumber: part['part-number'],
+      })),
+      mechanicName: session?.user?.name,
+    })
     const formData = {
       organizationId: session?.user?.organizationId,
       workOrderNumber,
