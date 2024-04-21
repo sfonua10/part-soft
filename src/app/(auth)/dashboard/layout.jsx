@@ -5,15 +5,13 @@ import { usePathname } from 'next/navigation'
 import { useSession, signOut } from 'next-auth/react'
 import { Fragment, useState } from 'react'
 import { Dialog, Transition, Menu } from '@headlessui/react'
-import {
-  Bars3Icon,
-  XMarkIcon,
-} from '@heroicons/react/24/outline'
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import { SidebarContext } from './sidebar-provider'
-import { Logo } from '@/components/Logo'
-import { useNavigation } from '@/hooks/useNavigation'
-import { classNames } from '@/utils/classNames'
+import { Logo } from '../../../components/Logo'
+import { useNavigation } from '../../../hooks/useNavigation'
+import { classNames } from '../../../utils/classNames'
+import ConvexClientProvider from '../../../contexts/ConvexClientProvider'
 
 export default function DashboardLayout({ children }) {
   const userNavigation = [
@@ -24,7 +22,7 @@ export default function DashboardLayout({ children }) {
   const { data: session } = useSession()
 
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const navigation = useNavigation(session, pathname);
+  const navigation = useNavigation(session, pathname)
 
   function handleSignOut() {
     signOut({ callbackUrl: '/' })
@@ -177,7 +175,7 @@ export default function DashboardLayout({ children }) {
                     ))}
                   </ul>
                 </li>
-                
+
                 <li className="-mx-6 mt-auto">
                   <a
                     href="/dashboard/user-profile"
@@ -338,14 +336,15 @@ export default function DashboardLayout({ children }) {
 
           <main className="py-10">
             <div className="px-4 sm:px-6 lg:px-8">
-              <SidebarContext.Provider value={{
-                isOpen: sidebarOpen,
-                toggleOpen: () => setSidebarOpen((x) => !x)
-              }}>
-
-              {children}
+              <SidebarContext.Provider
+                value={{
+                  isOpen: sidebarOpen,
+                  toggleOpen: () => setSidebarOpen((x) => !x),
+                }}
+              >
+                <ConvexClientProvider>{children}</ConvexClientProvider>
               </SidebarContext.Provider>
-              </div>
+            </div>
           </main>
         </div>
       </div>
