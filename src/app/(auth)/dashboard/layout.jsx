@@ -11,7 +11,7 @@ import { SidebarContext } from './sidebar-provider'
 import { Logo } from '../../../components/Logo'
 import { useNavigation } from '../../../hooks/useNavigation'
 import { classNames } from '../../../utils/classNames'
-import ConvexClientProvider from '../../../contexts/ConvexClientProvider'
+import ConvexClientProvider from '../../ConvexClientProvider'
 
 export default function DashboardLayout({ children }) {
   const userNavigation = [
