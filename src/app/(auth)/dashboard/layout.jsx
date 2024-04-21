@@ -8,10 +8,10 @@ import { Dialog, Transition, Menu } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import { SidebarContext } from './sidebar-provider'
-import { Logo } from '@/components/Logo'
-import { useNavigation } from '@/hooks/useNavigation'
-import { classNames } from '@/utils/classNames'
-import ConvexClientProvider from '@/app/ConvexClientProvider'
+import { Logo } from '../../../components/Logo'
+import { useNavigation } from '../../../hooks/useNavigation'
+import { classNames } from '../../../utils/classNames'
+import ConvexClientProvider from '../../../contexts/ConvexClientProvider'
 
 export default function DashboardLayout({ children }) {
   const userNavigation = [
